@@ -1,0 +1,10 @@
+*~
+*.pdf
+*.ps
+*.dSYM
+*.o
+test/*
+testprog/*
+man/*
+utpdf
+.DS_Store
