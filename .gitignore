@@ -3,9 +3,11 @@
 *.ps
 *.dSYM
 *.o
+*.svg
 test/*
 testprog/*
 man/*
+memo/*
 utps
 utpdf
 .DS_Store
