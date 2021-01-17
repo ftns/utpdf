@@ -6,5 +6,6 @@
 test/*
 testprog/*
 man/*
+utps
 utpdf
 .DS_Store

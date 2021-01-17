@@ -5,6 +5,9 @@ LDFLAGS = -lm
 PCMAIN = `pkg-config pangocairo --cflags --libs`
 PCOBJ  = `pkg-config pangocairo --cflags`
 
+all: utpdf
+	ln utpdf utps
+
 utpdf: utpdf.c utpdf.h paper.h drawing.h drawing.o coord.o io.o usage.o paper.o
 	$(CC) $(CFLAGS) $(PCMAIN) ${LDFLAGS} -o utpdf drawing.o coord.o io.o usage.o paper.o utpdf.c
 
@@ -28,3 +31,6 @@ paper.o: paper.c paper.h
 
 clean:
 	rm -r *~ *.o *.dSYM
+
+realclean:
+	rm -r *~ *.o *.dSYM utpdf utps
