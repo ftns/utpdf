@@ -55,7 +55,7 @@ int chk_sw(char *str, char *positive, char *negative) {
     else if (strncmp(str, positive, 8)==0) { return 1; }
     else if (strncmp(str, negative, 8)==0) { return 0; }
     else {
-        USAGE("argument must be \'%s\'/\'%s\'\n", positive, negative);
+        USAGE("argument must be \"%s\" or \"%s\"\n", positive, negative);
         return -1;
     }
 }
@@ -100,7 +100,8 @@ int main(int argc, char** argv){
     enum i_option
     { i_help, i_inch, i_mm, i_binding, i_outer, i_top, i_bottom, i_divide, 
       i_hfont, i_hsize, i_notebk, i_datefmt, i_headtxt, i_version, i_header,
-      i_fold_a, i_time_s, i_border, i_punch, i_number, i_binddir, i_END };
+      i_fold_a, i_time_s, i_border, i_punch, i_number, i_binddir, i_side,
+      i_unit, i_END };
 
     struct option long_options[] = {
 	/* i_help    */ { "help",        no_argument,          0, 'h'},
@@ -124,6 +125,8 @@ int main(int argc, char** argv){
         /* i_punch   */ { "punch",       optional_argument,    0,  0 },
         /* i_number  */ { "number",      optional_argument,    0,  0 },
         /* i_binddir */ { "binddir",     required_argument,    0,  0 },
+        /* i_side    */ { "side",        required_argument,    0,  0 },
+        /* i_unit    */ { "unit",        required_argument,    0,  0 },
 	/* i_END     */ { 0, 0, 0, 0 },
     };
     int lindex;
@@ -194,6 +197,10 @@ int main(int argc, char** argv){
                 arg->punchmark = chk_onoff(optarg); break;
             case i_number:
                 arg->numbering = chk_onoff(optarg); break;
+            case i_side:
+                arg->twosides = chk_sw(optarg, "2", "1"); break;
+            case i_unit:
+                inch = chk_sw(optarg, "inch", "mm"); break;
 	    } // switch (lindex)
 	} else {
 	    // short option

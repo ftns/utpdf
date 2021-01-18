@@ -89,16 +89,26 @@ void help(){
             
             close(0);
             dup(p2c_pipe[0]);   // stdin(0)->p2c_pipe[0]
-            close(p2c_pipe[1]); //   p2c_pipe[1] is for parent
+            close(p2c_pipe[1]); // p2c_pipe[1] is for parent
             
             kick_pager(pager);
+
+            if ((errno==EPERM)||(errno==ENOENT)) {
+                // EPERM (1): Operation not permitted.
+                // ENOENT(2): No such file or directory.
+                help_message(STDERR_FILENO);
+                exit(1);
+            } else {
+                perror("execvp()");
+                exit(1);
+            }                
         } else {
             // parent process
             close (p2c_pipe[0]); //   p2c_pipe[0] is for child
 
             help_message(p2c_pipe[1]);
             if (wait(&status)<0){
-                perror("wait");
+                perror("wait()");
                 exit(1);
             }
             exit(1);
@@ -143,8 +153,8 @@ void help_message(int fd){
     fprintf(f, "    -V --version         show version\n");
     fprintf(f, "    \n");
     fprintf(f, "  length unit:\n");
-    fprintf(f, "    --inch               unit is inch\n");
-    fprintf(f, "    --mm                 unit is mm (defalt)      \n");
+    fprintf(f, "    --inch --unit=inch   unit is inch\n");
+    fprintf(f, "    --mm   --unit=mm     unit is mm (defalt)      \n");
     fprintf(f, "  header:\n");
     fprintf(f, "    --header[=on/off]    header on/off (default: on)\n");
     fprintf(f, "    --header-font=<fontname> header font\n");

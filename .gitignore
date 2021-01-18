@@ -1,3 +1,5 @@
+.DS_Store
+._*
 *~
 *.pdf
 *.ps
@@ -10,4 +12,4 @@ man/*
 memo/*
 utps
 utpdf
-.DS_Store
+usage

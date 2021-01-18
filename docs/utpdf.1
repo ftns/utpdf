@@ -1,0 +1,155 @@
+.\"
+.Dd January 18, 2021
+.Os User Commands
+.Dt UTPDF,UTPS 1
+.Sh NAME
+.Nm utpdf ,
+.Nm utps
+.Nd margin-aware converter from utf-8 text to PDF/PostScript
+.Sh SYNOPSIS
+.Nm utpdf/utps
+.Op Ar options
+.Pa file(s)
+.\"
+.Sh DESCRIPTION
+.Nm utpdf/utps
+converts utf-8 text files or standard input to PDF/Postscript.
+By default, the PDF output is stored in files with
+.Pa ".pdf"
+suffix,
+PostScript output is sent to standard output.
+.Pp
+.Nm utpdf/utps
+set suitable margins with simplex/duplex, portrait/landscape,
+long edge binded/short edge binded printing.
+So printed papers are filed correctly in binder.
+.Pp
+.Nm utpdf/utps
+shows timestamp on the header. By default, it is
+a modification time of files. If you specified by
+.Fl -timestamp=cur
+option, or input is standard input, the timestamp is current time.
+.\"
+.Sh OPTIONS
+.Ss printing:
+.Bl -tag -width indent
+.It Fl b, -border[=on/off]
+draw border
+.It Fl B Ar point
+space between lines (default: 1.0pt)
+.It Fl m, -punch[=on/off]
+show punch mark (default: off)
+.It Fl n, -number[=on/off]
+show line number (default: off)
+.It Fl -notebook[=on/off]
+show baselines like notebook (default: off)
+.It Fl -fold-arrow[=on/off]
+show arrow indicate folded line (default: on)
+.It Fl -t Ar #
+tab width (default: 8)
+.It Fl -timestamp=mod/cur
+timestamp: file modified time/current time
+(file default: modified time/stdin: current time only)
+.It Fl F Ar fontname
+body font (default: IPAGothic)
+.It Fl S Ar fontsize
+font size in pt.
+(default: oneside 9.8pt./twoside 6.6pt.)
+.El
+.Ss paper:
+.Bl -tag -width indent
+.It Fl P Ar a3/a4/a5/b4/b5/b6/letter/legal
+paper size (default: a4)
+.It Fl d, -duplex[=on]
+duplex printing(default)
+.It Fl s -duplex=off
+simplex printing
+.It Fl l
+landscape
+.It Fl p
+portrait(default)
+.It Fl 1 -side=1
+one side per page (portrait default)
+.It Fl 2 -side=2\/
+two sides per page (landscape default)
+.It Fl -binddir= Ar l/s/n
+bind long edge/short edge/none
+(portrait default: long edge/landscape default: short edge)
+.El
+.Ss misc:
+.Bl -tag -width indent
+.It Fl o Ar filename
+output file name
+.It Fl h, -help
+show this message
+.It Fl V, -version
+show version
+.El
+.Ss length unit:
+.Bl -tag -width indent
+.It Fl -inch
+unit is inch
+.It Fl -mm
+unit is mm (defalt)
+.El
+.Ss header:
+.Bl -tag -width indent
+.It Fl -header[=on/off]
+header on/off (default: on)
+.It Fl -header-font= Ar fontname
+header font (default: sans-serif)
+.It Fl -header-size= Ar fontsize
+header font size (default: oneside 16.0pt./twoside 9.0pt.)
+.It Fl -header-text= Ar text
+header center text (default: filename)
+.It Fl -date-format= Ar format
+date format in
+.Li strftime(3)
+(default: %m/%d/%y %H:%M)
+.El
+.Ss margins:
+.Bl -tag -width indent
+.It Fl -binding= Ar length
+binding margin (default: 25.4mm/1.0inch)
+.It Fl -outer= Ar length
+outer margin   (default: 12.7mm/0.5inch)
+.It Fl -top= Ar length
+top margin     (default: 12.7mm/0.5inch)
+.It Fl -bottom= Ar length
+bottom margin  (default: 12.7mm/0.5inch)
+.It Fl -divide= Ar length
+distance between two sides (default: 6.3mm/0.2inch)
+.El
+.\"
+.Sh EXAMPLES
+Most simple example:
+.Dl $ utpdf foo.c
+makes one pdf file,
+.Pa foo.c.pdf.
+.Pp
+Another example:
+.Dl $ utpdf foo.c bar.c
+makes two pdf files,
+,Pa foo.c.pdf, bar.c.pdf.
+however:
+.Dl $ utpdf foo.c bar.c -o baz.pdf
+makes only one pdf file,
+.Pa baz.pdf,
+which contain
+.Pa foo.c
+and
+.Pa bar.c.
+.Pp
+If you want print file:
+.Dl $ utps foo.c | lpr
+so
+.Pa foo.c
+will be printed by default printer.
+If the printer has duplex printing capability,
+.Pa foo.c
+is printed by two-sided per paper. If you dare to want to print by one-sided
+per paper:
+.Dl $ utps -s foo.c | lpr
+.\"
+.Sh BUGS
+This program is tested only in Japanese environment(ja_JP.UTF-8).
