@@ -94,11 +94,12 @@ enum direction { d_none, d_up, d_down, d_right, d_left  };
 struct arguments {
     // option flags
     int twosides, numbering, noheader, punchmark, duplex, portrait, longedge;
-    int tab, notebook, fold_arrow, border;
+    int tab, notebook, fold_arrow, border, current_t, one_output, inch;
     // option strings
-    char *fontname, *headerfont, *in_fname, *date_format, *headertext;
+    char *fontname, *headerfont, *in_fname, *date_format, *headertext, *outfile;
+    char *binding_dir, *paper;
     // option length
-    double fontsize, hfont_large, hfont_medium, header_height;
+    double fontsize, hfont_large, hfont_medium, header_height, headersize;
     // paper size and margins
     double pwidth, pheight, binding, outer, ptop, pbottom, divide, betweenline;
     // file modified time

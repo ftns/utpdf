@@ -69,7 +69,7 @@ void help(){
     int p2c_pipe[2];
     char *pager=getenv(PAGER_ENV);
 
-    if (pager==NULL) {
+    if ((pager==NULL)||(pager[0]=='\0')) {
         help_message(STDERR_FILENO);
     } else {
         if (pipe(p2c_pipe)!=0){
@@ -85,8 +85,7 @@ void help(){
         // parent write -> p2c_pipe[1] -> p2c_pipe[0] -> child's stdin
         //
         if (pid==0) {
-            // child process
-            
+            // child process            
             close(0);
             dup(p2c_pipe[0]);   // stdin(0)->p2c_pipe[0]
             close(p2c_pipe[1]); // p2c_pipe[1] is for parent
@@ -138,33 +137,32 @@ void help_message(int fd){
             FONTSIZE, FONTSIZE_TWOSIDES);
     fprintf(f, "  paper:\n");
     fprintf(f, "    -P a3/a4/a5/b4/b5/b6/letter/legal\n");
-    fprintf(f, "                         paper size (default: %s)\n", paper_default());
-    fprintf(f, "    -d --duplex[=on]     duplex printing(default)\n");
-    fprintf(f, "    -s --duplex=off      simplex printing\n");
-    fprintf(f, "    -l                   landscape\n");
-    fprintf(f, "    -p                   portrait(default)\n");
-    fprintf(f, "    -1 --side=1          one side per page (portrait default)\n");
-    fprintf(f, "    -2 --side=2          two sides per page (landscape default) \n");
-    fprintf(f, "    --binddir=l/s/n      bind long edge/short edge/none\n");
+    fprintf(f, "                       paper size (default: %s)\n", paper_default());
+    fprintf(f, "    -d, --duplex[=on]  duplex printing(default)\n");
+    fprintf(f, "    -s, --duplex=off   simplex printing\n");
+    fprintf(f, "    -l, --mat=l        landscape\n");
+    fprintf(f, "    -p, --mat=p        portrait(default)\n");
+    fprintf(f, "    -1 --side=1        one side per page (portrait default)\n");
+    fprintf(f, "    -2 --side=2        two sides per page (landscape default) \n");
+    fprintf(f, "    --binddir=l/s/n    bind long edge/short edge/none\n");
     fprintf(f, "                   (portrait default: long edge/landscape default: short edge)\n");
     fprintf(f, "  misc:\n");
-    fprintf(f, "    -o <filename>        output file name\n");
-    fprintf(f, "    -h --help            show this message\n");
-    fprintf(f, "    -V --version         show version\n");
+    fprintf(f, "    -o <filename>      output file name\n");
+    fprintf(f, "    -h --help          show this message\n");
+    fprintf(f, "    -V --version       show version\n");
     fprintf(f, "    \n");
     fprintf(f, "  length unit:\n");
-    fprintf(f, "    --inch --unit=inch   unit is inch\n");
-    fprintf(f, "    --mm   --unit=mm     unit is mm (defalt)      \n");
+    fprintf(f, "    --inch, --unit=inch   unit is inch\n");
+    fprintf(f, "    --mm, --unit=mm       unit is mm (defalt)\n");
     fprintf(f, "  header:\n");
-    fprintf(f, "    --header[=on/off]    header on/off (default: on)\n");
-    fprintf(f, "    --header-font=<fontname> header font\n");
-    fprintf(f, "                         (default: sans-serif)\n");
+    fprintf(f, "    --header[=on/off]        header on/off (default: on)\n");
+    fprintf(f, "    --header-font=<fontname> header font (default: sans-serif)\n");
     fprintf(f, "    --header-size=<fontsize> header font size\n");
-    fprintf(f, "                         (default: oneside %1.1fpt./twoside %1.1fpt.)\n",
+    fprintf(f, "                             (default: oneside %1.1fpt./twoside %1.1fpt.)\n",
             HFONT_LARGE, HFONT_TWOSIDE_LARGE);
-    fprintf(f, "    --header-text=<text> header center text (default: filename)\n");
-    fprintf(f, "    --date-format=<format> \n");
-    fprintf(f, "                         date format in strftime(3) (default: %s)\n",
+    fprintf(f, "    --header-text=<text>     header center text (default: filename)\n");
+    fprintf(f, "    --date-format=<format>   date format in strftime(3)\n");
+    fprintf(f, "                             (default: %s)\n",
             DATE_FORMAT);
     fprintf(f, "  margins:\n");
     fprintf(f, "    --binding=<length>   binding margin (default: %2.1fmm/%1.1finch)\n",
@@ -183,13 +181,9 @@ void help_message(int fd){
 
 void usage(char *message){
     if (message != NULL){
-        if (errno != 0){
-            perror(message);
-        } else {
-            fprintf(stderr, "%s\n", message);
-        }
+        fprintf(stderr, "%s\n", message);
     }
-    fprintf(stderr, "\nUsage: %s [-12bBdFlmnstSPp...] <utf8_textfile> ...\n", prog_name);
+    fprintf(stderr, "Usage: %s [-12bBdFlmnstSPp...] <utf8_textfile> ...\n", prog_name);
     fprintf(stderr, "For more detail, %s -h\n", prog_name);
     exit(1);
 }

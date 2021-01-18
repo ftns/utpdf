@@ -5,7 +5,7 @@ LDFLAGS = -lm
 PCMAIN = `pkg-config pangocairo --cflags --libs`
 PCOBJ  = `pkg-config pangocairo --cflags`
 
-OBJECTS = drawing.o coord.o io.o usage.o paper.o
+OBJECTS = drawing.o coord.o io.o usage.o paper.o args.o
 
 all: utpdf
 	rm -f utps
@@ -20,8 +20,9 @@ $(OBJECTS):%.o:%.c
 drawing.o: drawing.c drawing.h coord.h utpdf.h io.h
 coord.o: coord.c coord.h utpdf.h
 io.o: io.c io.h
-usage.o: usage.c utpdf.h paper.h
+usage.o: usage.c usage.h utpdf.h paper.h
 paper.o: paper.c paper.h
+args.o: args.c args.h utpdf.h
 
 usage: usage.c utpdf.h paper.o
 	$(CC) $(CFLAGS) ${PCMAIN} -DSINGLE_DEBUG -o $@ paper.o $@.c

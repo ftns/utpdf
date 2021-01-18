@@ -1,0 +1,315 @@
+/*
+  margin-aware converter from utf-8 text to PDF/PostScript
+  utpdf utps
+
+  Copyright (c) 2021 by Akihiro SHIMIZU
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+#include "utpdf.h"
+#include "args.h"
+#include "paper.h"
+#include "usage.h"
+
+enum i_option
+{ i_help, i_inch, i_mm, i_binding, i_outer, i_top, i_bottom, i_divide, 
+  i_hfont, i_hsize, i_notebk, i_datefmt, i_headtxt, i_version, i_header,
+  i_fold_a, i_time_s, i_border, i_punch, i_number, i_binddir, i_side,
+  i_unit, i_mat, i_END };
+
+
+void parser(struct arguments *args, int short_index, int long_index, char *argstr){
+    if (short_index == 0) {
+        // long option
+        switch (long_index) {
+        case i_binddir:
+            args->binding_dir=argstr;
+            break;
+        case i_binding:
+            if (sscanf(argstr, "%lf", &args->binding)<1) {
+                USAGE("--binding argument:%s was wrong. \nExample: --binding=25.4\n", argstr);
+            }
+            break;
+        case i_outer:
+            if (sscanf(argstr, "%lf", &args->outer)<1) {
+                USAGE("--outer argument:%s was wrong. \nExample: --outer=12.7\n", argstr);
+            }
+            break;
+        case i_top:
+            if (sscanf(argstr, "%lf", &args->ptop)<1) {
+                USAGE("--top argument:%s was wrong. \nExample: --top=12.7\n", argstr);
+            }
+            break;
+        case i_bottom:
+            if (sscanf(argstr, "%lf", &args->pbottom)<1) {
+                USAGE("--bottom argument:%s was wrong. \nExample: --bottom=12.7\n", argstr);
+            }
+            break;
+        case i_divide:
+            if (sscanf(argstr, "%lf", &args->divide)<1) {
+                USAGE("--divide argument:%s was wrong. \nExample: --divide=12.7\n", argstr);
+            }
+            break;
+        case i_hfont:
+            args->headerfont = argstr; break;
+        case i_hsize:
+            if (sscanf(argstr, "%lf", &args->headersize)<1)  {
+                USAGE("--header-size argument:%s was wrong. \nExample: --header-size=12.0\n", argstr);
+            }
+            break;
+        case i_notebk:
+            args->notebook = chk_onoff(argstr); break;
+        case i_datefmt:
+            args->date_format = argstr; break;
+        case i_headtxt:
+            args->headertext = argstr; break;
+        case i_header:
+            args->noheader = !chk_onoff(argstr); break;
+        case i_fold_a:
+            args->fold_arrow = chk_onoff(argstr); break;
+        case i_time_s:
+            args->current_t = chk_sw(argstr, "cur", "mod"); break;
+        case i_border:
+            args->border = chk_onoff(argstr); break;
+        case i_punch:
+            args->punchmark = chk_onoff(argstr); break;
+        case i_number:
+            args->numbering = chk_onoff(argstr); break;
+        case i_side:
+            args->twosides = chk_sw(argstr, "2", "1"); break;
+        case i_unit:
+            args->inch = chk_sw(argstr, "inch", "mm"); break;
+        case i_mat:
+            args->portrait = chk_sw(argstr, "p", "l"); break;
+        } // switch (lindex)
+    } else {
+        // short option
+        switch (short_index) {
+        case '1':
+            args->twosides=0; break;
+        case '2':
+            args->twosides=1; break;
+        case 'b':
+            args->border = 1; break;
+        case 'B':
+            if (sscanf(argstr, "%lf", &args->betweenline)<1) {
+                USAGE("-B:(space between lines) argument:%s was wrong.\nExample: -B 1.5\n", argstr);
+            }
+            break;
+        case 'd':
+            args->duplex=1; break;
+        case 'F':
+            args->fontname = argstr; break;	
+        case 'h':
+            help(); break;
+        case 'H':
+            args->noheader=1; break;
+        case 'l':
+            args->portrait=0; break;	
+        case 'm':
+            args->punchmark=1; break;
+        case 'n':
+            args->numbering=1; break;
+        case 'o':
+            args->outfile = argstr; args->one_output=1; break;
+        case 'p':
+            args->portrait=1; break;
+        case 'P':
+            args->paper = argstr; break;
+        case 's':
+            args->duplex=0; break;
+        case 'S':
+            if (sscanf(argstr, "%lf", &args->fontsize)<1) {
+                USAGE("-S:(font size in pt.) argument:\"%s\" was wrong.\nExample: -S 12.0\n", argstr);
+            }
+            break;
+        case 't':
+            if (sscanf(argstr, "%d", &(args->tab))<1) {
+                USAGE("-t:(tab width) argument:\"%s\" was wrong.\nExample: -t 8\n", argstr);
+            }
+            break;
+        case 'V':
+            version(); break;
+        default:
+            // error
+            usage(NULL);
+        } // switch(opt)
+    }
+}
+
+
+struct arguments *getargs(int argc, char **argv){
+    static time_t mtime_store;
+    static struct arguments args_store={
+        // option flags
+	.twosides=-1, .numbering=0, .noheader=0, .punchmark=0, .duplex=1,
+	.portrait=1, .longedge=0, .tab=TAB, .notebook=0, .fold_arrow=1,
+        .border=0, .current_t=0, .one_output=0, .inch=0,
+        // option strings
+	.fontname=NULL, .headerfont=NULL, /* in_fname, */ .date_format=DATE_FORMAT,
+        .headertext=NULL, .outfile=NULL, .binding_dir=NULL, .paper=NULL,
+        // option length
+	.fontsize=0.0, .hfont_large=0, /* hfont_medium, header_height, */ .headersize=0.0,
+        // paper size and margins
+        /* pwidth, pheight, */ .binding=0.0, .outer=0.0, 
+	.ptop=0.0, .pbottom=0.0, .divide=0.0, .betweenline=BETWEEN_L,
+        // file modified time
+        .mtime=&mtime_store
+    };
+    struct arguments *args=&args_store;
+    
+    struct option long_options[] = {
+	/* i_help    */ { "help",        no_argument,          0, 'h'},
+	/* i_inch    */ { "inch",        no_argument, &args->inch, 1 },
+	/* i_mm      */ { "mm",          no_argument, &args->inch, 0 },
+	/* i_binding */ { "binding",     required_argument,    0,  0 },
+	/* i_outer   */ { "outer",       required_argument,    0,  0 },
+	/* i_top     */ { "top",         required_argument,    0,  0 },
+	/* i_bottom  */ { "bottom",      required_argument,    0,  0 },
+	/* i_divide  */ { "divide",      required_argument,    0,  0 },
+	/* i_hfont   */ { "header-font", required_argument,    0,  0 },
+	/* i_hsize   */ { "header-size", required_argument,    0,  0 },        
+	/* i_notebk  */ { "notebook",    optional_argument,    0,  0 },
+	/* i_datefmt */ { "date-format", required_argument,    0,  0 },
+	/* i_headtxt */ { "header-text", required_argument,    0,  0 },
+	/* i_version */ { "version",     no_argument,          0, 'V'},
+        /* i_header  */ { "header",      optional_argument,    0,  0 },
+        /* i_fold_a  */ { "fold-arrow",  optional_argument,    0,  0 },
+        /* i_time_s  */ { "timestamp",   required_argument,    0,  0 },
+        /* i_border  */ { "border",      optional_argument,    0,  0 },
+        /* i_punch   */ { "punch",       optional_argument,    0,  0 },
+        /* i_number  */ { "number",      optional_argument,    0,  0 },
+        /* i_binddir */ { "binddir",     required_argument,    0,  0 },
+        /* i_side    */ { "side",        required_argument,    0,  0 },
+        /* i_unit    */ { "unit",        required_argument,    0,  0 },
+        /* i_mat     */ { "mat",         required_argument,    0,  0 },
+	/* i_END     */ { 0, 0, 0, 0 },
+    };
+    // for getopt_long()
+    int opt, long_index;
+
+    while ((opt = getopt_long
+            (argc, argv, "12bB:dF:hlmno:pP:sS:t:V", long_options, &long_index)) != -1){
+        parser(args, opt, long_index, optarg);
+    }
+
+    // input files are exist?
+    if (optind >= argc) {
+	usage("No file specified\n");
+    }
+    // twoside default setting
+    if (args->twosides == -1) {
+	args->twosides = (!args->portrait);
+    }
+    // font size
+    if (args->fontsize == 0.0){
+	if (!args->twosides) {
+	    args->fontsize = FONTSIZE;
+	} else {
+	    args->fontsize = FONTSIZE_TWOSIDES;
+	}
+    }
+
+    if (args->headersize == 0.0){
+	if (! args->twosides) {
+	    args->hfont_large = HFONT_LARGE;
+	} else {
+	    args->hfont_large = HFONT_TWOSIDE_LARGE;
+	}
+    } else {
+	args->hfont_large = args->headersize;
+    }
+    args->hfont_medium = args->hfont_large*HFONT_M_RATE;
+    args->header_height = args->hfont_large;
+
+    // font name
+    if (args->fontname == NULL) {
+	args->fontname=DEFAULT_FONT;
+    }
+
+    if (args->headerfont == NULL) {
+	args->headerfont = HEADER_FONT;
+    }
+    
+    // paper
+    {
+	int p;
+	if (args->paper != NULL){
+	    for (p=0; p<PAPERS_END; p++){
+		if (strncmp(args->paper, paper_sizes[p].pname, PNAME_SIZE)==0){
+		    if (args->portrait){
+			args->pwidth  = paper_sizes[p].w;
+			args->pheight = paper_sizes[p].h;
+		    } else {
+			args->pwidth  = paper_sizes[p].h;
+			args->pheight = paper_sizes[p].w;
+		    }
+		    break; 
+		}
+	    }
+	    if (p>=PAPERS_END) USAGE("Unknown paper:%s\n", args->paper);
+	} else {
+	    // default
+	    if (args->portrait){
+		args->pwidth  = paper_sizes[PNAME_DEFAULT].w;
+		args->pheight = paper_sizes[PNAME_DEFAULT].h;
+	    } else {
+		args->pwidth  = paper_sizes[PNAME_DEFAULT].h;
+		args->pheight = paper_sizes[PNAME_DEFAULT].w;
+	    }
+	}
+    } // end of paper
+
+    // margins
+    if (args->inch) {
+	// inch -> point
+	args->binding *= 72; args->outer   *= 72;
+	args->ptop    *= 72; args->pbottom *= 72;
+	args->divide  *= 72;
+    } else {
+	// mm -> point
+	args->binding *= 2.8346; args->outer   *= 2.8346;
+	args->ptop    *= 2.8346; args->pbottom *= 2.8346;
+	args->divide  *= 2.8346;
+    }
+    if (args->binding == 0) { args->binding = BINDING; };
+    if (args->outer   == 0) { args->outer   = OUTER;   };
+    if (args->ptop    == 0) { args->ptop    = PTOP;    };
+    if (args->pbottom == 0) { args->pbottom = PBOTTOM; };
+    if (args->divide  == 0) { args->divide  = PBOTTOM; };
+    
+    if (args->binding_dir == NULL){ // default
+	args->longedge = args->portrait; // shortedge = landscape(!args->portrait)
+    } else {
+	switch (args->binding_dir[0]){
+	case 'l': // long edge
+	    args->longedge = 1;
+	    break;
+	case 's': // short edge
+	    args->longedge = 0;
+	    break;
+	case 'n': // no binding edge
+	    args->longedge = 1;
+	    args->binding = args->outer;
+	    break;
+	default:
+	    USAGE("--binding must be \'l/s/n\', but \'%s\'\n", args->binding_dir);
+	}
+    }
+    // end of margins
+
+    return args;
+}
+
+
+// end of args.c
