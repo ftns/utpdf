@@ -91,39 +91,10 @@
 
 enum direction { d_none, d_up, d_down, d_right, d_left  };
 
-struct arguments {
-    // option flags
-    int twosides, numbering, noheader, punchmark, duplex, portrait, longedge;
-    int tab, notebook, fold_arrow, border, current_t, one_output, inch;
-    // option strings
-    char *fontname, *headerfont, *in_fname, *date_format, *headertext, *outfile;
-    char *binding_dir, *paper;
-    // option length
-    double fontsize, hfont_large, hfont_medium, header_height, headersize;
-    // paper size and margins
-    double pwidth, pheight, binding, outer, ptop, pbottom, divide, betweenline;
-    // file modified time
-    time_t *mtime;
-};
-
-struct main_coordinates {
-  double head_top, mbottom, body_left, body_right, bwidth;
-  enum direction markdir;
-};
-
-struct sub_coordinates {
-	double text_left, num_right, body_inset; 
-	double body_top, oneline_h;
-};
-
-char *prog_name;
-
-extern void version();
-extern cairo_status_t write_func (void *closure, const unsigned char *data,
-                                  unsigned int length);
+extern char *prog_name;
 extern char *path2cmd(char *p);
-extern int chk_sw(char *str, char *positive, char *negative);
-extern int chk_onoff(char *str);
+extern cairo_status_t write_func
+   (void *closure, const unsigned char *data, unsigned int length);
 
 #endif
 

@@ -21,7 +21,6 @@
 #define __USAGE_H__
 
 #define PAGER_ENV "PAGER"
-#define USAGE(args...) { char buf[255]; snprintf(buf, 255, args); usage(buf);}
 
 extern void usage(char *message);
 extern char **cmd2vec(char *str);

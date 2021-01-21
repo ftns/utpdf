@@ -21,14 +21,155 @@
 #include "paper.h"
 #include "usage.h"
 
-enum i_option
-{ i_help, i_inch, i_mm, i_binding, i_outer, i_top, i_bottom, i_divide, 
-  i_hfont, i_hsize, i_notebk, i_datefmt, i_headtxt, i_version, i_header,
+#define USAGE(args...) { char buf[255]; snprintf(buf, 255, args); usage(buf);}
+typedef void (*usage_func_t)(char *);
+
+time_t mtime_store;
+args_t args_store = {
+    // option flags
+    .twosides=-1, .numbering=0, .noheader=0, .punchmark=0, .duplex=1,
+    .portrait=1, .longedge=0, .tab=TAB, .notebook=0, .fold_arrow=1,
+    .border=0, .current_t=0, .one_output=0, .inch=0,
+    // option strings
+    .fontname=NULL, .headerfont=NULL, /* in_fname, */ .date_format=DATE_FORMAT,
+    .headertext=NULL, .outfile=NULL, .binding_dir=NULL, .paper=NULL,
+    // option length
+    .fontsize=0, .hfont_large=0, /* hfont_medium, header_height, */
+    .headersize=0,
+    // paper size and margins
+    /* pwidth, pheight, */ .binding=0, .outer=0, .ptop=0, .pbottom=0,
+    .divide=0, .betweenline=BETWEEN_L,
+    // file modified time
+    .mtime=&mtime_store,
+};
+args_t *args = &args_store;
+
+typedef enum i_option
+{ i_help, i_inch, i_version, i_mm, i_binding, i_outer, i_top, i_bottom, 
+  i_divide, i_hfont, i_hsize, i_notebk, i_datefmt, i_headtxt, i_header,
   i_fold_a, i_time_s, i_border, i_punch, i_number, i_binddir, i_side,
-  i_unit, i_mat, i_END };
+  i_unit, i_orient, i_END } i_option_t;
+
+struct option long_options[]={
+        /*               { char *name; int has_arg; int *flag; int val; }; */
+        /* 00 i_help    */ { "help",        no_argument,          0, 'h'},
+        /* 01 i_version */ { "version",     no_argument,          0, 'V'},
+        /* 02 i_inch    */ { "inch",   no_argument, &args_store.inch, 1 },
+        /* 03 i_mm      */ { "mm",     no_argument, &args_store.inch, 0 },
+        /*    below options appeares in config file. */
+        /* 04 i_binding */ { "binding",     required_argument,    0,  0 },
+        /* 05 i_outer   */ { "outer",       required_argument,    0,  0 },
+        /* 06 i_top     */ { "top",         required_argument,    0,  0 },
+        /* 07 i_bottom  */ { "bottom",      required_argument,    0,  0 },
+        /* 08 i_divide  */ { "divide",      required_argument,    0,  0 },
+        /* 09 i_hfont   */ { "header-font", required_argument,    0,  0 },
+        /* 10 i_hsize   */ { "header-size", required_argument,    0,  0 },        
+        /* 11 i_notebk  */ { "notebook",    optional_argument,    0,  0 },
+        /* 12 i_datefmt */ { "date-format", required_argument,    0,  0 },
+        /* 13 i_headtxt */ { "header-text", required_argument,    0,  0 },
+        /* 14 i_header  */ { "header",      optional_argument,    0,  0 },
+        /* 15 i_fold_a  */ { "fold-arrow",  optional_argument,    0,  0 },
+        /* 16 i_time_s  */ { "timestamp",   required_argument,    0,  0 },
+        /* 17 i_border  */ { "border",      optional_argument,    0,  0 },
+        /* 18 i_punch   */ { "punch",       optional_argument,    0,  0 },
+        /* 19 i_number  */ { "number",      optional_argument,    0,  0 },
+        /* 20 i_binddir */ { "binddir",     required_argument,    0,  0 },
+        /* 21 i_side    */ { "side",        required_argument,    0,  0 },
+        /* 22 i_unit    */ { "unit",        required_argument,    0,  0 },
+        /* 23 i_orient  */ { "orientation", required_argument,    0,  0 },
+        /* 24 i_END     */ { 0, 0, 0, 0 }
+};
+
+#define LONGOP_NAMELEN 16
 
 
-void parser(struct arguments *args, int short_index, int long_index, char *argstr){
+char *conf_path="";
+int conf_line;
+
+void conf_usage(char *message);
+int chk_shortop(struct option *loption, char *value);
+void read_config(char *path);
+void parser(int short_index, int long_index, char *argstr, usage_func_t usage);
+int chk_sw(char *str, char *positive, char *negative, usage_func_t usage);
+int chk_onoff(char *str, usage_func_t usage);
+char *getconfpath();
+
+void conf_usage(char *message){
+    if (message != NULL){
+        fprintf(stderr, "%s:%2d %s\n", conf_path, conf_line, message);
+    }
+}
+
+int chk_shortop(struct option *loption, char *value){
+    if ((loption->flag == NULL) && (loption->val != 0)){
+        parser(loption->val, 0, value, conf_usage);
+        return 1;
+    }
+    if (loption->flag!=NULL){
+        *loption->flag=loption->val;
+        return 1;
+    }
+    return 0;
+}
+
+void read_config(char *path){
+    usage_func_t usage = conf_usage;
+    FILE *f=fopen(path, "r");
+    
+    if (f==NULL) {
+        // no config file.
+        return;
+    }
+    conf_path=path;
+    conf_line=0;
+    while (!feof(f)){
+        char linebuf[256], key[256], value[256];
+        int index, count;
+
+        conf_line++;
+        fgets(linebuf, 256, f);
+        count=sscanf(linebuf, "%[^:]:%s", key, value);
+        if ((count < 1)||(key[0]=='#')){
+            continue; // skip this line.
+        }
+        index = i_binding;
+        while (index < i_END){
+            if (strncmp(key, long_options[index].name, LONGOP_NAMELEN)==0) break;
+            index++;
+        }
+        if (index < i_END){
+            // keyword hit!
+            switch (long_options[index].has_arg){
+            case no_argument:
+                if (chk_shortop(&long_options[index], NULL)) break;
+                parser(0, index, NULL, conf_usage);
+                break;
+            case required_argument:
+                if (chk_shortop(&long_options[index], NULL)) break;
+                if (count==2){
+                    parser(0, index, value, conf_usage);
+                } else {
+                    USAGE("%s require an argument\n", key);
+                }
+                break;
+            case optional_argument:
+                if (chk_shortop(&long_options[index], NULL)) break;
+                if (count==1) {
+                    parser(0, index, NULL, conf_usage); 
+                } else {
+                    parser(0, index, value, conf_usage);
+                }
+                break;
+            } // switch()
+        } else {
+            USAGE("%s: No such option.\n", key);
+        } // if (index < i_end) else
+    }
+    fclose(f);
+    conf_path="";
+}
+
+void parser(int short_index, int long_index, char *argstr, usage_func_t usage){
     if (short_index == 0) {
         // long option
         switch (long_index) {
@@ -68,29 +209,29 @@ void parser(struct arguments *args, int short_index, int long_index, char *argst
             }
             break;
         case i_notebk:
-            args->notebook = chk_onoff(argstr); break;
+            args->notebook = chk_onoff(argstr, usage); break;
         case i_datefmt:
             args->date_format = argstr; break;
         case i_headtxt:
             args->headertext = argstr; break;
         case i_header:
-            args->noheader = !chk_onoff(argstr); break;
+            args->noheader = !chk_onoff(argstr, usage); break;
         case i_fold_a:
-            args->fold_arrow = chk_onoff(argstr); break;
+            args->fold_arrow = chk_onoff(argstr, usage); break;
         case i_time_s:
-            args->current_t = chk_sw(argstr, "cur", "mod"); break;
+            args->current_t = chk_sw(argstr, "cur", "mod", usage); break;
         case i_border:
-            args->border = chk_onoff(argstr); break;
+            args->border = chk_onoff(argstr, usage); break;
         case i_punch:
-            args->punchmark = chk_onoff(argstr); break;
+            args->punchmark = chk_onoff(argstr, usage); break;
         case i_number:
-            args->numbering = chk_onoff(argstr); break;
+            args->numbering = chk_onoff(argstr, usage); break;
         case i_side:
-            args->twosides = chk_sw(argstr, "2", "1"); break;
+            args->twosides = chk_sw(argstr, "2", "1", usage); break;
         case i_unit:
-            args->inch = chk_sw(argstr, "inch", "mm"); break;
-        case i_mat:
-            args->portrait = chk_sw(argstr, "p", "l"); break;
+            args->inch = chk_sw(argstr, "inch", "mm", usage); break;
+        case i_orient:
+            args->portrait = chk_sw(argstr, "p", "l", usage); break;
         } // switch (lindex)
     } else {
         // short option
@@ -148,59 +289,38 @@ void parser(struct arguments *args, int short_index, int long_index, char *argst
 }
 
 
-struct arguments *getargs(int argc, char **argv){
-    static time_t mtime_store;
-    static struct arguments args_store={
-        // option flags
-	.twosides=-1, .numbering=0, .noheader=0, .punchmark=0, .duplex=1,
-	.portrait=1, .longedge=0, .tab=TAB, .notebook=0, .fold_arrow=1,
-        .border=0, .current_t=0, .one_output=0, .inch=0,
-        // option strings
-	.fontname=NULL, .headerfont=NULL, /* in_fname, */ .date_format=DATE_FORMAT,
-        .headertext=NULL, .outfile=NULL, .binding_dir=NULL, .paper=NULL,
-        // option length
-	.fontsize=0.0, .hfont_large=0, /* hfont_medium, header_height, */ .headersize=0.0,
-        // paper size and margins
-        /* pwidth, pheight, */ .binding=0.0, .outer=0.0, 
-	.ptop=0.0, .pbottom=0.0, .divide=0.0, .betweenline=BETWEEN_L,
-        // file modified time
-        .mtime=&mtime_store
-    };
-    struct arguments *args=&args_store;
-    
-    struct option long_options[] = {
-	/* i_help    */ { "help",        no_argument,          0, 'h'},
-	/* i_inch    */ { "inch",        no_argument, &args->inch, 1 },
-	/* i_mm      */ { "mm",          no_argument, &args->inch, 0 },
-	/* i_binding */ { "binding",     required_argument,    0,  0 },
-	/* i_outer   */ { "outer",       required_argument,    0,  0 },
-	/* i_top     */ { "top",         required_argument,    0,  0 },
-	/* i_bottom  */ { "bottom",      required_argument,    0,  0 },
-	/* i_divide  */ { "divide",      required_argument,    0,  0 },
-	/* i_hfont   */ { "header-font", required_argument,    0,  0 },
-	/* i_hsize   */ { "header-size", required_argument,    0,  0 },        
-	/* i_notebk  */ { "notebook",    optional_argument,    0,  0 },
-	/* i_datefmt */ { "date-format", required_argument,    0,  0 },
-	/* i_headtxt */ { "header-text", required_argument,    0,  0 },
-	/* i_version */ { "version",     no_argument,          0, 'V'},
-        /* i_header  */ { "header",      optional_argument,    0,  0 },
-        /* i_fold_a  */ { "fold-arrow",  optional_argument,    0,  0 },
-        /* i_time_s  */ { "timestamp",   required_argument,    0,  0 },
-        /* i_border  */ { "border",      optional_argument,    0,  0 },
-        /* i_punch   */ { "punch",       optional_argument,    0,  0 },
-        /* i_number  */ { "number",      optional_argument,    0,  0 },
-        /* i_binddir */ { "binddir",     required_argument,    0,  0 },
-        /* i_side    */ { "side",        required_argument,    0,  0 },
-        /* i_unit    */ { "unit",        required_argument,    0,  0 },
-        /* i_mat     */ { "mat",         required_argument,    0,  0 },
-	/* i_END     */ { 0, 0, 0, 0 },
-    };
+int chk_sw(char *str, char *positive, char *negative, usage_func_t usage) {
+    if (str==NULL) { return 1; }
+    else if (strncmp(str, positive, 8)==0) { return 1; }
+    else if (strncmp(str, negative, 8)==0) { return 0; }
+    else {
+        USAGE("argument must be \"%s\" or \"%s\"\n", positive, negative);
+        return -1;
+    }
+}
+
+int chk_onoff(char *str, usage_func_t usage){
+    return chk_sw(str, "on", "off", usage);
+}
+
+
+char *getconfpath(){
+    static char path[256];
+    snprintf(path, 256, "%s/%s", getenv("HOME"), CONFNAME);
+    return path;
+}
+
+void getargs(int argc, char **argv){
     // for getopt_long()
     int opt, long_index;
 
+    // fetch from config file
+    read_config(getconfpath());
+    
+    // fetch from command line
     while ((opt = getopt_long
             (argc, argv, "12bB:dF:hlmno:pP:sS:t:V", long_options, &long_index)) != -1){
-        parser(args, opt, long_index, optarg);
+        parser(opt, long_index, optarg, (usage_func_t )usage);
     }
 
     // input files are exist?
@@ -307,9 +427,5 @@ struct arguments *getargs(int argc, char **argv){
 	}
     }
     // end of margins
-
-    return args;
 }
 
-
-// end of args.c

@@ -21,6 +21,7 @@
 #include "coord.h"
 #include "drawing.h"
 #include "utpdf.h"
+#include "args.h"
 
 #define PI 3.14159265359
 
@@ -168,9 +169,8 @@ void draw_cont_arrow(cairo_t *cr, double x, double y, double edge, double width,
 }
 
 
-void draw_header(cairo_t *cr, struct arguments *arg, int page,
-		 struct main_coordinates *mcoord, struct sub_coordinates *scoord,
-		 char *datebuf){
+void draw_header(cairo_t *cr, args_t *arg, int page, mcoord_t *mcoord,
+                 scoord_t *scoord, char *datebuf){
     double hbaseline, hinset, gap;
     cairo_font_extents_t f_ext;
     char pagebuf[255];
@@ -215,7 +215,7 @@ void draw_header(cairo_t *cr, struct arguments *arg, int page,
 
 
 void draw_limited_text
-    (cairo_t *cr, struct UFILE *in_f, int tab, const double limit, int *cont){
+    (cairo_t *cr, UFILE *in_f, int tab, const double limit, int *cont){
     int clen, olen;
     double em, tabw; // width of "M", tab
     double cur_left, orig_left, cur_base, limit_x;
@@ -302,8 +302,8 @@ void draw_limited_text
 }
 
 
-void draw_lines(cairo_t *cr, struct UFILE *in_f, struct arguments *arg, int lineperpage,
-		struct main_coordinates *mcoord, struct sub_coordinates *scoord){
+void draw_lines(cairo_t *cr, UFILE *in_f, args_t *arg, int lineperpage,
+		mcoord_t *mcoord, scoord_t *scoord){
     int pline=1; 	// line number of this page
     static int fline=1; // line nunber of this file
     double limitw, baseline;
@@ -377,7 +377,7 @@ void draw_lines(cairo_t *cr, struct UFILE *in_f, struct arguments *arg, int line
 } // end of draw_lines()
 
 
-int draw_pages(cairo_t *cr, struct UFILE *in_f, struct arguments *arg){
+int draw_pages(cairo_t *cr, UFILE *in_f, args_t *arg){
     // header
     char datebuf[255];
     struct tm *modt;
@@ -388,8 +388,8 @@ int draw_pages(cairo_t *cr, struct UFILE *in_f, struct arguments *arg){
     strftime(datebuf, 255, arg->date_format, modt);
     
     do {
-	struct main_coordinates mc_store, *mcoord=&mc_store;
-	struct sub_coordinates sc_store, *scoord=&sc_store;
+	mcoord_t mc_store, *mcoord=&mc_store;
+	scoord_t sc_store, *scoord=&sc_store;
 	int lineperpage;
 
 	// local coordinates

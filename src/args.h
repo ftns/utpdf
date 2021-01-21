@@ -21,8 +21,27 @@
 
 #include "utpdf.h"
 
-extern struct arguments *getargs(int argc, char **argv);
+#define CONFNAME ".utpdfrc"
 
+typedef struct arguments {
+    // option flags
+    int twosides, numbering, noheader, punchmark, duplex, portrait, longedge;
+    int tab, notebook, fold_arrow, border, current_t, one_output, inch;
+    // option strings
+    char *fontname, *headerfont, *in_fname, *date_format, *headertext, *outfile;
+    char *binding_dir, *paper;
+    // option length
+    double fontsize, hfont_large, hfont_medium, header_height, headersize;
+    // paper size and margins
+    double pwidth, pheight, binding, outer, ptop, pbottom, divide, betweenline;
+    // file modified time
+    time_t *mtime;
+} args_t;
+
+extern args_t *args;
+extern args_t args_store;
+
+extern void getargs(int argc, char **argv);
 
 #endif
 // end of args.h

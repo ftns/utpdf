@@ -6,8 +6,8 @@
 *.dSYM
 *.o
 *.svg
-test/*
-testprog/*
+src/test/*
+src/testprog/*
 man/*
 memo/*
 utps

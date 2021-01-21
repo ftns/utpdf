@@ -21,9 +21,14 @@
 #define __COORD_H__
 
 #include "utpdf.h"
+#include "args.h"
 
-extern void calc_page_coordinates(struct arguments *arg, int page,
-			   struct main_coordinates *mcoord);
+typedef struct main_coordinates {
+  double head_top, mbottom, body_left, body_right, bwidth;
+  enum direction markdir;
+} mcoord_t;
+
+extern void calc_page_coordinates(args_t *arg, int page, mcoord_t *mcoord);
 
 #endif
 

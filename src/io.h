@@ -23,23 +23,23 @@
 #define UBUFLEN   16384 // 16Kbyte
 #define USTACKLEN 256
 
-struct UFILE {
+typedef struct utf8_file {
    int fd;
    char queue[UBUFLEN];
    char stack[USTACKLEN];
    char *fname;
    int eof;
    int qindex, lastr, sindex;
-};
+} UFILE;
 
 extern int nbytechar(char c);
 extern int openfd(const char *path, int flag);
 
-extern struct UFILE *open_u(char *path);
-extern struct UFILE *fdopen_u(int fd, char *path);
-extern int close_u(struct UFILE *f);
-extern int get_one_uchar(struct UFILE *f, char *dst);
-extern int rewind_u(struct UFILE *f, int len);
-extern int eof_u(struct UFILE *f);
+extern UFILE *open_u(char *path);
+extern UFILE *fdopen_u(int fd, char *path);
+extern int close_u(UFILE *f);
+extern int get_one_uchar(UFILE *f, char *dst);
+extern int rewind_u(UFILE *f, int len);
+extern int eof_u(UFILE *f);
 
 #endif

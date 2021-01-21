@@ -24,6 +24,7 @@
 #include "args.h"
 
 int makepdf=1;
+char *prog_name;
 
 // write to file
 cairo_status_t write_func (void *closure, const unsigned char *data,
@@ -48,31 +49,12 @@ char *path2cmd(char *p){
     return p;
 }
 
-int chk_sw(char *str, char *positive, char *negative) {
-    if (str==NULL) { return 1; }
-    else if (strncmp(str, positive, 8)==0) { return 1; }
-    else if (strncmp(str, negative, 8)==0) { return 0; }
-    else {
-        USAGE("argument must be \"%s\" or \"%s\"\n", positive, negative);
-        return -1;
-    }
-}
-
-int chk_onoff(char *str){
-    return chk_sw(str, "on", "off");
-}
 
 //
 // 
 int main(int argc, char** argv){
     int fileindex;
-    /*
-    char *binding_dir=NULL;
-    char *paper=NULL;
-    double headersize=0.0;
-    int args->current_t=0, inch=0, args->one_output=0;
-    */
-    struct arguments *args;
+    // args_t *args;
     
     prog_name=path2cmd(argv[0]);
     makepdf = (strncmp(prog_name, MKPDFNAME, NAMELEN)==0);
@@ -80,7 +62,7 @@ int main(int argc, char** argv){
     //
     // parse arguments
     //
-    args=getargs(argc, argv);
+    getargs(argc, argv);
     
     //
     // Draw each file
@@ -94,7 +76,7 @@ int main(int argc, char** argv){
       
 	for (fileindex = optind; fileindex < argc; fileindex++) {    
 	    // file stuff
-	    struct UFILE *in_f;
+	    UFILE *in_f;
 	    int in_fd;
 	    struct stat stat_b;
   

@@ -69,7 +69,7 @@ int openfd(const char *path, int flag){
 //
 // UFILE: utf-8 reading interface
 
-struct UFILE *open_u(char *path) {
+UFILE *open_u(char *path) {
     char ebuf[256];
     int fd=open(path, O_RDONLY);
 
@@ -81,10 +81,10 @@ struct UFILE *open_u(char *path) {
     return fdopen_u(fd, path);
 }
     
-struct UFILE *fdopen_u(int fd, char *path){
-    struct UFILE *f;
+UFILE *fdopen_u(int fd, char *path){
+    UFILE *f;
 
-    f = malloc(sizeof(struct UFILE));
+    f = malloc(sizeof(UFILE));
     f->fd = fd;
     f->eof = 0;
     f->qindex = 0;
@@ -94,14 +94,14 @@ struct UFILE *fdopen_u(int fd, char *path){
     return f;
 }
 
-int close_u(struct UFILE *f){
+int close_u(UFILE *f){
     int result;
     result=close(f->fd);
     free(f);
     return result;
 }
 
-int get_one_uchar(struct UFILE *f, char *dst){
+int get_one_uchar(UFILE *f, char *dst){
     int i, clen;
     char ebuf[256];
 
@@ -168,7 +168,7 @@ int get_one_uchar(struct UFILE *f, char *dst){
     }
 }
 
-int rewind_u(struct UFILE *f, int len){
+int rewind_u(UFILE *f, int len){
     if (len <= f->qindex) {
         f->qindex -= len;
         return len;
@@ -178,7 +178,7 @@ int rewind_u(struct UFILE *f, int len){
     }
 }
 
-int eof_u(struct UFILE *f){
+int eof_u(UFILE *f){
     return (f->eof
             && (f->qindex == f->lastr)
             && (f->sindex == 0));

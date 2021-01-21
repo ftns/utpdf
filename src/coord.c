@@ -23,7 +23,7 @@
 //
 // calc main_coordinates
 
-void twoside_oddpage_leftside(struct arguments *arg, struct main_coordinates *mcoord){
+void twoside_oddpage_leftside(args_t *arg, mcoord_t *mcoord){
   if (arg->longedge) {
     if (arg->portrait) {
       mcoord->head_top   = arg->ptop;
@@ -60,7 +60,7 @@ void twoside_oddpage_leftside(struct arguments *arg, struct main_coordinates *mc
   }
 }
 
-void twoside_oddpage_rightside(struct arguments *arg, struct main_coordinates *mcoord){
+void twoside_oddpage_rightside(args_t *arg, mcoord_t *mcoord){
   mcoord->markdir = d_none;
   if (arg->longedge) {
     if (arg->portrait) {
@@ -94,7 +94,7 @@ void twoside_oddpage_rightside(struct arguments *arg, struct main_coordinates *m
   }
 }
 
-void twoside_evenpage_leftside(struct arguments *arg, struct main_coordinates *mcoord){
+void twoside_evenpage_leftside(args_t *arg, mcoord_t *mcoord){
   if (arg->longedge) {
     if (arg->portrait) {
       mcoord->head_top   = arg->ptop;
@@ -131,7 +131,7 @@ void twoside_evenpage_leftside(struct arguments *arg, struct main_coordinates *m
   }
 }
 
-void twoside_evenpage_rightside(struct arguments *arg, struct main_coordinates *mcoord){
+void twoside_evenpage_rightside(args_t *arg, mcoord_t *mcoord){
   if (arg->longedge) {
     if (arg->portrait) {
       mcoord->head_top   = arg->ptop;
@@ -168,7 +168,7 @@ void twoside_evenpage_rightside(struct arguments *arg, struct main_coordinates *
   }
 }
 
-void oneside_oddpage( struct arguments *arg, struct main_coordinates *mcoord){
+void oneside_oddpage(args_t *arg, mcoord_t *mcoord){
   if (arg->longedge) {
     if (arg->portrait) {
       mcoord->head_top   = arg->ptop;
@@ -202,7 +202,7 @@ void oneside_oddpage( struct arguments *arg, struct main_coordinates *mcoord){
   mcoord->bwidth = mcoord->body_right - mcoord->body_left;
 }
 
-void oneside_evenpage(struct arguments *arg, struct main_coordinates *mcoord){
+void oneside_evenpage(args_t *arg, mcoord_t *mcoord){
   if (arg->longedge) {
     if (arg->portrait){
       mcoord->head_top   = arg->ptop;
@@ -237,8 +237,7 @@ void oneside_evenpage(struct arguments *arg, struct main_coordinates *mcoord){
 
 
 // calcurate coordinates depend on each page
-void calc_page_coordinates(struct arguments *arg, int page,
-			   struct main_coordinates *mcoord){
+void calc_page_coordinates(args_t *arg, int page, mcoord_t *mcoord){
     if (arg->duplex){
         if (arg->twosides){
             switch (page%4){

@@ -22,6 +22,13 @@
 
 #include "utpdf.h"
 #include "io.h"
+#include "args.h"
+#include "coord.h"
+
+typedef struct sub_coordinates {
+	double text_left, num_right, body_inset; 
+	double body_top, oneline_h;
+} scoord_t;
 
 extern double font_ascent(cairo_t *cr);
 extern double font_descent(cairo_t *cr);
@@ -43,15 +50,14 @@ extern void draw_cont_arrow
      double r, double g, double b);
 
 extern void draw_header
-   (cairo_t *cr, struct arguments *arg, int page,
-    struct main_coordinates *mcoord,
-    struct sub_coordinates *scoord, char *datebuf);
+   (cairo_t *cr, args_t *arg, int page, mcoord_t *mcoord,
+    scoord_t *scoord, char *datebuf);
 extern void draw_limited_text
-    (cairo_t *cr, struct UFILE *in_f, int tab, const double limit, int *cont);
+    (cairo_t *cr, UFILE *in_f, int tab, const double limit, int *cont);
 extern void draw_lines
-    (cairo_t *cr, struct UFILE *in_f, struct arguments *arg,int lineperpage,
-     struct main_coordinates *mcoord, struct sub_coordinates *scoord);
-extern int draw_pages(cairo_t *cr, struct UFILE *in_f, struct arguments *arg);
+    (cairo_t *cr, UFILE *in_f, args_t *arg,int lineperpage,
+     mcoord_t *mcoord, scoord_t *scoord);
+extern int draw_pages(cairo_t *cr, UFILE *in_f, args_t *arg);
 
 #endif
 
