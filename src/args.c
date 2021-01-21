@@ -45,7 +45,7 @@ args_t args_store = {
 args_t *args = &args_store;
 
 typedef enum i_option
-{ i_help, i_inch, i_version, i_mm, i_binding, i_outer, i_top, i_bottom, 
+{ i_help, i_version, i_inch, i_mm, i_binding, i_outer, i_top, i_bottom, 
   i_divide, i_hfont, i_hsize, i_notebk, i_datefmt, i_headtxt, i_header,
   i_fold_a, i_time_s, i_border, i_punch, i_number, i_binddir, i_side,
   i_unit, i_orient, i_END } i_option_t;
@@ -81,18 +81,22 @@ struct option long_options[]={
 };
 
 #define LONGOP_NAMELEN 16
-
+#define PARSE_LEN 256
 
 char *conf_path="";
 int conf_line;
-
+//
+// forward declaration
 void conf_usage(char *message);
-int chk_shortop(struct option *loption, char *value);
+int  chk_shortop(struct option *loption, char *value);
 void read_config(char *path);
 void parser(int short_index, int long_index, char *argstr, usage_func_t usage);
-int chk_sw(char *str, char *positive, char *negative, usage_func_t usage);
-int chk_onoff(char *str, usage_func_t usage);
+int  chk_sw(char *str, char *positive, char *negative, usage_func_t usage);
+int  chk_onoff(char *str, usage_func_t usage);
 char *getconfpath();
+int  parse_conf(char *str, char *key, char *value);
+//
+//
 
 void conf_usage(char *message){
     if (message != NULL){
@@ -123,12 +127,15 @@ void read_config(char *path){
     conf_path=path;
     conf_line=0;
     while (!feof(f)){
-        char linebuf[256], key[256], value[256];
+        char linebuf[PARSE_LEN], key[PARSE_LEN], *value=(char *)malloc(PARSE_LEN);
         int index, count;
 
         conf_line++;
-        fgets(linebuf, 256, f);
-        count=sscanf(linebuf, "%[^:]:%s", key, value);
+        fgets(linebuf, PARSE_LEN, f);
+        //count=sscanf(linebuf, "%[^:]:%s", key, value);
+        count=parse_conf(linebuf, key, value);
+        fprintf(stderr, "%d, \"%s\", \"%s\"\n", count, key, value);
+        
         if ((count < 1)||(key[0]=='#')){
             continue; // skip this line.
         }
@@ -303,11 +310,52 @@ int chk_onoff(char *str, usage_func_t usage){
     return chk_sw(str, "on", "off", usage);
 }
 
-
 char *getconfpath(){
     static char path[256];
     snprintf(path, 256, "%s/%s", getenv("HOME"), CONFNAME);
     return path;
+}
+
+int parse_conf(char *str, char *key, char *value){
+    int s=0, k=0, v=0;
+
+    key[0]='\0';
+    value[0]='\0';
+
+    // comment line?
+    if (str[0]=='#'){
+        return 0;
+    }
+    // fetch keyword
+    while ((str[s]!=':')&&(str[s]!='\0')&&(str[s]!='\n')){
+        key[k++]=str[s++];
+    }
+    if ((str[s]=='\0')||(str[s]=='\n')){
+        // error
+        key[0]='\0';
+        return 0;
+    }
+    key[k]='\0';
+    s++;
+    // skip space&tab
+    while (((str[s]==' ')||(str[s]=='\t'))&&((str[s]!='\0')&&(str[s]!='\n'))){
+        s++;
+    }
+    if ((str[s]=='\0')||(str[s]=='\n')){
+        // no value
+        return 1;
+    }
+    // fetch value
+    while ((str[s]!='\0')&&(str[s]!='\n')){
+        value[v++] = str[s++];
+    }
+    value[v]='\0';
+    // remove last space&tab
+    v--;
+    while ((value[v]==' ')||(value[v]=='\t')){
+        value[v--] = '\0';
+    }
+    return 2;
 }
 
 void getargs(int argc, char **argv){

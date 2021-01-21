@@ -18,6 +18,7 @@
 */
 
 #include <math.h>
+#include <locale.h>
 #include "coord.h"
 #include "drawing.h"
 #include "utpdf.h"
@@ -383,7 +384,7 @@ int draw_pages(cairo_t *cr, UFILE *in_f, args_t *arg){
     struct tm *modt;
     // numbering
     int page=1;
-
+    
     modt = localtime(arg->mtime);
     strftime(datebuf, 255, arg->date_format, modt);
     

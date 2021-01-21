@@ -54,8 +54,8 @@ char *path2cmd(char *p){
 // 
 int main(int argc, char** argv){
     int fileindex;
-    // args_t *args;
-    
+
+    setlocale(LC_ALL, "");
     prog_name=path2cmd(argv[0]);
     makepdf = (strncmp(prog_name, MKPDFNAME, NAMELEN)==0);
 

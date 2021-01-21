@@ -27,6 +27,6 @@ args.o: args.c args.h utpdf.h
 usage: usage.c utpdf.h paper.o
 	$(CC) $(CFLAGS) ${PCMAIN} -DSINGLE_DEBUG -o $@ paper.o $@.c
 clean:
-	rm -rf *~ *.o *.dSYM
-realclean:
-	rm -rf *~ *.o *.dSYM utpdf utps
+	rm -rf *~ *.o *.dSYM a.out
+realclean: clean
+	rm -rf utpdf utps

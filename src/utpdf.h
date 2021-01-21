@@ -33,6 +33,7 @@
 #include <time.h>
 #include <string.h>
 #include <getopt.h>
+#include <locale.h>
 
 #define MKPDFNAME "utpdf"
 #define NAMELEN 255
