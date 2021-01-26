@@ -177,8 +177,7 @@ void draw_header(cairo_t *cr, args_t *arg, int page, mcoord_t *mcoord,
     char pagebuf[255];
     
     // hbaseline: the baseline of header font
-    cairo_select_font_face (cr, arg->headerfont, CAIRO_FONT_SLANT_NORMAL,
-			    CAIRO_FONT_WEIGHT_BOLD);
+    cairo_select_font_face (cr, arg->headerfont, arg->hfont_slant, arg->hfont_weight);
     cairo_set_font_size (cr, arg->hfont_large);
     cairo_font_extents(cr, &f_ext);
     gap = (scoord->body_top - mcoord->head_top - (f_ext.ascent + f_ext.descent))/2;

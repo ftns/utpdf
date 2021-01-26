@@ -88,7 +88,8 @@
 #define LW_BORDER 1
 
 // header date format -- strftime()
-#define DATE_FORMAT "%m/%d/%y %H:%M"
+// #define DATE_FORMAT "%m/%d/%y %H:%M"
+#define DATE_FORMAT "%D %R"
 
 enum direction { d_none, d_up, d_down, d_right, d_left  };
 

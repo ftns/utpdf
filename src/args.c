@@ -30,6 +30,7 @@ args_t args_store = {
     .twosides=-1, .numbering=0, .noheader=0, .punchmark=0, .duplex=1,
     .portrait=1, .longedge=0, .tab=TAB, .notebook=0, .fold_arrow=1,
     .border=0, .current_t=0, .one_output=0, .inch=0,
+    .hfont_slant=CAIRO_FONT_SLANT_NORMAL, .hfont_weight=CAIRO_FONT_WEIGHT_BOLD,
     // option strings
     .fontname=NULL, .headerfont=NULL, /* in_fname, */ .date_format=DATE_FORMAT,
     .headertext=NULL, .outfile=NULL, .binding_dir=NULL, .paper=NULL,
@@ -48,36 +49,38 @@ typedef enum i_option
 { i_help, i_version, i_inch, i_mm, i_binding, i_outer, i_top, i_bottom, 
   i_divide, i_hfont, i_hsize, i_notebk, i_datefmt, i_headtxt, i_header,
   i_fold_a, i_time_s, i_border, i_punch, i_number, i_binddir, i_side,
-  i_unit, i_orient, i_END } i_option_t;
+  i_unit, i_orient, i_hslant, i_hweigbt, i_END } i_option_t;
 
 struct option long_options[]={
         /*               { char *name; int has_arg; int *flag; int val; }; */
-        /* 00 i_help    */ { "help",        no_argument,          0, 'h'},
-        /* 01 i_version */ { "version",     no_argument,          0, 'V'},
-        /* 02 i_inch    */ { "inch",   no_argument, &args_store.inch, 1 },
-        /* 03 i_mm      */ { "mm",     no_argument, &args_store.inch, 0 },
+        /* 00 i_help    */ { "help",          no_argument,          0, 'h'},
+        /* 01 i_version */ { "version",       no_argument,          0, 'V'},
+        /* 02 i_inch    */ { "inch",     no_argument, &args_store.inch, 1 },
+        /* 03 i_mm      */ { "mm",       no_argument, &args_store.inch, 0 },
         /*    below options appeares in config file. */
-        /* 04 i_binding */ { "binding",     required_argument,    0,  0 },
-        /* 05 i_outer   */ { "outer",       required_argument,    0,  0 },
-        /* 06 i_top     */ { "top",         required_argument,    0,  0 },
-        /* 07 i_bottom  */ { "bottom",      required_argument,    0,  0 },
-        /* 08 i_divide  */ { "divide",      required_argument,    0,  0 },
-        /* 09 i_hfont   */ { "header-font", required_argument,    0,  0 },
-        /* 10 i_hsize   */ { "header-size", required_argument,    0,  0 },        
-        /* 11 i_notebk  */ { "notebook",    optional_argument,    0,  0 },
-        /* 12 i_datefmt */ { "date-format", required_argument,    0,  0 },
-        /* 13 i_headtxt */ { "header-text", required_argument,    0,  0 },
-        /* 14 i_header  */ { "header",      optional_argument,    0,  0 },
-        /* 15 i_fold_a  */ { "fold-arrow",  optional_argument,    0,  0 },
-        /* 16 i_time_s  */ { "timestamp",   required_argument,    0,  0 },
-        /* 17 i_border  */ { "border",      optional_argument,    0,  0 },
-        /* 18 i_punch   */ { "punch",       optional_argument,    0,  0 },
-        /* 19 i_number  */ { "number",      optional_argument,    0,  0 },
-        /* 20 i_binddir */ { "binddir",     required_argument,    0,  0 },
-        /* 21 i_side    */ { "side",        required_argument,    0,  0 },
-        /* 22 i_unit    */ { "unit",        required_argument,    0,  0 },
-        /* 23 i_orient  */ { "orientation", required_argument,    0,  0 },
-        /* 24 i_END     */ { 0, 0, 0, 0 }
+        /* 04 i_binding */ { "binding",       required_argument,    0,  0 },
+        /* 05 i_outer   */ { "outer",         required_argument,    0,  0 },
+        /* 06 i_top     */ { "top",           required_argument,    0,  0 },
+        /* 07 i_bottom  */ { "bottom",        required_argument,    0,  0 },
+        /* 08 i_divide  */ { "divide",        required_argument,    0,  0 },
+        /* 09 i_hfont   */ { "header-font",   required_argument,    0,  0 },
+        /* 10 i_hsize   */ { "header-size",   required_argument,    0,  0 },        
+        /* 11 i_notebk  */ { "notebook",      optional_argument,    0,  0 },
+        /* 12 i_datefmt */ { "date-format",   optional_argument,    0,  0 },
+        /* 13 i_headtxt */ { "header-text",   optional_argument,    0,  0 },
+        /* 14 i_header  */ { "header",        optional_argument,    0,  0 },
+        /* 15 i_fold_a  */ { "fold-arrow",    optional_argument,    0,  0 },
+        /* 16 i_time_s  */ { "timestamp",     required_argument,    0,  0 },
+        /* 17 i_border  */ { "border",        optional_argument,    0,  0 },
+        /* 18 i_punch   */ { "punch",         optional_argument,    0,  0 },
+        /* 19 i_number  */ { "number",        optional_argument,    0,  0 },
+        /* 20 i_binddir */ { "binddir",       required_argument,    0,  0 },
+        /* 21 i_side    */ { "side",          required_argument,    0,  0 },
+        /* 22 i_unit    */ { "unit",          required_argument,    0,  0 },
+        /* 23 i_orient  */ { "orientation",   required_argument,    0,  0 },
+        /* 24 i_hslant  */ { "header-slant",  required_argument,    0,  0 },
+        /* 25 i_hweigbt */ { "header-weight", required_argument,    0,  0 },
+        /* 26 i_END     */ { 0, 0, 0, 0 }
 };
 
 #define LONGOP_NAMELEN 16
@@ -91,6 +94,8 @@ void conf_usage(char *message);
 int  chk_shortop(struct option *loption, char *value);
 void read_config(char *path);
 void parser(int short_index, int long_index, char *argstr, usage_func_t usage);
+void chk_slant(int *value, char *str, usage_func_t usage);
+void chk_weight(int *value, char *str, usage_func_t usage);
 int  chk_sw(char *str, char *positive, char *negative, usage_func_t usage);
 int  chk_onoff(char *str, usage_func_t usage);
 char *getconfpath();
@@ -100,7 +105,7 @@ int  parse_conf(char *str, char *key, char *value);
 
 void conf_usage(char *message){
     if (message != NULL){
-        fprintf(stderr, "%s:%2d %s\n", conf_path, conf_line, message);
+        fprintf(stderr, "%s line %d: %s\n", conf_path, conf_line, message);
     }
 }
 
@@ -116,6 +121,7 @@ int chk_shortop(struct option *loption, char *value){
     return 0;
 }
 
+    
 void read_config(char *path){
     usage_func_t usage = conf_usage;
     FILE *f=fopen(path, "r");
@@ -132,13 +138,13 @@ void read_config(char *path){
 
         conf_line++;
         fgets(linebuf, PARSE_LEN, f);
-        //count=sscanf(linebuf, "%[^:]:%s", key, value);
         count=parse_conf(linebuf, key, value);
-        fprintf(stderr, "%d, \"%s\", \"%s\"\n", count, key, value);
+        // fprintf(stderr, "%d, \"%s\", \"%s\"\n", count, key, value); // DEBUG
         
         if ((count < 1)||(key[0]=='#')){
             continue; // skip this line.
         }
+        // compare key and long_options[index].name from i_binding to i_END-1.
         index = i_binding;
         while (index < i_END){
             if (strncmp(key, long_options[index].name, LONGOP_NAMELEN)==0) break;
@@ -218,9 +224,19 @@ void parser(int short_index, int long_index, char *argstr, usage_func_t usage){
         case i_notebk:
             args->notebook = chk_onoff(argstr, usage); break;
         case i_datefmt:
-            args->date_format = argstr; break;
+            if ((argstr==NULL)||(argstr[0]=='\0')){
+                args->date_format = DATE_FORMAT;
+            } else {
+                args->date_format = argstr;
+            }
+            break;
         case i_headtxt:
-            args->headertext = argstr; break;
+            if ((argstr==NULL)||(argstr[0]=='\0')){
+                args->headertext = NULL;
+            } else {
+                args->headertext = argstr;
+            }
+            break;
         case i_header:
             args->noheader = !chk_onoff(argstr, usage); break;
         case i_fold_a:
@@ -239,6 +255,10 @@ void parser(int short_index, int long_index, char *argstr, usage_func_t usage){
             args->inch = chk_sw(argstr, "inch", "mm", usage); break;
         case i_orient:
             args->portrait = chk_sw(argstr, "p", "l", usage); break;
+        case i_hslant:
+            chk_slant(&args->hfont_slant, argstr, usage); break;
+        case i_hweigbt:
+            chk_weight(&args->hfont_weight, argstr, usage); break;
         } // switch (lindex)
     } else {
         // short option
@@ -256,6 +276,9 @@ void parser(int short_index, int long_index, char *argstr, usage_func_t usage){
             break;
         case 'd':
             args->duplex=1; break;
+        case 'f':
+            read_config(argstr);
+            break;
         case 'F':
             args->fontname = argstr; break;	
         case 'h':
@@ -295,7 +318,20 @@ void parser(int short_index, int long_index, char *argstr, usage_func_t usage){
     }
 }
 
+void chk_slant(int *value, char *str, usage_func_t usage){
+    if (strncmp(str, "normal", 8)==0)  { *value=CAIRO_FONT_SLANT_NORMAL;  return; }
+    if (strncmp(str, "italic", 8)==0)  { *value=CAIRO_FONT_SLANT_ITALIC;  return; }
+    if (strncmp(str, "oblique", 8)==0) { *value=CAIRO_FONT_SLANT_OBLIQUE; return; }
+    USAGE("header-slant must be \"normal\", \"italic\", \"olique\",\nbut %s\n", str);
+}
 
+void chk_weight(int *value, char *str, usage_func_t usage){
+    if (strncmp(str, "normal", 8)==0) { *value=CAIRO_FONT_WEIGHT_NORMAL; return; }
+    if (strncmp(str, "bold", 8)==0)   { *value=CAIRO_FONT_WEIGHT_BOLD;   return; }
+    USAGE("header-weight must be \"normal\" or \"bold\",\nbut %s\n", str);
+}
+
+// check arguments & return true(1)/false(0)
 int chk_sw(char *str, char *positive, char *negative, usage_func_t usage) {
     if (str==NULL) { return 1; }
     else if (strncmp(str, positive, 8)==0) { return 1; }
@@ -310,12 +346,14 @@ int chk_onoff(char *str, usage_func_t usage){
     return chk_sw(str, "on", "off", usage);
 }
 
+// get full path of "~/.utpdfrc" 
 char *getconfpath(){
     static char path[256];
     snprintf(path, 256, "%s/%s", getenv("HOME"), CONFNAME);
     return path;
 }
 
+// str -> key, value
 int parse_conf(char *str, char *key, char *value){
     int s=0, k=0, v=0;
 
@@ -367,7 +405,7 @@ void getargs(int argc, char **argv){
     
     // fetch from command line
     while ((opt = getopt_long
-            (argc, argv, "12bB:dF:hlmno:pP:sS:t:V", long_options, &long_index)) != -1){
+            (argc, argv, "12bB:df:F:hlmno:pP:sS:t:V", long_options, &long_index)) != -1){
         parser(opt, long_index, optarg, (usage_func_t )usage);
     }
 
@@ -477,3 +515,4 @@ void getargs(int argc, char **argv){
     // end of margins
 }
 
+// end of args.c

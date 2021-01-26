@@ -141,28 +141,31 @@ void help_message(int fd){
     fprintf(f, "    -s, --duplex=off    simplex printing\n");
     fprintf(f, "    -l, --orientation=l paper orientation is landscape\n");
     fprintf(f, "    -p, --orientation=p paper orientation is portrait(default)\n");
-    fprintf(f, "    -1 --side=1         one side per surface (portrait default)\n");
-    fprintf(f, "    -2 --side=2         two sides per surface (landscape default) \n");
+    fprintf(f, "    -1, --side=1        one side per surface (portrait default)\n");
+    fprintf(f, "    -2, --side=2        two sides per surface (landscape default) \n");
     fprintf(f, "    --binddir=l/s/n     bind long edge/short edge/none\n");
     fprintf(f, "                   (portrait default: long edge/landscape default: short edge)\n");
     fprintf(f, "  misc:\n");
-    fprintf(f, "    -o <filename>       output file name\n");
-    fprintf(f, "    -h --help           show this message\n");
-    fprintf(f, "    -V --version        show version\n");
-    fprintf(f, "    \n");
+    fprintf(f, "    -o <output_file>    output file name\n");
+    fprintf(f, "    -f <config_file>    optional config file name\n");
+    fprintf(f, "    -h, --help          show this message\n");
+    fprintf(f, "    -V, --version       show version\n");
     fprintf(f, "  length unit:\n");
-    fprintf(f, "    --inch, --unit=inch   unit is inch\n");
-    fprintf(f, "    --mm, --unit=mm       unit is mm (defalt)\n");
+    fprintf(f, "    --inch, --unit=inch unit is inch\n");
+    fprintf(f, "    --mm, --unit=mm     unit is mm (defalt)\n");
     fprintf(f, "  header:\n");
     fprintf(f, "    --header[=on/off]        header on/off (default: on)\n");
+    fprintf(f, "    --header-text[=<text>]   header center text (default: filename)\n");
     fprintf(f, "    --header-font=<fontname> header font (default: sans-serif)\n");
     fprintf(f, "    --header-size=<fontsize> header font size\n");
     fprintf(f, "                             (default: oneside %1.1fpt./twoside %1.1fpt.)\n",
             HFONT_LARGE, HFONT_TWOSIDE_LARGE);
-    fprintf(f, "    --header-text=<text>     header center text (default: filename)\n");
-    fprintf(f, "    --date-format=<format>   date format in strftime(3)\n");
-    fprintf(f, "                             (default: %s)\n",
-            DATE_FORMAT);
+    fprintf(f, "    --header-weight=normal/bold\n");
+    fprintf(f, "                             header font weight (default: bold)\n");
+    fprintf(f, "    --header-slant=normal/italic/oblique\n");
+    fprintf(f, "                             header font slant (default: normal)\n");    
+    fprintf(f, "    --date-format[=<format>] date format in strftime(3)\n");
+    fprintf(f, "                             (default: %s)\n", DATE_FORMAT);
     fprintf(f, "  margins:\n");
     fprintf(f, "    --binding=<length>   binding margin (default: %2.1fmm/%1.1finch)\n",
             BINDING/72*25.4, BINDING/72);    

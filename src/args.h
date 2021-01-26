@@ -27,6 +27,7 @@ typedef struct arguments {
     // option flags
     int twosides, numbering, noheader, punchmark, duplex, portrait, longedge;
     int tab, notebook, fold_arrow, border, current_t, one_output, inch;
+    int hfont_slant, hfont_weight;
     // option strings
     char *fontname, *headerfont, *in_fname, *date_format, *headertext, *outfile;
     char *binding_dir, *paper;

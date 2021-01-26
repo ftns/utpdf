@@ -106,7 +106,7 @@ int main(int argc, char** argv){
                     if (strncmp(args->outfile, "-", 255)==0) {
 			out_fd = STDOUT_FILENO;
 		    } else {
-			out_fd = openfd(args->outfile, O_CREAT|O_WRONLY|O_TRUNC);
+			out_fd = openfd(args->outfile, O_CREAT|O_RDWR|O_TRUNC);
 		    }
 		    surface = cairo_pdf_surface_create_for_stream
 			((cairo_write_func_t )write_func, (void *)&out_fd,
