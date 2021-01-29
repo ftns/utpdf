@@ -212,6 +212,13 @@ void version(){
 
 
 #ifdef SINGLE_DEBUG
+
+char *prog_name;
+
+char *paper_default() {
+    return "a4";
+}
+
 int main(int argc, char **argv){
     prog_name=argv[0];
 
