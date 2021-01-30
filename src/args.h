@@ -21,7 +21,8 @@
 
 #include "utpdf.h"
 
-#define CONFNAME ".utpdfrc"
+#define PDF_CONF_FILE ".utpdfrc"
+#define PS_CONF_FILE ".utpsrc"
 
 typedef struct arguments {
     // option flags

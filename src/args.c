@@ -371,7 +371,11 @@ int chk_onoff(char *str, usage_func_t usage){
 // get full path of "~/.utpdfrc" 
 char *getconfpath(){
     static char path[256];
-    snprintf(path, 256, "%s/%s", getenv("HOME"), CONFNAME);
+    if (makepdf){
+        snprintf(path, 256, "%s/%s", getenv("HOME"), PDF_CONF_FILE);
+    } else {
+        snprintf(path, 256, "%s/%s", getenv("HOME"), PS_CONF_FILE);
+    }
     return path;
 }
 

@@ -93,6 +93,7 @@
 
 enum direction { d_none, d_up, d_down, d_right, d_left  };
 
+extern int makepdf;
 extern char *prog_name;
 extern char *path2cmd(char *p);
 extern cairo_status_t write_func
