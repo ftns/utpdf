@@ -16,6 +16,8 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
+#include <pango/pangocairo.h>
+#include <cairo.h>
 #include "utpdf.h"
 #include "args.h"
 #include "paper.h"
@@ -30,7 +32,9 @@ args_t args_store = {
     .twosides=-1, .numbering=0, .noheader=0, .punchmark=0, .duplex=1,
     .portrait=1, .longedge=0, .tab=TAB, .notebook=0, .fold_arrow=1,
     .border=0, .current_t=0, .one_output=0, .inch=0,
-    .hfont_slant=CAIRO_FONT_SLANT_NORMAL, .hfont_weight=CAIRO_FONT_WEIGHT_BOLD,
+    .hfont_slant=PANGO_STYLE_NORMAL, .hfont_weight=PANGO_WEIGHT_BOLD,
+    .bfont_slant=PANGO_STYLE_NORMAL, .bfont_weight=PANGO_WEIGHT_NORMAL,
+    
     // option strings
     .fontname=NULL, .headerfont=NULL, /* in_fname, */ .date_format=DATE_FORMAT,
     .headertext=NULL, .outfile=NULL, .binding_dir=NULL, .paper=NULL,
@@ -49,7 +53,8 @@ typedef enum i_option
 { i_help, i_version, i_inch, i_mm, i_binding, i_outer, i_top, i_bottom, 
   i_divide, i_hfont, i_hsize, i_notebk, i_datefmt, i_headtxt, i_header,
   i_fold_a, i_time_s, i_border, i_punch, i_number, i_binddir, i_side,
-  i_unit, i_orient, i_hslant, i_hweigbt, i_END } i_option_t;
+  i_unit, i_orient, i_hslant, i_hweigbt, i_bfont, i_bsize, i_bweight,
+  i_bslant, i_END } i_option_t;
 
 struct option long_options[]={
         /*               { char *name; int has_arg; int *flag; int val; }; */
@@ -57,14 +62,14 @@ struct option long_options[]={
         /* 01 i_version */ { "version",       no_argument,          0, 'V'},
         /* 02 i_inch    */ { "inch",     no_argument, &args_store.inch, 1 },
         /* 03 i_mm      */ { "mm",       no_argument, &args_store.inch, 0 },
-        /*    below options appeares in config file. */
+        /*    below options are appeared in config file. */
         /* 04 i_binding */ { "binding",       required_argument,    0,  0 },
         /* 05 i_outer   */ { "outer",         required_argument,    0,  0 },
         /* 06 i_top     */ { "top",           required_argument,    0,  0 },
         /* 07 i_bottom  */ { "bottom",        required_argument,    0,  0 },
         /* 08 i_divide  */ { "divide",        required_argument,    0,  0 },
         /* 09 i_hfont   */ { "header-font",   required_argument,    0,  0 },
-        /* 10 i_hsize   */ { "header-size",   required_argument,    0,  0 },        
+        /* 10 i_hsize   */ { "header-size",   required_argument,    0,  0 },
         /* 11 i_notebk  */ { "notebook",      optional_argument,    0,  0 },
         /* 12 i_datefmt */ { "date-format",   optional_argument,    0,  0 },
         /* 13 i_headtxt */ { "header-text",   optional_argument,    0,  0 },
@@ -80,7 +85,11 @@ struct option long_options[]={
         /* 23 i_orient  */ { "orientation",   required_argument,    0,  0 },
         /* 24 i_hslant  */ { "header-slant",  required_argument,    0,  0 },
         /* 25 i_hweigbt */ { "header-weight", required_argument,    0,  0 },
-        /* 26 i_END     */ { 0, 0, 0, 0 }
+        /* 26 i_bfont   */ { "body-font",     required_argument,    0, 'F'},
+        /* 27 i_bsize   */ { "body-size",     required_argument,    0, 'S'},
+        /* 28 i_bweight */ { "body-weight",   required_argument,    0,  0 },
+        /* 29 i_bslant  */ { "body-slant",    required_argument,    0,  0 },
+        /* 30 i_END     */ { 0, 0, 0, 0 }
 };
 
 #define LONGOP_NAMELEN 16
@@ -259,7 +268,11 @@ void parser(int short_index, int long_index, char *argstr, usage_func_t usage){
             chk_slant(&args->hfont_slant, argstr, usage); break;
         case i_hweigbt:
             chk_weight(&args->hfont_weight, argstr, usage); break;
-        } // switch (lindex)
+        case i_bweight:
+            chk_weight(&args->bfont_weight, argstr, usage); break;
+        case i_bslant:
+            chk_slant(&args->bfont_slant, argstr, usage); break;
+    } // switch (lindex)
     } else {
         // short option
         switch (short_index) {
@@ -319,16 +332,25 @@ void parser(int short_index, int long_index, char *argstr, usage_func_t usage){
 }
 
 void chk_slant(int *value, char *str, usage_func_t usage){
-    if (strncmp(str, "normal", 8)==0)  { *value=CAIRO_FONT_SLANT_NORMAL;  return; }
-    if (strncmp(str, "italic", 8)==0)  { *value=CAIRO_FONT_SLANT_ITALIC;  return; }
-    if (strncmp(str, "oblique", 8)==0) { *value=CAIRO_FONT_SLANT_OBLIQUE; return; }
-    USAGE("header-slant must be \"normal\", \"italic\", \"olique\",\nbut %s\n", str);
+    if (strncmp(str, "normal", 8)==0)  { *value=PANGO_STYLE_NORMAL;  return; }
+    if (strncmp(str, "italic", 8)==0)  { *value=PANGO_STYLE_ITALIC;  return; }
+    if (strncmp(str, "oblique", 8)==0) { *value=PANGO_STYLE_OBLIQUE; return; }
+    USAGE("slant must be \"normal\", \"italic\", \"olique\",\nbut %s\n", str);
 }
 
 void chk_weight(int *value, char *str, usage_func_t usage){
-    if (strncmp(str, "normal", 8)==0) { *value=CAIRO_FONT_WEIGHT_NORMAL; return; }
-    if (strncmp(str, "bold", 8)==0)   { *value=CAIRO_FONT_WEIGHT_BOLD;   return; }
-    USAGE("header-weight must be \"normal\" or \"bold\",\nbut %s\n", str);
+    int v;
+    
+    if (strncmp(str, "normal", 8)==0) { *value=PANGO_WEIGHT_NORMAL; return; }
+    if (strncmp(str, "bold", 8)==0)   { *value=PANGO_WEIGHT_BOLD;   return; }
+    if (strncmp(str, "light", 8)==0)  { *value=PANGO_WEIGHT_LIGHT;  return; }
+    if ((sscanf(str, "%d", &v)==1)
+        && (v >= PANGO_WEIGHT_THIN) && (v <= PANGO_WEIGHT_ULTRAHEAVY)) {
+        *value=v; return;
+    }        
+        
+    USAGE("weight must be \"light\", \"normal\", \"bold\", or %d-%d, \nbut %s\n",
+          PANGO_WEIGHT_THIN, PANGO_WEIGHT_ULTRAHEAVY, str);
 }
 
 // check arguments & return true(1)/false(0)

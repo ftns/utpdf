@@ -151,7 +151,7 @@ void draw_cont_arrow(cairo_t *cr, double x, double y, double edge, double width,
 
 #define PAGEBUFLEN 64
 
-void draw_header(pcobj *obj, args_t *arg, int page, mcoord_t *mcoord,
+void draw_header(pcobj *obj, args_t *args, int page, mcoord_t *mcoord,
                  scoord_t *scoord, char *datebuf){
     double hbaseline, hinset, gap;
     char pagebuf[PAGEBUFLEN];
@@ -159,42 +159,42 @@ void draw_header(pcobj *obj, args_t *arg, int page, mcoord_t *mcoord,
     double ascent, descent;
     
     // hbaseline: the baseline of header font
-    // cairo_select_font_face (cr, , arg->hfont_slant, arg->hfont_weight);
-    pcobj_setfont(obj, arg->headerfont, arg->hfont_large);
-    // cairo_font_extents(cr, &f_ext);
+    // cairo_select_font_face (cr, , args->hfont_slant, args->hfont_weight);
+    pcobj_setfont(obj, args->headerfont, args->hfont_large);
+    pcobj_font_face(obj, args->hfont_slant, args->hfont_weight);
     ascent=pcobj_font_ascent(obj);
     descent=pcobj_font_descent(obj);
     gap = (scoord->body_top - mcoord->head_top - pcobj_font_height(obj))/3;
     hbaseline = scoord->body_top - gap - descent;
 
     // hinset: header inset
-    cairo_set_font_size (cr, arg->hfont_medium);
+    cairo_set_font_size (cr, args->hfont_medium);
     hinset = pcobj_text_width(obj, "0");
 		
     // draw left part: modified date
-    pcobj_setfont(obj, arg->headerfont, arg->hfont_medium);
-    pcobj_weight(obj, PANGO_WEIGHT_BOLD);
-    pcobj_style(obj, PANGO_STYLE_NORMAL); 
+    pcobj_setfont(obj, args->headerfont, args->hfont_medium);
+    pcobj_weight(obj, args->hfont_weight);
+    pcobj_style(obj, args->hfont_slant);
     pcobj_move_to(obj, mcoord->body_left+hinset, hbaseline);
     show_text_at_left(obj, datebuf);
   
     // center part: filename
-    pcobj_setsize(obj, arg->hfont_large);
+    pcobj_setsize(obj, args->hfont_large);
     pcobj_move_to(obj, mcoord->body_left+mcoord->bwidth/2, hbaseline);
 
-    if (arg->headertext == NULL) {
-	show_text_at_center(obj, arg->in_fname);
+    if (args->headertext == NULL) {
+	show_text_at_center(obj, args->in_fname);
     } else {
-	show_text_at_center(obj, arg->headertext);
+	show_text_at_center(obj, args->headertext);
     }
     // right part: page
     snprintf(pagebuf, PAGEBUFLEN, "page: %d  ", page);
-    pcobj_setsize(obj, arg->hfont_medium);
+    pcobj_setsize(obj, args->hfont_medium);
     pcobj_move_to(obj, mcoord->body_left + mcoord->bwidth - hinset, hbaseline);
     show_text_at_right(obj, pagebuf);
 
-    pcobj_weight(obj, PANGO_WEIGHT_NORMAL);
-    pcobj_style(obj, PANGO_STYLE_NORMAL);
+    // settle font face default
+    pcobj_font_face(obj, PANGO_STYLE_NORMAL, PANGO_WEIGHT_NORMAL);
 }
 
 
@@ -285,7 +285,7 @@ void draw_limited_text(pcobj *obj, UFILE *in_f, int tab, const double limit,
 }
 
 
-void draw_lines(pcobj *obj, UFILE *in_f, args_t *arg, int lineperpage,
+void draw_lines(pcobj *obj, UFILE *in_f, args_t *args, int lineperpage,
 		mcoord_t *mcoord, scoord_t *scoord){
     int pline=1; 	// line number of this page
     static int fline=1; // line nunber of this file
@@ -294,27 +294,26 @@ void draw_lines(pcobj *obj, UFILE *in_f, args_t *arg, int lineperpage,
     // read buffer stuff
     static int cont=0;
     
-    // cairo_select_font_face (cr, arg->fontname, CAIRO_FONT_SLANT_NORMAL,
+    // cairo_select_font_face (cr, args->fontname, CAIRO_FONT_SLANT_NORMAL,
     // 			    CAIRO_FONT_WEIGHT_NORMAL);
-    // cairo_set_font_size (cr, arg->fontsize);
-    pcobj_setfont(obj, arg->fontname, arg->fontsize);
-    pcobj_style(obj, PANGO_STYLE_NORMAL);
-    pcobj_weight(obj, PANGO_WEIGHT_NORMAL);
+    // cairo_set_font_size (cr, args->fontsize);
+    pcobj_setfont(obj, args->fontname, args->fontsize);
+    pcobj_font_face(obj, args->bfont_slant, args->bfont_weight);
 
     while ((!eof_u(in_f)) && (pline <= lineperpage)) {
 	baseline = scoord->body_top+scoord->oneline_h*pline;
-	if ((arg->notebook)&&(pline<lineperpage)) {
+	if ((args->notebook)&&(pline<lineperpage)) {
 	    // draw thin baseline
 	    draw_rel_line(cr, mcoord->body_left, baseline, 
 			  mcoord->bwidth, 0, 0.1, C_BASEL);
 	}
 
         cairo_move_to(cr, mcoord->body_left, baseline);
-        if (cont && arg->fold_arrow) {
+        if (cont && args->fold_arrow) {
             // draw continue arrow
             double r = scoord->oneline_h - pcobj_font_ascent(obj)/2
                        + pcobj_font_descent(obj);
-            if (arg->numbering) {
+            if (args->numbering) {
                 draw_cont_arrow
                     (cr, scoord->num_right-r/2, baseline-scoord->oneline_h, r,
                      ARROW_WIDTH, C_ARROW);
@@ -324,7 +323,7 @@ void draw_lines(pcobj *obj, UFILE *in_f, args_t *arg, int lineperpage,
                      ARROW_WIDTH, C_ARROW);
             }
         } else {				
-            if (arg->numbering) {
+            if (args->numbering) {
                 char nbuf[255];
                 // draw line number
                 snprintf(nbuf, 255, "%5d", fline);
@@ -339,10 +338,10 @@ void draw_lines(pcobj *obj, UFILE *in_f, args_t *arg, int lineperpage,
         // pcobj_move_to(obj, scoord->text_left, baseline);
 
         // folding & draw text
-        draw_limited_text(obj, in_f, arg->tab, limitw, &cont, scoord->text_left, baseline);
+        draw_limited_text(obj, in_f, args->tab, limitw, &cont, scoord->text_left, baseline);
         //
 			    
-        if (cont && arg->fold_arrow) {
+        if (cont && args->fold_arrow) {
             draw_return_arrow
                 (cr, mcoord->body_right-scoord->body_inset, baseline-pcobj_font_ascent(obj)/2,
                  scoord->oneline_h-pcobj_font_ascent(obj)/2+pcobj_font_descent(obj),
@@ -353,7 +352,7 @@ void draw_lines(pcobj *obj, UFILE *in_f, args_t *arg, int lineperpage,
     } // while ((!feof(in_f)) && (pline <= lineperpage))
     // finish body lines
 		
-    if (arg->notebook) {
+    if (args->notebook) {
 	int i;
 	for (i=pline; i < lineperpage; i++){
 	    baseline = scoord->body_top+scoord->oneline_h*i;
@@ -362,10 +361,14 @@ void draw_lines(pcobj *obj, UFILE *in_f, args_t *arg, int lineperpage,
 			  mcoord->bwidth, 0, LW_THIN_BASELINE, C_BASEL);
 	}
     }
+
+    // settle font face default
+    pcobj_font_face(obj, PANGO_STYLE_NORMAL, PANGO_WEIGHT_NORMAL);
+
 } // end of draw_lines()
 
 
-int draw_pages(cairo_t *cr, UFILE *in_f, args_t *arg){
+int draw_pages(cairo_t *cr, UFILE *in_f, args_t *args){
     // header
     char datebuf[255];
     struct tm *modt;
@@ -373,8 +376,8 @@ int draw_pages(cairo_t *cr, UFILE *in_f, args_t *arg){
     int page=1;
     pcobj *obj=pcobj_new(cr);
     
-    modt = localtime(arg->mtime);
-    strftime(datebuf, 255, arg->date_format, modt);
+    modt = localtime(args->mtime);
+    strftime(datebuf, 255, args->date_format, modt);
     
     do {
 	mcoord_t mc_store, *mcoord=&mc_store;
@@ -384,28 +387,28 @@ int draw_pages(cairo_t *cr, UFILE *in_f, args_t *arg){
 	// local coordinates
 	double bottombase, bodyheight;
 	    
-	calc_page_coordinates(arg, page, mcoord);
+	calc_page_coordinates(args, page, mcoord);
 
-	scoord->body_inset = arg->fontsize;
+	scoord->body_inset = args->fontsize;
 	// y-axis
-	scoord->oneline_h = arg->fontsize+arg->betweenline;
-	if (!arg->noheader){
+	scoord->oneline_h = args->fontsize+args->betweenline;
+	if (!args->noheader){
 	    // has header
-	    scoord->body_top = mcoord->head_top + arg->header_height + scoord->oneline_h;
-	    bodyheight = arg->pheight - (scoord->body_top + mcoord->mbottom);
+	    scoord->body_top = mcoord->head_top + args->header_height + scoord->oneline_h;
+	    bodyheight = args->pheight - (scoord->body_top + mcoord->mbottom);
 	} else {
 	    // no header
 	    scoord->body_top = mcoord->head_top;
-	    bodyheight = arg->pheight - (mcoord->head_top + mcoord->mbottom);
+	    bodyheight = args->pheight - (mcoord->head_top + mcoord->mbottom);
 	}	    
 	lineperpage = (int)(bodyheight/scoord->oneline_h);
 	bottombase = scoord->body_top + scoord->oneline_h*lineperpage;
 	    
 	// x-axis
-	cairo_select_font_face (cr, arg->fontname, CAIRO_FONT_SLANT_NORMAL,
+	cairo_select_font_face (cr, args->fontname, CAIRO_FONT_SLANT_NORMAL,
 				CAIRO_FONT_WEIGHT_NORMAL);
-	cairo_set_font_size (cr, arg->fontsize);
-	if (arg->numbering) {
+	cairo_set_font_size (cr, args->fontsize);
+	if (args->numbering) {
 	    scoord->num_right = mcoord->body_left + scoord->body_inset
 		+ pcobj_text_width(obj, "000000"); // vertical line
 	    scoord->text_left = scoord->num_right + pcobj_text_width(obj, "0");
@@ -413,42 +416,42 @@ int draw_pages(cairo_t *cr, UFILE *in_f, args_t *arg){
 	    scoord->text_left = mcoord->body_left + scoord->body_inset;
 	}
 	// draw punchmark
-	if (arg->punchmark){
+	if (args->punchmark){
 	    switch (mcoord->markdir){
 	    case d_none:
 		break;
 	    case d_up:
-		draw_mark(cr, d_up, arg->pwidth/2, mcoord->head_top/2);
+		draw_mark(cr, d_up, args->pwidth/2, mcoord->head_top/2);
 		break;
 	    case d_down:
-		draw_mark(cr, d_down, arg->pwidth/2, arg->pheight - mcoord->mbottom/2);
+		draw_mark(cr, d_down, args->pwidth/2, args->pheight - mcoord->mbottom/2);
 		break;
 	    case d_left:
-		draw_mark(cr, d_left, mcoord->body_left/2, arg->pheight/2);
+		draw_mark(cr, d_left, mcoord->body_left/2, args->pheight/2);
 		break;
 	    case d_right:
-		draw_mark(cr, d_right, (mcoord->body_right + arg->pwidth)/2, arg->pheight/2);
+		draw_mark(cr, d_right, (mcoord->body_right + args->pwidth)/2, args->pheight/2);
 		break;
 	    }
         }
         // draw border
-        if (arg->border){
+        if (args->border){
             draw_rectangle(cr, mcoord->body_left, mcoord->head_top, mcoord->bwidth,
-                           arg->pheight - mcoord->mbottom - mcoord->head_top,
+                           args->pheight - mcoord->mbottom - mcoord->head_top,
                            LW_BORDER, C_BORDER);
-            if (!arg->noheader){
+            if (!args->noheader){
                 draw_rel_line(cr, mcoord->body_left, scoord->body_top,
                               mcoord->bwidth, 0, LW_BORDER, C_BORDER);
             }
         }
         // draw header
-        if (!arg->noheader){
+        if (!args->noheader){
             //
-            draw_header(obj, arg, page, mcoord, scoord, datebuf);
+            draw_header(obj, args, page, mcoord, scoord, datebuf);
             //
             // header base line
-            if (arg->notebook){
-                if (arg->numbering) {
+            if (args->notebook){
+                if (args->numbering) {
                     // virtical line
                     draw_rel_line(cr, scoord->num_right, scoord->body_top, 
                                   0, bottombase - scoord->body_top+LW_THICK_BASELINE,
@@ -471,32 +474,32 @@ int draw_pages(cairo_t *cr, UFILE *in_f, args_t *arg){
             }
         } else {
             // no header
-            if (arg->notebook) {
+            if (args->notebook) {
                 // top line
                 draw_rel_line(cr, mcoord->body_left, mcoord->head_top, mcoord->bwidth, 0,
                               1, C_BASEL);
                 cairo_set_source_rgb(cr, C_BLACK);
-                if (arg->numbering) {
+                if (args->numbering) {
                     // vertical line
                     draw_rel_line(cr, scoord->num_right, mcoord->head_top,
                                   0, bottombase - mcoord->head_top+LW_THICK_BASELINE,
                                   LW_VLINE, C_NUMVL);
                 }
             }
-        } // if (!arg->noheader)
+        } // if (!args->noheader)
 
         page++;
         
         // draw body
-        draw_lines(obj, in_f, arg, lineperpage, mcoord, scoord);
+        draw_lines(obj, in_f, args, lineperpage, mcoord, scoord);
         //
 	
-        if (arg->notebook){
+        if (args->notebook){
             // footer line
             draw_rel_line(cr, mcoord->body_left, bottombase+1, mcoord->bwidth, 0, 1, C_BASEL);
         }
 
-        if (!arg->twosides || (page % 2 != 0)){
+        if (!args->twosides || (page % 2 != 0)){
             if (!(eof_u(in_f))){
                 cairo_show_page(cr); // new page
             }
@@ -507,7 +510,7 @@ int draw_pages(cairo_t *cr, UFILE *in_f, args_t *arg){
     pcobj_free(obj);
     
     page--;
-    if (arg->twosides) {
+    if (args->twosides) {
         return(ceil(page/2.0));
     } else {
         return(page);

@@ -36,6 +36,7 @@ extern void pcobj_settext(pcobj *obj, const char *str);
 extern void pcobj_print(pcobj *obj, const char *str);
 extern void pcobj_weight(pcobj *obj, PangoWeight w);
 extern void pcobj_style(pcobj *obj, PangoStyle style);
+extern void pcobj_font_face(pcobj *obj, PangoStyle style, PangoWeight w);
 extern double pcobj_font_ascent(pcobj *obj);
 extern double pcobj_font_descent(pcobj *obj);
 extern double pcobj_font_height(pcobj *obj);

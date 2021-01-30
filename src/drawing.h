@@ -47,14 +47,14 @@ extern void draw_cont_arrow
      double r, double g, double b);
 
 extern void draw_header
-   (pcobj *obj, args_t *arg, int page, mcoord_t *mcoord,
+   (pcobj *obj, args_t *args, int page, mcoord_t *mcoord,
     scoord_t *scoord, char *datebuf);
-extern void draw_lines(pcobj *obj, UFILE *in_f, args_t *arg, int lineperpage,
+extern void draw_lines(pcobj *obj, UFILE *in_f, args_t *args, int lineperpage,
                        mcoord_t *mcoord, scoord_t *scoord);
 extern void draw_lines
-    (pcobj *obj, UFILE *in_f, args_t *arg,int lineperpage,
+    (pcobj *obj, UFILE *in_f, args_t *args,int lineperpage,
      mcoord_t *mcoord, scoord_t *scoord);
-extern int draw_pages(cairo_t *cr, UFILE *in_f, args_t *arg);
+extern int draw_pages(cairo_t *cr, UFILE *in_f, args_t *args);
 
 #endif
 

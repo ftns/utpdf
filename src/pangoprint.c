@@ -80,6 +80,16 @@ void pcobj_style(pcobj *obj, PangoStyle style){
     pango_layout_set_font_description (obj->layout, obj->desc);
 }
 
+void pcobj_font_face(pcobj *obj, PangoStyle style, PangoWeight w){
+    if ((w<100)||(w>1000)){
+        fprintf(stderr, "pcobj_font_face: weight must be 100-1000, but %d\n", w);
+    } else {        
+        pango_font_description_set_style(obj->desc, style);
+        pango_font_description_set_weight(obj->desc, w);
+        pango_layout_set_font_description (obj->layout, obj->desc);
+    }
+}
+
 double pcobj_font_ascent(pcobj *obj){
     int base;
     PangoRectangle ink, logical;
@@ -105,11 +115,10 @@ double pcobj_font_height(pcobj *obj){
     PangoRectangle ink, logical;
         
     base=pango_layout_get_baseline(obj->layout);
-    pango_cairo_update_layout (obj->cr, obj->layout);
+    pango_cairo_update_layout(obj->cr, obj->layout);
     pango_layout_get_extents(obj->layout, &ink, &logical);
     return logical.height/PANGO_SCALE;
 }
-
 
 double pcobj_text_width(pcobj *obj, const char *str){
     PangoRectangle ink, logical;
