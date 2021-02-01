@@ -29,7 +29,7 @@ typedef void (*usage_func_t)(char *);
 time_t mtime_store;
 args_t args_store = {
     // option flags
-    .twosides=-1, .numbering=0, .noheader=0, .punchmark=0, .duplex=1,
+    .twocols=-1, .numbering=0, .noheader=0, .punchmark=0, .duplex=1,
     .portrait=1, .longedge=0, .tab=TAB, .notebook=0, .fold_arrow=1,
     .border=0, .current_t=0, .one_output=0, .inch=0,
     .hfont_slant=PANGO_STYLE_NORMAL, .hfont_weight=PANGO_WEIGHT_BOLD,
@@ -54,7 +54,7 @@ typedef enum i_option
   i_divide, i_hfont, i_hsize, i_notebk, i_datefmt, i_headtxt, i_header,
   i_fold_a, i_time_s, i_border, i_punch, i_number, i_binddir, i_side,
   i_unit, i_orient, i_hslant, i_hweigbt, i_bfont, i_bsize, i_bweight,
-  i_bslant, i_END } i_option_t;
+  i_bslant, i_tab, i_END } i_option_t;
 
 struct option long_options[]={
         /*               { char *name; int has_arg; int *flag; int val; }; */
@@ -80,7 +80,7 @@ struct option long_options[]={
         /* 18 i_punch   */ { "punch",         optional_argument,    0,  0 },
         /* 19 i_number  */ { "number",        optional_argument,    0,  0 },
         /* 20 i_binddir */ { "binddir",       required_argument,    0,  0 },
-        /* 21 i_side    */ { "side",          required_argument,    0,  0 },
+        /* 21 i_side    */ { "col",           required_argument,    0,  0 },
         /* 22 i_unit    */ { "unit",          required_argument,    0,  0 },
         /* 23 i_orient  */ { "orientation",   required_argument,    0,  0 },
         /* 24 i_hslant  */ { "header-slant",  required_argument,    0,  0 },
@@ -89,7 +89,8 @@ struct option long_options[]={
         /* 27 i_bsize   */ { "body-size",     required_argument,    0, 'S'},
         /* 28 i_bweight */ { "body-weight",   required_argument,    0,  0 },
         /* 29 i_bslant  */ { "body-slant",    required_argument,    0,  0 },
-        /* 30 i_END     */ { 0, 0, 0, 0 }
+        /* 30 i_tab     */ { "tab",           required_argument,    0, 't'},
+        /* 31 i_END     */ { 0, 0, 0, 0 }
 };
 
 #define LONGOP_NAMELEN 16
@@ -259,7 +260,7 @@ void parser(int short_index, int long_index, char *argstr, usage_func_t usage){
         case i_number:
             args->numbering = chk_onoff(argstr, usage); break;
         case i_side:
-            args->twosides = chk_sw(argstr, "2", "1", usage); break;
+            args->twocols = chk_sw(argstr, "2", "1", usage); break;
         case i_unit:
             args->inch = chk_sw(argstr, "inch", "mm", usage); break;
         case i_orient:
@@ -277,9 +278,9 @@ void parser(int short_index, int long_index, char *argstr, usage_func_t usage){
         // short option
         switch (short_index) {
         case '1':
-            args->twosides=0; break;
+            args->twocols=0; break;
         case '2':
-            args->twosides=1; break;
+            args->twocols=1; break;
         case 'b':
             args->border = 1; break;
         case 'B':
@@ -440,23 +441,23 @@ void getargs(int argc, char **argv){
 	usage("No file specified\n");
     }
     // twoside default setting
-    if (args->twosides == -1) {
-	args->twosides = (!args->portrait);
+    if (args->twocols == -1) {
+	args->twocols = (!args->portrait);
     }
     // font size
     if (args->fontsize == 0.0){
-	if (!args->twosides) {
+	if (!args->twocols) {
 	    args->fontsize = FONTSIZE;
 	} else {
-	    args->fontsize = FONTSIZE_TWOSIDES;
+	    args->fontsize = FONTSIZE_TWOCOLS;
 	}
     }
 
     if (args->headersize == 0.0){
-	if (! args->twosides) {
+	if (! args->twocols) {
 	    args->hfont_large = HFONT_LARGE;
 	} else {
-	    args->hfont_large = HFONT_TWOSIDE_LARGE;
+	    args->hfont_large = HFONT_TWOCOLS_LARGE;
 	}
     } else {
 	args->hfont_large = args->headersize;

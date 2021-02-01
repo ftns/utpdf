@@ -120,52 +120,66 @@ void help_message(int fd){
     
     fprintf(f, "Usage: %s [options] <utf8_textfile> ...\n", prog_name);
     fprintf(f, "options:\n");
-    fprintf(f, "  printing:\n");
+    fprintf(f, "  basic settings:\n");
     fprintf(f, "    -b, --border[=on/off] draw border\n");
     fprintf(f, "    -B <point>            space between lines (default: 1.0pt)\n");
     fprintf(f, "    -m, --punch[=on/off]  show punch mark\n");
     fprintf(f, "    -n, --number[=on/off] show line number\n");
     fprintf(f, "    --notebook[=on/off]   show baselines like notebook\n");
     fprintf(f, "    --fold-arrow[=on/off] show the arrows indicate folded line (default: on)\n");
-    fprintf(f, "    -t <#>                tab width (default: %d)\n", TAB);
+    fprintf(f, "    -t <#>, --tab=<#>     tab width (default: %d)\n", TAB);
     fprintf(f, "    --timestamp=mod/cur   timestamp: file modified time/current time\n");
-    fprintf(f, "                          (file default: modified time/stdin: current time only)\n");
-    fprintf(f, "    -F <fontname>         body font (default: %s)\n", DEFAULT_FONT);
-    fprintf(f, "    -S <fontsize>         font size in pt.\n");
-    fprintf(f, "                          (default: oneside %1.1fpt./twoside %1.1fpt.)\n",
-            FONTSIZE, FONTSIZE_TWOSIDES);
-    fprintf(f, "  paper:\n");
+    fprintf(f, "                        (file default: modified time/stdin: current time only)\n");
+    fprintf(f, "\n");
+    
+    fprintf(f, "  sheet:\n");
     fprintf(f, "    -P a3/a4/a5/b4/b5/b6/letter/legal\n");
-    fprintf(f, "                        paper size (default: %s)\n", paper_default());
+    fprintf(f, "                        sheet size (default: %s)\n", paper_default());
     fprintf(f, "    -d, --duplex[=on]   duplex printing(default)\n");
     fprintf(f, "    -s, --duplex=off    simplex printing\n");
-    fprintf(f, "    -l, --orientation=l paper orientation is landscape\n");
-    fprintf(f, "    -p, --orientation=p paper orientation is portrait(default)\n");
-    fprintf(f, "    -1, --side=1        one side per surface (portrait default)\n");
-    fprintf(f, "    -2, --side=2        two sides per surface (landscape default) \n");
+    fprintf(f, "    -l, --orientation=l sheet orientation is landscape\n");
+    fprintf(f, "    -p, --orientation=p sheet orientation is portrait(default)\n");
+    fprintf(f, "    -1, --col=1         one column per sheet (portrait default)\n");
+    fprintf(f, "    -2, --col=2         two colimns per sheet (landscape default) \n");
     fprintf(f, "    --binddir=l/s/n     bind long edge/short edge/none\n");
     fprintf(f, "                   (portrait default: long edge/landscape default: short edge)\n");
+    fprintf(f, "\n");
+    
     fprintf(f, "  misc:\n");
     fprintf(f, "    -o <output_file>    output file name\n");
     fprintf(f, "    -f <config_file>    optional config file name\n");
     fprintf(f, "    -h, --help          show this message\n");
     fprintf(f, "    -V, --version       show version\n");
-    fprintf(f, "  length unit:\n");
-    fprintf(f, "    --inch, --unit=inch unit is inch\n");
-    fprintf(f, "    --mm, --unit=mm     unit is mm (defalt)\n");
+    fprintf(f, "    --inch, --unit=inch length unit is inch\n");
+    fprintf(f, "    --mm,   --unit=mm   length unit is mm (defalt)\n");
+    fprintf(f, "\n");
+
+    fprintf(f, "  body:\n");
+    fprintf(f, "    -F <fontname>, --body-font <fontname>\n");
+    fprintf(f, "                          body font (default: %s)\n", DEFAULT_FONT);
+    fprintf(f, "    -S <fontsize>, --body-size <fontsize>\n");
+    fprintf(f, "                          font size in pt.\n");
+    fprintf(f, "                          (default: oneside %1.1fpt./twoside %1.1fpt.)\n",FONTSIZE, FONTSIZE_TWOCOLS);
+    fprintf(f, "    --body-weight=light/normal/bold/100-1000\n");
+    fprintf(f, "                          body font weight (default: normal)\n");
+    fprintf(f, "    --body-slant=normal/italic/oblique\n");
+    fprintf(f, "                          body font slant (default: normal)\n");
+    fprintf(f, "\n");
+
     fprintf(f, "  header:\n");
     fprintf(f, "    --header[=on/off]        header on/off (default: on)\n");
     fprintf(f, "    --header-text[=<text>]   header center text (default: filename)\n");
     fprintf(f, "    --header-font=<fontname> header font (default: sans-serif)\n");
     fprintf(f, "    --header-size=<fontsize> header font size\n");
-    fprintf(f, "                             (default: oneside %1.1fpt./twoside %1.1fpt.)\n",
-            HFONT_LARGE, HFONT_TWOSIDE_LARGE);
-    fprintf(f, "    --header-weight=normal/bold\n");
+    fprintf(f, "                             (default: one column %1.1fpt./two columns %1.1fpt.)\n", HFONT_LARGE, HFONT_TWOCOLS_LARGE);
+    fprintf(f, "    --header-weight=light/normal/bold/100-1000\n");
     fprintf(f, "                             header font weight (default: bold)\n");
     fprintf(f, "    --header-slant=normal/italic/oblique\n");
     fprintf(f, "                             header font slant (default: normal)\n");    
     fprintf(f, "    --date-format[=<format>] date format in strftime(3)\n");
     fprintf(f, "                             (default: %s)\n", DATE_FORMAT);
+    fprintf(f, "\n");
+
     fprintf(f, "  margins:\n");
     fprintf(f, "    --binding=<length>   binding margin (default: %2.1fmm/%1.1finch)\n",
             BINDING/72*25.4, BINDING/72);    
@@ -175,8 +189,7 @@ void help_message(int fd){
             PTOP/72*25.4, PTOP/72);    
     fprintf(f, "    --bottom=<length>    bottom margin  (default: %2.1fmm/%1.1finch)\n",
             PBOTTOM/72*25.4, PBOTTOM/72);
-    fprintf(f, "    --divide=<length>    distance between two sides (default: %2.1fmm/%1.1finch)\n",
-            DIVIDE/72*25.4, DIVIDE/72);
+    fprintf(f, "    --divide=<length>    distance between two sides (default: %2.1fmm/%1.1finch)\n", DIVIDE/72*25.4, DIVIDE/72);
     fclose(f);
 }
 

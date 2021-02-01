@@ -23,212 +23,212 @@
 //
 // calc main_coordinates
 
-void twoside_oddpage_leftside(args_t *arg, mcoord_t *mcoord){
-  if (arg->longedge) {
-    if (arg->portrait) {
-      mcoord->head_top   = arg->ptop;
-      mcoord->mbottom    = arg->pbottom;
-      mcoord->bwidth     = (arg->pwidth - (arg->binding + arg->outer + arg->divide))/2;
-      mcoord->body_left  = arg->binding;
+void twoside_oddpage_leftside(args_t *args, mcoord_t *mcoord){
+  if (args->longedge) {
+    if (args->portrait) {
+      mcoord->head_top   = args->ptop;
+      mcoord->mbottom    = args->pbottom;
+      mcoord->bwidth     = (args->pwidth - (args->binding + args->outer + args->divide))/2;
+      mcoord->body_left  = args->binding;
       mcoord->body_right = mcoord->body_left+mcoord->bwidth;
       mcoord->markdir    = d_left;
     } else {
-      mcoord->head_top   = arg->binding;
-      mcoord->mbottom    = arg->outer;
-      mcoord->bwidth     = (arg->pwidth-(arg->ptop + arg->pbottom + arg->divide))/2;
-      mcoord->body_left  = arg->ptop;
+      mcoord->head_top   = args->binding;
+      mcoord->mbottom    = args->outer;
+      mcoord->bwidth     = (args->pwidth-(args->ptop + args->pbottom + args->divide))/2;
+      mcoord->body_left  = args->ptop;
       mcoord->body_right = mcoord->body_left + mcoord->bwidth;
       mcoord->markdir    = d_up;
     }
   } else {
     // short edge
-    if (arg->portrait) {
-      mcoord->head_top   = arg->binding;
-      mcoord->mbottom    = arg->outer;
-      mcoord->bwidth     = (arg->pwidth - (arg->ptop + arg->pbottom + arg->divide))/2;
-      mcoord->body_left  = arg->ptop;
+    if (args->portrait) {
+      mcoord->head_top   = args->binding;
+      mcoord->mbottom    = args->outer;
+      mcoord->bwidth     = (args->pwidth - (args->ptop + args->pbottom + args->divide))/2;
+      mcoord->body_left  = args->ptop;
       mcoord->body_right = mcoord->body_left + mcoord->bwidth;
       mcoord->markdir    = d_up;
     } else {
-      mcoord->head_top   = arg->ptop;
-      mcoord->mbottom    = arg->pbottom;
-      mcoord->bwidth     = (arg->pwidth-(arg->binding+arg->outer+arg->divide))/2;
-      mcoord->body_left  = arg->binding;
+      mcoord->head_top   = args->ptop;
+      mcoord->mbottom    = args->pbottom;
+      mcoord->bwidth     = (args->pwidth-(args->binding+args->outer+args->divide))/2;
+      mcoord->body_left  = args->binding;
       mcoord->body_right = mcoord->body_left+mcoord->bwidth;
       mcoord->markdir    = d_left;
     }
   }
 }
 
-void twoside_oddpage_rightside(args_t *arg, mcoord_t *mcoord){
+void twoside_oddpage_rightside(args_t *args, mcoord_t *mcoord){
   mcoord->markdir = d_none;
-  if (arg->longedge) {
-    if (arg->portrait) {
-      mcoord->head_top   = arg->ptop;
-      mcoord->mbottom    = arg->pbottom;
-      mcoord->bwidth     = (arg->pwidth - (arg->binding + arg->outer + arg->divide))/2;
-      mcoord->body_left  = arg->binding + mcoord->bwidth + arg->divide;
-      mcoord->body_right = arg->pwidth - arg->outer;
+  if (args->longedge) {
+    if (args->portrait) {
+      mcoord->head_top   = args->ptop;
+      mcoord->mbottom    = args->pbottom;
+      mcoord->bwidth     = (args->pwidth - (args->binding + args->outer + args->divide))/2;
+      mcoord->body_left  = args->binding + mcoord->bwidth + args->divide;
+      mcoord->body_right = args->pwidth - args->outer;
     } else {
-      mcoord->head_top   = arg->binding;
-      mcoord->mbottom    = arg->outer;
-      mcoord->bwidth     = (arg->pwidth - (arg->ptop + arg->pbottom + arg->divide))/2;
-      mcoord->body_left  = arg->ptop + mcoord->bwidth+arg->divide;
-      mcoord->body_right = arg->pwidth - arg->pbottom;
+      mcoord->head_top   = args->binding;
+      mcoord->mbottom    = args->outer;
+      mcoord->bwidth     = (args->pwidth - (args->ptop + args->pbottom + args->divide))/2;
+      mcoord->body_left  = args->ptop + mcoord->bwidth+args->divide;
+      mcoord->body_right = args->pwidth - args->pbottom;
     }
   } else {
     // short edge
-    if (arg->portrait) {
-      mcoord->head_top   = arg->binding;
-      mcoord->mbottom    = arg->outer;
-      mcoord->bwidth     = (arg->pwidth - (arg->ptop + arg->pbottom + arg->divide))/2;
-      mcoord->body_left  = arg->ptop + mcoord->bwidth + arg->divide;
-      mcoord->body_right = arg->pwidth - arg->pbottom;
+    if (args->portrait) {
+      mcoord->head_top   = args->binding;
+      mcoord->mbottom    = args->outer;
+      mcoord->bwidth     = (args->pwidth - (args->ptop + args->pbottom + args->divide))/2;
+      mcoord->body_left  = args->ptop + mcoord->bwidth + args->divide;
+      mcoord->body_right = args->pwidth - args->pbottom;
     } else {
-      mcoord->head_top   = arg->ptop;
-      mcoord->mbottom    = arg->pbottom;
-      mcoord->bwidth     = (arg->pwidth - (arg->binding + arg->outer + arg->divide))/2;
-      mcoord->body_left  = arg->binding + mcoord->bwidth + arg->divide;
-      mcoord->body_right = arg->pwidth - arg->outer;
+      mcoord->head_top   = args->ptop;
+      mcoord->mbottom    = args->pbottom;
+      mcoord->bwidth     = (args->pwidth - (args->binding + args->outer + args->divide))/2;
+      mcoord->body_left  = args->binding + mcoord->bwidth + args->divide;
+      mcoord->body_right = args->pwidth - args->outer;
     }
   }
 }
 
-void twoside_evenpage_leftside(args_t *arg, mcoord_t *mcoord){
-  if (arg->longedge) {
-    if (arg->portrait) {
-      mcoord->head_top   = arg->ptop;
-      mcoord->mbottom    = arg->pbottom;
-      mcoord->bwidth     = (arg->pwidth - (arg->binding + arg->outer + arg->divide))/2;
-      mcoord->body_left  = arg->outer;
+void twoside_evenpage_leftside(args_t *args, mcoord_t *mcoord){
+  if (args->longedge) {
+    if (args->portrait) {
+      mcoord->head_top   = args->ptop;
+      mcoord->mbottom    = args->pbottom;
+      mcoord->bwidth     = (args->pwidth - (args->binding + args->outer + args->divide))/2;
+      mcoord->body_left  = args->outer;
       mcoord->body_right = mcoord->body_left + mcoord->bwidth;
       mcoord->markdir    = d_none; // d_right;
     } else {
-      mcoord->head_top   = arg->outer;
-      mcoord->mbottom    = arg->binding;
-      mcoord->bwidth     = (arg->pwidth - (arg->ptop + arg->pbottom + arg->divide))/2;
-      mcoord->body_left  = arg->ptop;
+      mcoord->head_top   = args->outer;
+      mcoord->mbottom    = args->binding;
+      mcoord->bwidth     = (args->pwidth - (args->ptop + args->pbottom + args->divide))/2;
+      mcoord->body_left  = args->ptop;
       mcoord->body_right = mcoord->body_left + mcoord->bwidth;
       mcoord->markdir    = d_down;
     }
   } else {
     // short edge
-    if (arg->portrait) {
-      mcoord->head_top   = arg->outer;
-      mcoord->mbottom    = arg->binding;
-      mcoord->bwidth     = (arg->pwidth-(arg->ptop+arg->pbottom+arg->divide))/2;
-      mcoord->body_left  = arg->ptop;
+    if (args->portrait) {
+      mcoord->head_top   = args->outer;
+      mcoord->mbottom    = args->binding;
+      mcoord->bwidth     = (args->pwidth-(args->ptop+args->pbottom+args->divide))/2;
+      mcoord->body_left  = args->ptop;
       mcoord->body_right = mcoord->body_left+mcoord->bwidth;
       mcoord->markdir    = d_down;
     } else {
-      mcoord->head_top   = arg->ptop;
-      mcoord->mbottom    = arg->pbottom;
-      mcoord->bwidth     = (arg->pwidth-(arg->binding+arg->outer+arg->divide))/2;
-      mcoord->body_left  = arg->outer;
+      mcoord->head_top   = args->ptop;
+      mcoord->mbottom    = args->pbottom;
+      mcoord->bwidth     = (args->pwidth-(args->binding+args->outer+args->divide))/2;
+      mcoord->body_left  = args->outer;
       mcoord->body_right = mcoord->body_left+mcoord->bwidth;
       mcoord->markdir    = d_none; // d_right;
     }
   }
 }
 
-void twoside_evenpage_rightside(args_t *arg, mcoord_t *mcoord){
-  if (arg->longedge) {
-    if (arg->portrait) {
-      mcoord->head_top   = arg->ptop;
-      mcoord->mbottom    = arg->pbottom;
-      mcoord->bwidth     = (arg->pwidth-(arg->binding+arg->outer+arg->divide))/2;
-      mcoord->body_left  = arg->outer+mcoord->bwidth+arg->divide;
-      mcoord->body_right = arg->pwidth-arg->binding;
+void twoside_evenpage_rightside(args_t *args, mcoord_t *mcoord){
+  if (args->longedge) {
+    if (args->portrait) {
+      mcoord->head_top   = args->ptop;
+      mcoord->mbottom    = args->pbottom;
+      mcoord->bwidth     = (args->pwidth-(args->binding+args->outer+args->divide))/2;
+      mcoord->body_left  = args->outer+mcoord->bwidth+args->divide;
+      mcoord->body_right = args->pwidth-args->binding;
       mcoord->markdir    = d_right;
     } else {
-      mcoord->head_top   = arg->outer;
-      mcoord->mbottom    = arg->binding;
-      mcoord->bwidth     = (arg->pwidth-(arg->ptop+arg->pbottom+arg->divide))/2;
-      mcoord->body_left  = arg->ptop+mcoord->bwidth+arg->divide;
-      mcoord->body_right = arg->pwidth-arg->pbottom;
+      mcoord->head_top   = args->outer;
+      mcoord->mbottom    = args->binding;
+      mcoord->bwidth     = (args->pwidth-(args->ptop+args->pbottom+args->divide))/2;
+      mcoord->body_left  = args->ptop+mcoord->bwidth+args->divide;
+      mcoord->body_right = args->pwidth-args->pbottom;
       mcoord->markdir    = d_none;
     }
   } else {
     // short edge
-    if (arg->portrait) {
-      mcoord->head_top   = arg->outer;
-      mcoord->mbottom    = arg->binding;
-      mcoord->bwidth     = (arg->pwidth-(arg->ptop+arg->pbottom+arg->divide))/2;
-      mcoord->body_left  = arg->ptop+mcoord->bwidth+arg->divide;
-      mcoord->body_right = arg->pwidth-arg->pbottom;
+    if (args->portrait) {
+      mcoord->head_top   = args->outer;
+      mcoord->mbottom    = args->binding;
+      mcoord->bwidth     = (args->pwidth-(args->ptop+args->pbottom+args->divide))/2;
+      mcoord->body_left  = args->ptop+mcoord->bwidth+args->divide;
+      mcoord->body_right = args->pwidth-args->pbottom;
       mcoord->markdir    = d_none;
     } else {
-      mcoord->head_top   = arg->ptop;
-      mcoord->mbottom    = arg->pbottom;
-      mcoord->bwidth     = (arg->pwidth-(arg->binding+arg->outer+arg->divide))/2;
-      mcoord->body_left  = arg->outer+mcoord->bwidth+arg->divide;
-      mcoord->body_right = arg->pwidth-arg->binding;
+      mcoord->head_top   = args->ptop;
+      mcoord->mbottom    = args->pbottom;
+      mcoord->bwidth     = (args->pwidth-(args->binding+args->outer+args->divide))/2;
+      mcoord->body_left  = args->outer+mcoord->bwidth+args->divide;
+      mcoord->body_right = args->pwidth-args->binding;
       mcoord->markdir    = d_right;
     }
   }
 }
 
-void oneside_oddpage(args_t *arg, mcoord_t *mcoord){
-  if (arg->longedge) {
-    if (arg->portrait) {
-      mcoord->head_top   = arg->ptop;
-      mcoord->mbottom    = arg->pbottom;
-      mcoord->body_left  = arg->binding;
-      mcoord->body_right = arg->pwidth-arg->outer;
+void oneside_oddpage(args_t *args, mcoord_t *mcoord){
+  if (args->longedge) {
+    if (args->portrait) {
+      mcoord->head_top   = args->ptop;
+      mcoord->mbottom    = args->pbottom;
+      mcoord->body_left  = args->binding;
+      mcoord->body_right = args->pwidth-args->outer;
       mcoord->markdir =  d_left;
     } else {
-      mcoord->head_top   = arg->binding;
-      mcoord->mbottom    = arg->outer;
-      mcoord->body_left  = arg->ptop;
-      mcoord->body_right = arg->pwidth-arg->pbottom;
+      mcoord->head_top   = args->binding;
+      mcoord->mbottom    = args->outer;
+      mcoord->body_left  = args->ptop;
+      mcoord->body_right = args->pwidth-args->pbottom;
       mcoord->markdir    = d_up;
     }
   } else {
     // short edge
-    if (arg->portrait) {
-      mcoord->head_top   = arg->binding;
-      mcoord->mbottom    = arg->outer;
-      mcoord->body_left  = arg->ptop;
-      mcoord->body_right = arg->pwidth-arg->pbottom;
+    if (args->portrait) {
+      mcoord->head_top   = args->binding;
+      mcoord->mbottom    = args->outer;
+      mcoord->body_left  = args->ptop;
+      mcoord->body_right = args->pwidth-args->pbottom;
       mcoord->markdir    = d_up;
     } else {
-      mcoord->head_top   = arg->ptop;
-      mcoord->mbottom    = arg->pbottom;
-      mcoord->body_left  = arg->binding;
-      mcoord->body_right = arg->pwidth - arg->outer;
+      mcoord->head_top   = args->ptop;
+      mcoord->mbottom    = args->pbottom;
+      mcoord->body_left  = args->binding;
+      mcoord->body_right = args->pwidth - args->outer;
       mcoord->markdir    = d_left;
     }
   }
   mcoord->bwidth = mcoord->body_right - mcoord->body_left;
 }
 
-void oneside_evenpage(args_t *arg, mcoord_t *mcoord){
-  if (arg->longedge) {
-    if (arg->portrait){
-      mcoord->head_top   = arg->ptop;
-      mcoord->mbottom    = arg->pbottom;
-      mcoord->body_left  = arg->outer;
-      mcoord->body_right = arg->pwidth-arg->binding;
+void oneside_evenpage(args_t *args, mcoord_t *mcoord){
+  if (args->longedge) {
+    if (args->portrait){
+      mcoord->head_top   = args->ptop;
+      mcoord->mbottom    = args->pbottom;
+      mcoord->body_left  = args->outer;
+      mcoord->body_right = args->pwidth-args->binding;
       mcoord->markdir    = d_right;
     } else {
-      mcoord->head_top   = arg->outer;
-      mcoord->mbottom    = arg->binding;
-      mcoord->body_left  = arg->ptop;
-      mcoord->body_right = arg->pwidth-arg->pbottom;
+      mcoord->head_top   = args->outer;
+      mcoord->mbottom    = args->binding;
+      mcoord->body_left  = args->ptop;
+      mcoord->body_right = args->pwidth-args->pbottom;
       mcoord->markdir    = d_down;
     }
   } else {
-    if (arg->portrait) {
-      mcoord->head_top   = arg->outer;
-      mcoord->mbottom    = arg->binding;
-      mcoord->body_left  = arg->ptop;
-      mcoord->body_right = arg->pwidth - arg->pbottom;
+    if (args->portrait) {
+      mcoord->head_top   = args->outer;
+      mcoord->mbottom    = args->binding;
+      mcoord->body_left  = args->ptop;
+      mcoord->body_right = args->pwidth - args->pbottom;
       mcoord->markdir    = d_down;
     } else {
-      mcoord->head_top   = arg->ptop;
-      mcoord->mbottom    = arg->pbottom;
-      mcoord->body_left  = arg->outer;
-      mcoord->body_right = arg->pwidth - arg->binding;
+      mcoord->head_top   = args->ptop;
+      mcoord->mbottom    = args->pbottom;
+      mcoord->body_left  = args->outer;
+      mcoord->body_right = args->pwidth - args->binding;
       mcoord->markdir    = d_right;
     }
   }
@@ -238,8 +238,8 @@ void oneside_evenpage(args_t *arg, mcoord_t *mcoord){
 
 // calcurate coordinates depend on each page
 void calc_page_coordinates(args_t *arg, int page, mcoord_t *mcoord){
-    if (arg->duplex){
-        if (arg->twosides){
+    if (args->duplex){
+        if (args->twocols){
             switch (page%4){
             case 1:
                 // odd page, left side
@@ -268,9 +268,9 @@ void calc_page_coordinates(args_t *arg, int page, mcoord_t *mcoord){
                 oneside_evenpage(arg, mcoord);
             } // if (page %2)
             // mcoord->bwidth = mcoord->body_right - mcoord->body_left;
-        } // if (arg->twosides) else
+        } // if (args->twocols) else
     } else {
-        if (arg->twosides){
+        if (args->twocols){
 	    if (page%2){
 	        // odd page only, left side
                 twoside_oddpage_leftside(arg, mcoord);

@@ -26,6 +26,10 @@ typedef struct pango_cairo_print_object {
     cairo_t *cr;
     PangoFontDescription *desc;
     PangoLayout *layout;
+    // PangoFontMetrics *metrics;
+    // PangoFontset *fontset;
+    // PangoFontMap *fontmap;
+    // PangoContext *context;
 } pcobj; 
 
 extern pcobj *pcobj_new(cairo_t *cr);

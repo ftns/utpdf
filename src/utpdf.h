@@ -50,13 +50,13 @@
 #define DIVIDE	18.00 // divide: 0.25inch(6.35mm)
 
 #define DEFAULT_FONT "IPAGothic"
-#define FONTSIZE          9.8  	// default fontsize for oneside 
-#define FONTSIZE_TWOSIDES 6.6	// default fontsize for twosides
-#define BETWEEN_L         1.0	// space between lines
+#define FONTSIZE         9.8 // default fontsize for onecol 
+#define FONTSIZE_TWOCOLS 6.6 // default fontsize for twocols
+#define BETWEEN_L        1.0 // space between lines
 
 #define HEADER_FONT "sans-serif"
 #define HFONT_LARGE  	    16.0    // default fontsize for header
-#define HFONT_TWOSIDE_LARGE  9.0    // default fontsize for twosides header
+#define HFONT_TWOCOLS_LARGE  9.0    // default fontsize for twocols header
 #define HFONT_M_RATE	     0.75   // header medium font/large font
 
 #define ARROW_WIDTH 1.0 // width of folding arrow

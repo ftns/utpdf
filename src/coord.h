@@ -28,7 +28,7 @@ typedef struct main_coordinates {
   enum direction markdir;
 } mcoord_t;
 
-extern void calc_page_coordinates(args_t *arg, int page, mcoord_t *mcoord);
+extern void calc_page_coordinates(args_t *args, int page, mcoord_t *mcoord);
 
 #endif
 

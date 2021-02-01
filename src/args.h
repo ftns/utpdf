@@ -26,7 +26,7 @@
 
 typedef struct arguments {
     // option flags
-    int twosides, numbering, noheader, punchmark, duplex, portrait, longedge;
+    int twocols, numbering, noheader, punchmark, duplex, portrait, longedge;
     int tab, notebook, fold_arrow, border, current_t, one_output, inch;
     int hfont_slant, hfont_weight, bfont_slant, bfont_weight;
     // option strings

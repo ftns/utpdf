@@ -405,9 +405,12 @@ int draw_pages(cairo_t *cr, UFILE *in_f, args_t *args){
 	bottombase = scoord->body_top + scoord->oneline_h*lineperpage;
 	    
 	// x-axis
-	cairo_select_font_face (cr, args->fontname, CAIRO_FONT_SLANT_NORMAL,
-				CAIRO_FONT_WEIGHT_NORMAL);
-	cairo_set_font_size (cr, args->fontsize);
+	// cairo_select_font_face (cr, args->fontname, CAIRO_FONT_SLANT_NORMAL,
+        // 			CAIRO_FONT_WEIGHT_NORMAL);
+	// cairo_set_font_size (cr, args->fontsize);
+        pcobj_setfont(obj, args->fontname, args->fontsize);
+        pcobj_font_face(obj, args->bfont_slant, args->bfont_weight);
+
 	if (args->numbering) {
 	    scoord->num_right = mcoord->body_left + scoord->body_inset
 		+ pcobj_text_width(obj, "000000"); // vertical line
@@ -499,7 +502,7 @@ int draw_pages(cairo_t *cr, UFILE *in_f, args_t *args){
             draw_rel_line(cr, mcoord->body_left, bottombase+1, mcoord->bwidth, 0, 1, C_BASEL);
         }
 
-        if (!args->twosides || (page % 2 != 0)){
+        if (!args->twocols || (page % 2 != 0)){
             if (!(eof_u(in_f))){
                 cairo_show_page(cr); // new page
             }
@@ -510,7 +513,7 @@ int draw_pages(cairo_t *cr, UFILE *in_f, args_t *args){
     pcobj_free(obj);
     
     page--;
-    if (args->twosides) {
+    if (args->twocols) {
         return(ceil(page/2.0));
     } else {
         return(page);
