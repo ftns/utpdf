@@ -27,6 +27,7 @@
 #include "utpdf.h"
 #include "paper.h"
 #include "usage.h"
+#include "args.h"
 
 #define ARGC 32
 #define MAXSTRLEN 255
@@ -115,6 +116,14 @@ void help(){
     }
 }
 
+char *get_confname(){
+    if (makepdf){
+        return PDF_CONF_FILE;
+    } else {
+        return PS_CONF_FILE;
+    }
+}
+
 void help_message(int fd){
     FILE *f=fdopen(fd, "w");
     
@@ -122,7 +131,6 @@ void help_message(int fd){
     fprintf(f, "options:\n");
     fprintf(f, "  basic settings:\n");
     fprintf(f, "    -b, --border[=on/off] draw border\n");
-    fprintf(f, "    -B <point>            space between lines (default: 1.0pt)\n");
     fprintf(f, "    -m, --punch[=on/off]  show punch mark\n");
     fprintf(f, "    -n, --number[=on/off] show line number\n");
     fprintf(f, "    --notebook[=on/off]   show baselines like notebook\n");
@@ -146,8 +154,9 @@ void help_message(int fd){
     fprintf(f, "\n");
     
     fprintf(f, "  misc:\n");
-    fprintf(f, "    -o <output_file>    output file name\n");
-    fprintf(f, "    -f <config_file>    optional config file name\n");
+    fprintf(f, "    -o <output_file>    output file\n");
+    fprintf(f, "    -f <config_file>    optional config file\n");
+    fprintf(f, "    -c <case_name>      load $HOME/%s-<case_name> as config file\n", get_confname());
     fprintf(f, "    -h, --help          show this message\n");
     fprintf(f, "    -V, --version       show version\n");
     fprintf(f, "    --inch, --unit=inch length unit is inch\n");
@@ -156,26 +165,37 @@ void help_message(int fd){
 
     fprintf(f, "  body:\n");
     fprintf(f, "    -F <fontname>, --body-font <fontname>\n");
-    fprintf(f, "                          body font (default: %s)\n", DEFAULT_FONT);
+    fprintf(f, "                        body font (default: %s)\n", DEFAULT_FONT);
     fprintf(f, "    -S <fontsize>, --body-size <fontsize>\n");
-    fprintf(f, "                          font size in pt.\n");
-    fprintf(f, "                          (default: oneside %1.1fpt./twoside %1.1fpt.)\n",FONTSIZE, FONTSIZE_TWOCOLS);
+    fprintf(f, "                        font size in pt.\n");
+    fprintf(f, "                        (default: oneside %1.1fpt./twoside %1.1fpt.)\n",FONTSIZE, FONTSIZE_TWOCOLS);
     fprintf(f, "    --body-weight=light/normal/bold/100-1000\n");
-    fprintf(f, "                          body font weight (default: normal)\n");
+    fprintf(f, "                        body font weight (default: normal)\n");
     fprintf(f, "    --body-slant=normal/italic/oblique\n");
-    fprintf(f, "                          body font slant (default: normal)\n");
+    fprintf(f, "                        body font slant (default: normal)\n");
+    fprintf(f, "    --body-spacing <point>\n");
+    fprintf(f, "                        space between lines (default: %3.2fpt)\n", BETWEEN_L);
     fprintf(f, "\n");
 
     fprintf(f, "  header:\n");
     fprintf(f, "    --header[=on/off]        header on/off (default: on)\n");
-    fprintf(f, "    --header-text[=<text>]   header center text (default: filename)\n");
-    fprintf(f, "    --header-font=<fontname> header font (default: sans-serif)\n");
-    fprintf(f, "    --header-size=<fontsize> header font size\n");
+    fprintf(f, "    --header-text[=<text>]   center text of header (default: filename)\n");
+    fprintf(f, "    --header-font=<fontname> font of center text (default: %s)\n", HEADER_FONT);
+    fprintf(f, "    --header-size=<fontsize> font size of center text\n");
     fprintf(f, "                             (default: one column %1.1fpt./two columns %1.1fpt.)\n", HFONT_LARGE, HFONT_TWOCOLS_LARGE);
     fprintf(f, "    --header-weight=light/normal/bold/100-1000\n");
-    fprintf(f, "                             header font weight (default: bold)\n");
+    fprintf(f, "                             font weight of cenrer text (default: bold)\n");
     fprintf(f, "    --header-slant=normal/italic/oblique\n");
-    fprintf(f, "                             header font slant (default: normal)\n");    
+    fprintf(f, "                             header font slant (default: normal)\n");
+    fprintf(f, "    --header-side-size=<fontsize>\n");    
+    fprintf(f, "                             font size of side part -- date & page\n");
+    fprintf(f, "                             (default: %3.2f = header-size * %3.2f)\n",
+            HFONT_LARGE*HFONT_M_RATE, HFONT_M_RATE);
+    fprintf(f, "    --header-side-slant=normal/italic/oblique\n");
+    fprintf(f, "                             side font slant\n");
+    fprintf(f, "                             (default: same as center)\n");
+    fprintf(f, "    --header-side-weight=light/normal/bold/100-1000\n");
+    fprintf(f, "                             side font weight (default: same as center)\n");
     fprintf(f, "    --date-format[=<format>] date format in strftime(3)\n");
     fprintf(f, "                             (default: %s)\n", DATE_FORMAT);
     fprintf(f, "\n");

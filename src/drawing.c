@@ -153,33 +153,34 @@ void draw_cont_arrow(cairo_t *cr, double x, double y, double edge, double width,
 
 void draw_header(pcobj *obj, args_t *args, int page, mcoord_t *mcoord,
                  scoord_t *scoord, char *datebuf){
-    double hbaseline, hinset, gap;
+    double hbaseline, hinset, descent;
     char pagebuf[PAGEBUFLEN];
     cairo_t *cr=obj->cr;
-    double ascent, descent;
     
     // hbaseline: the baseline of header font
     // cairo_select_font_face (cr, , args->hfont_slant, args->hfont_weight);
-    pcobj_setfont(obj, args->headerfont, args->hfont_large);
+    pcobj_setfont(obj, args->headerfont, args->head_size);
     pcobj_font_face(obj, args->hfont_slant, args->hfont_weight);
-    ascent=pcobj_font_ascent(obj);
     descent=pcobj_font_descent(obj);
-    gap = (scoord->body_top - mcoord->head_top - pcobj_font_height(obj))/3;
-    hbaseline = scoord->body_top - gap - descent;
+    // gap = (scoord->body_top - mcoord->head_top - pcobj_font_height(obj))/3;
+    // hbaseline = scoord->body_top - gap - descent;
+    hbaseline = scoord->body_top - descent;
 
     // hinset: header inset
-    cairo_set_font_size (cr, args->hfont_medium);
+    cairo_set_font_size (cr, args->side_size);
     hinset = pcobj_text_width(obj, "0");
 		
-    // draw left part: modified date
-    pcobj_setfont(obj, args->headerfont, args->hfont_medium);
-    pcobj_weight(obj, args->hfont_weight);
-    pcobj_style(obj, args->hfont_slant);
+    // draw left side: modified date
+    pcobj_setfont(obj, args->headerfont, args->side_size);
+    pcobj_weight(obj, args->side_weight);
+    pcobj_style(obj, args->side_slant);
     pcobj_move_to(obj, mcoord->body_left+hinset, hbaseline);
     show_text_at_left(obj, datebuf);
   
     // center part: filename
-    pcobj_setsize(obj, args->hfont_large);
+    pcobj_setsize(obj, args->head_size);
+    pcobj_weight(obj, args->hfont_weight);
+    pcobj_style(obj, args->hfont_slant);
     pcobj_move_to(obj, mcoord->body_left+mcoord->bwidth/2, hbaseline);
 
     if (args->headertext == NULL) {
@@ -187,9 +188,11 @@ void draw_header(pcobj *obj, args_t *args, int page, mcoord_t *mcoord,
     } else {
 	show_text_at_center(obj, args->headertext);
     }
-    // right part: page
+    // right side: page
     snprintf(pagebuf, PAGEBUFLEN, "page: %d  ", page);
-    pcobj_setsize(obj, args->hfont_medium);
+    pcobj_setsize(obj, args->side_size);
+    pcobj_weight(obj, args->side_weight);
+    pcobj_style(obj, args->side_slant);
     pcobj_move_to(obj, mcoord->body_left + mcoord->bwidth - hinset, hbaseline);
     show_text_at_right(obj, pagebuf);
 
@@ -437,6 +440,16 @@ int draw_pages(cairo_t *cr, UFILE *in_f, args_t *args){
 		break;
 	    }
         }
+        // draw watermark
+        if (args->wmark_text != NULL){
+            pcobj_draw_watermark(obj, args->wmark_text, args->wmark_font,
+                                 mcoord->body_left, mcoord->head_top, mcoord->bwidth,
+                                 args->pheight - mcoord->mbottom - mcoord->head_top,
+                                 args->wmark_weight, args->wmark_slant,
+                                 args->wmark_r, args->wmark_g, args->wmark_b);
+        }
+        cairo_set_source_rgb(obj->cr, C_BLACK);
+        
         // draw border
         if (args->border){
             draw_rectangle(cr, mcoord->body_left, mcoord->head_top, mcoord->bwidth,

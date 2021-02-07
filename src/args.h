@@ -29,11 +29,14 @@ typedef struct arguments {
     int twocols, numbering, noheader, punchmark, duplex, portrait, longedge;
     int tab, notebook, fold_arrow, border, current_t, one_output, inch;
     int hfont_slant, hfont_weight, bfont_slant, bfont_weight;
+    int side_slant, side_weight, wmark_slant, wmark_weight;
     // option strings
     char *fontname, *headerfont, *in_fname, *date_format, *headertext, *outfile;
-    char *binding_dir, *paper;
+    char *binding_dir, *paper, *wmark_text, *wmark_font;
+    
     // option length
-    double fontsize, hfont_large, hfont_medium, header_height, headersize;
+    double fontsize, header_height, head_size, side_size;
+    double wmark_r, wmark_g, wmark_b;
     // paper size and margins
     double pwidth, pheight, binding, outer, ptop, pbottom, divide, betweenline;
     // file modified time

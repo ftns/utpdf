@@ -20,7 +20,7 @@ $(OBJECTS):%.o:%.c
 drawing.o: drawing.c drawing.h coord.h utpdf.h io.h args.h pangoprint.h
 coord.o: coord.c coord.h utpdf.h args.h
 io.o: io.c io.h
-usage.o: usage.c usage.h utpdf.h paper.h
+usage.o: usage.c usage.h utpdf.h paper.h args.h
 paper.o: paper.c paper.h
 args.o: args.c args.h utpdf.h
 
@@ -35,7 +35,7 @@ realclean: clean
 TEST_PROGS = pangoprint usage
 
 $(TEST_PROGS):%:%.c
-	$(CC) $(CFLAGS) $(PCMAIN) -DSINGLE_DEBUG -o $@ $<
+	$(CC) $(CFLAGS) $(PCMAIN) ${LDFLAGS} -DSINGLE_DEBUG -o $@ $<
 
 pagoprint.o: pangoprint.h pangoprint.c
 usage: usage.c usage.h utpdf.h paper.h

@@ -44,8 +44,15 @@ extern void pcobj_font_face(pcobj *obj, PangoStyle style, PangoWeight w);
 extern double pcobj_font_ascent(pcobj *obj);
 extern double pcobj_font_descent(pcobj *obj);
 extern double pcobj_font_height(pcobj *obj);
+extern double pcobj_width(pcobj *obj);
+extern double pcobj_ink_width(pcobj *obj);
 extern double pcobj_text_width(pcobj *obj, const char *str);
 extern void pcobj_move_to(pcobj *obj, double x, double y);
+extern void pcobj_draw_watermark(pcobj *obj, char *text, char *font,
+                                 double x, double y, double dx, double dy,
+                                 PangoWeight weight, PangoStyle style,
+                                 double r, double g, double b);
+
 
 #endif
 // end of pangoprint.h

@@ -18,6 +18,7 @@
 */
 
 #include "pangoprint.h"
+#include <math.h>
 
 pcobj *pcobj_new(cairo_t *cr){    
     pcobj *obj = malloc(sizeof(pcobj));
@@ -121,18 +122,81 @@ double pcobj_font_height(pcobj *obj){
 }
 
 double pcobj_text_width(pcobj *obj, const char *str){
-    PangoRectangle ink, logical;
-        
-    // base=pango_layout_get_baseline(obj->layout);
     pcobj_settext(obj, str);
-    pango_cairo_update_layout (obj->cr, obj->layout);
+    return pcobj_width(obj);
+}
+
+double pcobj_width(pcobj *obj){
+    PangoRectangle ink, logical;
+    // pango_cairo_update_layout (obj->cr, obj->layout);
     pango_layout_get_extents(obj->layout, &ink, &logical);
     return logical.width/PANGO_SCALE;
+}
+
+double pcobj_ink_width(pcobj *obj){
+    PangoRectangle ink, logical;
+    // pango_cairo_update_layout (obj->cr, obj->layout);
+    pango_layout_get_extents(obj->layout, &ink, &logical);
+    return ink.width/PANGO_SCALE;
 }
 
 void pcobj_move_to(pcobj *obj, double x, double y){
     cairo_move_to(obj->cr, x, y-pcobj_font_ascent(obj));
     //    cairo_move_to(obj->cr, x, y);
+}
+
+void pcobj_draw_watermark(pcobj *obj, char *text, char *font,
+                          double x, double y, double dx, double dy,
+                          PangoWeight weight, PangoStyle style,
+                          double r, double g, double b){
+    double rad, tan_t, h, w, k, new_h, new_w, e;
+
+    pcobj_setfont(obj, font, 16);
+    pcobj_font_face(obj, style, weight);
+    cairo_set_source_rgb(obj->cr, r, g, b);
+    
+    cairo_save(obj->cr);{
+        cairo_translate(obj->cr, x+dx/2, y+dy/2);
+        pango_cairo_update_layout (obj->cr, obj->layout);
+
+        w=pcobj_text_width(obj, text);
+        h=pcobj_font_height(obj);
+        // h=pcobj_font_ascent(obj);
+        k=h/w;
+        tan_t=dy/dx;
+        rad=atan(tan_t);
+        r=sqrt(pow(dx,2)+pow(dy,2));
+
+        if (dx>dy){
+            e=r/(2*(1+(tan_t/k)));
+        } else {
+            e=r/(2*(1+1/(k*tan_t)));
+        }
+        new_w=r-2*e;
+        new_h=k*new_w;
+        pcobj_setsize(obj, 1.1*1*new_w/w);// 16*new_w/w);
+        new_w = pcobj_ink_width(obj);
+        new_h = pcobj_font_height(obj);
+        
+        cairo_rotate(obj->cr, -rad);
+        cairo_move_to(obj->cr, -new_w/2, -new_h/2);
+        pango_cairo_show_layout(obj->cr, obj->layout);
+        cairo_set_source_rgb(obj->cr, 0, 0, 0);
+#ifdef SINGLE_DEBUG
+        cairo_set_line_width(obj->cr, 0.5);
+        cairo_rectangle(obj->cr, -new_w/2, -new_h/2, new_w, new_h);
+        cairo_stroke(obj->cr);
+#endif
+
+    } cairo_restore(obj->cr);
+    
+#ifdef SINGLE_DEBUG
+    cairo_rectangle(obj->cr, x, y, dx, dy);
+    cairo_move_to(obj->cr, x, y+dy);
+    cairo_line_to(obj->cr, x+dx, y);
+    cairo_stroke(obj->cr);
+#endif
+    pango_cairo_update_layout (obj->cr, obj->layout);
 }
 
 // --- debug part ---
@@ -158,6 +222,7 @@ double cairo_text_width(cairo_t *cr, const char *str){
 #define C_BLUE   0, 0, 1    // blue
 #define C_BLACK  0, 0, 0    // black
 #define C_WHITE  1, 1, 1    // white
+#define C_WATERMARK 0.9, 0.9, 1 // watermark
 #define FONT_SIZE 16
 #define LINE_HEIGHT (FONT_SIZE+4)
 #define TOP 48
@@ -172,6 +237,12 @@ static void draw_text (cairo_t *cr, char *font){
     int w;
     
     obj = pcobj_new(cr);
+
+    // print watermark
+    pcobj_draw_watermark(obj, "The quick fox ", "serif",
+                         LEFT, TOP, A4_h-LEFT*2, A4_w-TOP*2,
+                         PANGO_WEIGHT_BOLD, PANGO_STYLE_ITALIC,
+                         C_WATERMARK);
 
     // print fontname
     cairo_set_source_rgb(cr, C_BLACK);

@@ -37,7 +37,7 @@
 
 #define MKPDFNAME "utpdf"
 #define NAMELEN 255
-#define VERSION "0.8"
+#define VERSION "0.81d"
 
 // unit: point.
 // 1inch = 72pt.
@@ -57,7 +57,11 @@
 #define HEADER_FONT "sans-serif"
 #define HFONT_LARGE  	    16.0    // default fontsize for header
 #define HFONT_TWOCOLS_LARGE  9.0    // default fontsize for twocols header
-#define HFONT_M_RATE	     0.75   // header medium font/large font
+// #define HFONT_M_RATE	     0.75   // header medium font/large font
+#define HFONT_M_RATE	     0.66
+
+#define WATERMARK_FONT "sans-serif"
+
 
 #define ARROW_WIDTH 1.0 // width of folding arrow
 
@@ -80,6 +84,15 @@
 #define C_GREEN  0,   1,   0	// green
 #define C_BLUE   0,   0,   1	// blue
 #define C_BLACK  0,   0,   0	// black
+
+// watermark color
+#define WMARK_R 0.9
+#define WMARK_G 0.9
+#define WMARK_B 1.0
+#define UIWM_R 230
+#define UIWM_G 230
+#define UIWM_B 255
+
 
 // line width
 #define LW_THIN_BASELINE 0.1
