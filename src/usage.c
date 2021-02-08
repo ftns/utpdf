@@ -133,15 +133,15 @@ void help_message(int fd){
     fprintf(f, "    -b, --border[=on/off] draw border\n");
     fprintf(f, "    -m, --punch[=on/off]  show punch mark\n");
     fprintf(f, "    -n, --number[=on/off] show line number\n");
-    fprintf(f, "    --notebook[=on/off]   show baselines like notebook\n");
-    fprintf(f, "    --fold-arrow[=on/off] show the arrows indicate folded line (default: on)\n");
     fprintf(f, "    -t <#>, --tab=<#>     tab width (default: %d)\n", TAB);
     fprintf(f, "    --timestamp=mod/cur   timestamp: file modified time/current time\n");
     fprintf(f, "                        (file default: modified time/stdin: current time only)\n");
+    fprintf(f, "    --notebook[=on/off]   show baselines like notebook\n");
+    fprintf(f, "    --fold-arrow[=on/off] show the arrows indicate folded line (default: on)\n");
     fprintf(f, "\n");
     
     fprintf(f, "  sheet:\n");
-    fprintf(f, "    -P a3/a4/a5/b4/b5/b6/letter/legal\n");
+    fprintf(f, "    -P, --paper=a3/a4/a5/b4/b5/b6/letter/legal\n");
     fprintf(f, "                        sheet size (default: %s)\n", paper_default());
     fprintf(f, "    -d, --duplex[=on]   duplex printing(default)\n");
     fprintf(f, "    -s, --duplex=off    simplex printing\n");
@@ -164,16 +164,16 @@ void help_message(int fd){
     fprintf(f, "\n");
 
     fprintf(f, "  body:\n");
-    fprintf(f, "    -F <fontname>, --body-font <fontname>\n");
+    fprintf(f, "    -F <fontname>, --body-font=<fontname>\n");
     fprintf(f, "                        body font (default: %s)\n", DEFAULT_FONT);
-    fprintf(f, "    -S <fontsize>, --body-size <fontsize>\n");
+    fprintf(f, "    -S <fontsize>, --body-size=<fontsize>\n");
     fprintf(f, "                        font size in pt.\n");
     fprintf(f, "                        (default: oneside %1.1fpt./twoside %1.1fpt.)\n",FONTSIZE, FONTSIZE_TWOCOLS);
     fprintf(f, "    --body-weight=light/normal/bold/100-1000\n");
     fprintf(f, "                        body font weight (default: normal)\n");
     fprintf(f, "    --body-slant=normal/italic/oblique\n");
     fprintf(f, "                        body font slant (default: normal)\n");
-    fprintf(f, "    --body-spacing <point>\n");
+    fprintf(f, "    --body-spacing=<point>\n");
     fprintf(f, "                        space between lines (default: %3.2fpt)\n", BETWEEN_L);
     fprintf(f, "\n");
 
@@ -199,7 +199,18 @@ void help_message(int fd){
     fprintf(f, "    --date-format[=<format>] date format in strftime(3)\n");
     fprintf(f, "                             (default: %s)\n", DATE_FORMAT);
     fprintf(f, "\n");
+    fprintf(f, "  watermark:\n");
+    fprintf(f, "    --watermark-text=<text>      text of watermark\n");
+    fprintf(f, "    --watermark-font=<fontname>  watermark font name (default: %s)\n", WATERMARK_FONT);
+    fprintf(f, "    --watermark-slant=normal/italic/oblique\n");
+    fprintf(f, "                                 watermark font slant (defaullt: normal)\n");
+    fprintf(f, "    --watermark-weight=light/normal/bold/100-1000\n");
+    fprintf(f, "                                 watermark font weight (default: bold)\n");
+    fprintf(f, "    --watermark-collor=<red digit>,<green digit>,<blue digit>\n");
+    fprintf(f, "                                 watermark color (default: 230,230,255)\n");
+    fprintf(f, "                                 each digit must be 0-255.\n");
 
+    fprintf(f, "\n");
     fprintf(f, "  margins:\n");
     fprintf(f, "    --binding=<length>   binding margin (default: %2.1fmm/%1.1finch)\n",
             BINDING/72*25.4, BINDING/72);    

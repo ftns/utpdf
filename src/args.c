@@ -29,7 +29,7 @@ typedef void (*usage_func_t)(char *);
 time_t mtime_store;
 args_t args_store = {
     // option flags
-    .twocols=-1, .numbering=0, .noheader=0, .punchmark=0, .duplex=1,
+    .twocols=-1, .numbering=0, .header=1, .punchmark=0, .duplex=1,
     .portrait=1, .longedge=0, .tab=TAB, .notebook=0, .fold_arrow=1,
     .border=0, .current_t=0, .one_output=0, .inch=0,
     .hfont_slant=PANGO_STYLE_NORMAL, .hfont_weight=PANGO_WEIGHT_BOLD,
@@ -57,7 +57,8 @@ typedef enum i_option
   i_fold_a, i_time_s, i_border, i_punch, i_number, i_binddir, i_side,
   i_unit, i_orient, i_hslant, i_hweigbt, i_bfont, i_bsize, i_bweight,
   i_bslant, i_bspace, i_tab, i_side_size, i_side_slant, i_side_weight,
-  i_wm_text, i_wm_font, i_wm_slant, i_wm_weight, i_wm_color, i_END } i_option_t;
+  i_wm_text, i_wm_font, i_wm_slant, i_wm_weight, i_wm_color, i_paper,
+  i_END } i_option_t;
 
 #define NOARG no_argument 
 #define REQARG required_argument
@@ -106,7 +107,8 @@ struct option long_options[]={
     /* 37 i_wm_slant    */ { "watermark-slant",    REQARG,  0,  0 },
     /* 38 i_wm_weight   */ { "watermark-weight",   REQARG,  0,  0 },
     /* 39 i_wm_color    */ { "watermark-color",    REQARG,  0,  0 },
-    /* 40 i_END         */ { 0, 0, 0, 0 }
+    /* 40 i_paper       */ { "paper",              REQARG,  0, 'P'},    
+    /* 41 i_END         */ { 0, 0, 0, 0 }
 };
 
 #define LONGOP_NAMELEN 32
@@ -117,16 +119,17 @@ int conf_line;
 //
 // forward declaration
 void conf_usage(char *message);
-int  chk_shortop(struct option *loption, char *value);
+int  do_shortop(struct option *loption, char *value);
 void read_config(char *path);
-void parser(int short_index, int long_index, char *argstr, usage_func_t usage);
-void chk_slant(int *value, char *str, usage_func_t usage);
-void chk_weight(int *value, char *str, usage_func_t usage);
-int  chk_sw(char *str, char *positive, char *negative, usage_func_t usage);
-int  chk_onoff(char *str, usage_func_t usage);
+char *cmd2opt(const char *cmd, int is_conf_file);
+void parser(int short_index, int long_index, char *argstr, usage_func_t usage, int is_conf_file);
+void chk_slant(int *value, char *str, char *opt, usage_func_t usage);
+void chk_weight(int *value, char *str, char *opt, usage_func_t usage);
+void chk_sw(int *r, char *str, char *positive, char *negative, char *opt, usage_func_t usage);
+void chk_onoff(int *r, char *str, char *opt, usage_func_t usage);
 char *getconfpath();
 int  parse_conf(char *str, char *key, char *value);
-void chk_color(double *r, double *g, double *b, char *argstr, usage_func_t usage);
+void chk_color(double *r, double *g, double *b, char *argstr, char *opt, usage_func_t usage);
 //
 //
 
@@ -136,12 +139,14 @@ void conf_usage(char *message){
     }
 }
 
-int chk_shortop(struct option *loption, char *value){
+int do_shortop(struct option *loption, char *value){
     if ((loption->flag == NULL) && (loption->val != 0)){
-        parser(loption->val, 0, value, conf_usage);
+        // parse as short option 
+        parser(loption->val, 0, value, conf_usage, 1);
         return 1;
     }
     if (loption->flag!=NULL){
+        // set val to flag
         *loption->flag=loption->val;
         return 1;
     }
@@ -196,23 +201,23 @@ void read_config(char *path){
             // keyword hit!
             switch (long_options[index].has_arg){
             case no_argument:
-                if (chk_shortop(&long_options[index], NULL)) break;
-                parser(0, index, NULL, conf_usage);
+                if (do_shortop(&long_options[index], NULL)) break;
+                parser(0, index, NULL, conf_usage, 1);
                 break;
             case required_argument:
-                if (chk_shortop(&long_options[index], NULL)) break;
+                if (do_shortop(&long_options[index], NULL)) break;
                 if (count==2){
-                    parser(0, index, value, conf_usage);
+                    parser(0, index, value, conf_usage, 1);
                 } else {
                     USAGE("%s require an argument\n", key);
                 }
                 break;
             case optional_argument:
-                if (chk_shortop(&long_options[index], NULL)) break;
+                if (do_shortop(&long_options[index], NULL)) break;
                 if (count==1) {
-                    parser(0, index, NULL, conf_usage); 
+                    parser(0, index, NULL, conf_usage, 1); 
                 } else {
-                    parser(0, index, value, conf_usage);
+                    parser(0, index, value, conf_usage, 1);
                 }
                 break;
             } // switch()
@@ -224,47 +229,67 @@ void read_config(char *path){
     conf_path="";
 }
 
-void parser(int short_index, int long_index, char *argstr, usage_func_t usage){
+char *cmd2opt(const char *cmd, int is_conf_file){
+    char *opt=(char *)malloc(256);
+    if (is_conf_file) {
+        snprintf(opt, 256, "%s: ", cmd);
+    } else {
+        snprintf(opt, 256, "--%s=", cmd);
+    }
+    return opt;
+}
+
+void parser(int short_index, int long_index, char *argstr, usage_func_t usage, int is_conf_file){
     if (short_index == 0) {
         // long option
+        char *opt=cmd2opt(long_options[long_index].name, is_conf_file);
+        
         switch (long_index) {
         case i_binddir:
-            args->binding_dir=argstr;
+            switch (argstr[0]){
+            case 'l':
+            case 's':
+            case 'n':
+                args->binding_dir=argstr;
+                break;
+            default:
+                USAGE("%s must be \"l/s/n\", but \"%s\"\n", opt, argstr);
+            }
             break;
         case i_binding:
             if (!get_double(argstr, &args->binding)) {
-                USAGE("--binding argument:%s was wrong. \nExample: --binding=25.4\n", argstr);
+                USAGE("%s%s was wrong. \nExample: %s25.4\n", opt, argstr, opt);
             }
             break;
         case i_outer:
             if (!get_double(argstr, &args->outer)) {
-                USAGE("--outer argument:%s was wrong. \nExample: --outer=12.7\n", argstr);
+                USAGE("%s%s was wrong. \nExample: %s12.7\n", opt, argstr, opt);
             }
             break;
         case i_top:
             if (!get_double(argstr, &args->ptop)) {
-                USAGE("--top argument:%s was wrong. \nExample: --top=12.7\n", argstr);
+                USAGE("%s%s was wrong. \nExample: %s12.7\n", opt, argstr, opt);
             }
             break;
         case i_bottom:
             if (!get_double(argstr, &args->pbottom)) {
-                USAGE("--bottom argument:%s was wrong. \nExample: --bottom=12.7\n", argstr);
+                USAGE("%s%s was wrong. \nExample: %s12.7\n", opt, argstr, opt);
             }
             break;
         case i_divide:
             if (!get_double(argstr, &args->divide)) {
-                USAGE("--divide argument:%s was wrong. \nExample: --divide=12.7\n", argstr);
+                USAGE("%s%s was wrong. \nExample: %s12.7\n", opt, argstr, opt);
             }
             break;
         case i_hfont:
             args->headerfont = argstr; break;
         case i_hsize:
             if (!get_double(argstr, &args->head_size)) {
-                USAGE("--header-size argument:%s was wrong. \nExample: --header-size=12.0\n", argstr);
+                USAGE("%s%s was wrong. \nExample: %s12.0\n", opt, argstr, opt);
             }
             break;
         case i_notebk:
-            args->notebook = chk_onoff(argstr, usage); break;
+            chk_onoff(&args->notebook, argstr, opt, usage); break;
         case i_datefmt:
             if ((argstr==NULL)||(argstr[0]=='\0')){
                 args->date_format = DATE_FORMAT;
@@ -280,55 +305,55 @@ void parser(int short_index, int long_index, char *argstr, usage_func_t usage){
             }
             break;
         case i_header:
-            args->noheader = !chk_onoff(argstr, usage); break;
+            chk_onoff(&args->header, argstr, opt, usage); break;
         case i_fold_a:
-            args->fold_arrow = chk_onoff(argstr, usage); break;
+            chk_onoff(&args->fold_arrow, argstr, opt, usage); break;
         case i_time_s:
-            args->current_t = chk_sw(argstr, "cur", "mod", usage); break;
+            chk_sw(&args->current_t, argstr, "cur", "mod", opt, usage); break;
         case i_border:
-            args->border = chk_onoff(argstr, usage); break;
+            chk_onoff(&args->border, argstr, opt, usage); break;
         case i_punch:
-            args->punchmark = chk_onoff(argstr, usage); break;
+            chk_onoff(&args->punchmark, argstr, opt, usage); break;
         case i_number:
-            args->numbering = chk_onoff(argstr, usage); break;
+            chk_onoff(&args->numbering, argstr, opt, usage); break;
         case i_side:
-            args->twocols = chk_sw(argstr, "2", "1", usage); break;
+            chk_sw(&args->twocols, argstr, "2", "1", opt, usage); break;
         case i_unit:
-            args->inch = chk_sw(argstr, "inch", "mm", usage); break;
+            chk_sw(&args->inch, argstr, "inch", "mm", opt, usage); break;
         case i_orient:
-            args->portrait = chk_sw(argstr, "p", "l", usage); break;
+            chk_sw(&args->portrait, argstr, "p", "l", opt, usage); break;
         case i_hslant:
-            chk_slant(&args->hfont_slant, argstr, usage); break;
+            chk_slant(&args->hfont_slant, argstr, opt, usage); break;
         case i_hweigbt:
-            chk_weight(&args->hfont_weight, argstr, usage); break;
+            chk_weight(&args->hfont_weight, argstr, opt, usage); break;
         case i_bweight:
-            chk_weight(&args->bfont_weight, argstr, usage); break;
+            chk_weight(&args->bfont_weight, argstr, opt, usage); break;
         case i_bslant:
-            chk_slant(&args->bfont_slant, argstr, usage); break;
+            chk_slant(&args->bfont_slant, argstr, opt, usage); break;
         case i_bspace:
             if (!get_double(argstr, &args->betweenline)) {
-                USAGE("--body-spacing argument:%s was wrong.\nExample: --body-spacing=1.5\n", argstr);
+                USAGE("%s%s was wrong.\nExample: %s1.5\n", opt, argstr, opt);
             }
             break;
         case i_side_size:
             if (!get_double(argstr, &args->side_size)) {
-                USAGE("--header-side-size argument: %s was wrong.\nExample: --header-side-size=6.0\n", argstr);
+                USAGE("%s%s was wrong.\nExample: %s6.0\n", opt, argstr, opt);
             }
             break;
         case i_side_slant:  // "header-side-slant"
-            chk_slant(&args->side_slant, argstr, usage); break;            
+            chk_slant(&args->side_slant, argstr, opt, usage); break;            
         case i_side_weight: // "header-side-weight"
-            chk_weight(&args->side_weight, argstr, usage); break;
+            chk_weight(&args->side_weight, argstr, opt, usage); break;
         case i_wm_text:
             args->wmark_text=argstr; break;
         case i_wm_font:
             args->wmark_font=argstr; break;
         case i_wm_slant:
-            chk_slant(&args->wmark_slant, argstr, usage); break;            
+            chk_slant(&args->wmark_slant, argstr, opt, usage); break;            
         case i_wm_weight:
-            chk_weight(&args->wmark_weight, argstr, usage); break;
+            chk_weight(&args->wmark_weight, argstr, opt, usage); break;
         case i_wm_color:
-            chk_color(&args->wmark_r, &args->wmark_g, &args->wmark_b, argstr, usage); break;
+            chk_color(&args->wmark_r, &args->wmark_g, &args->wmark_b, argstr, opt, usage); break;
         } // switch (lindex)
     } else {
         // short option
@@ -349,8 +374,6 @@ void parser(int short_index, int long_index, char *argstr, usage_func_t usage){
             args->fontname = argstr; break;	
         case 'h':
             help(); break;
-        case 'H':
-            args->noheader=1; break;
         case 'l':
             args->portrait=0; break;	
         case 'm':
@@ -384,14 +407,14 @@ void parser(int short_index, int long_index, char *argstr, usage_func_t usage){
     }
 }
 
-void chk_slant(int *value, char *str, usage_func_t usage){
+void chk_slant(int *value, char *str, char *opt, usage_func_t usage){
     if (strncmp(str, "normal", 8)==0)  { *value=PANGO_STYLE_NORMAL;  return; }
     if (strncmp(str, "italic", 8)==0)  { *value=PANGO_STYLE_ITALIC;  return; }
     if (strncmp(str, "oblique", 8)==0) { *value=PANGO_STYLE_OBLIQUE; return; }
-    USAGE("slant must be \"normal\", \"italic\", \"olique\",\nbut %s\n", str);
+    USAGE("%s must be \"normal\", \"italic\", \"olique\", but \"%s\"\n", opt, str);
 }
 
-void chk_weight(int *value, char *str, usage_func_t usage){
+void chk_weight(int *value, char *str, char *opt, usage_func_t usage){
     int v;
     
     if (strncmp(str, "normal", 8)==0) { *value=PANGO_WEIGHT_NORMAL; return; }
@@ -402,32 +425,32 @@ void chk_weight(int *value, char *str, usage_func_t usage){
         *value=v; return;
     }        
         
-    USAGE("weight must be \"light\", \"normal\", \"bold\", or %d-%d, \nbut %s\n",
-          PANGO_WEIGHT_THIN, PANGO_WEIGHT_ULTRAHEAVY, str);
+    USAGE("%s must be \"light\", \"normal\", \"bold\", or %d-%d, \nbut \"%s\"\n",
+          opt, PANGO_WEIGHT_THIN, PANGO_WEIGHT_ULTRAHEAVY, str);
 }
 
 // check arguments & return true(1)/false(0)
-int chk_sw(char *str, char *positive, char *negative, usage_func_t usage) {
-    if (str==NULL) { return 1; }
-    else if (strncmp(str, positive, 8)==0) { return 1; }
-    else if (strncmp(str, negative, 8)==0) { return 0; }
+void chk_sw(int *r, char *str, char *positive, char *negative, char *opt, usage_func_t usage) {
+    if (str==NULL) { *r=1; }
+    else if (strncmp(str, positive, 8)==0) { *r=1; }
+    else if (strncmp(str, negative, 8)==0) { *r=0; }
     else {
-        USAGE("argument must be \"%s\" or \"%s\"\n", positive, negative);
-        return -1;
+        USAGE("%s must be \"%s\" or \"%s\", but \"%s\"\n", opt, positive, negative, str);
     }
 }
 
-int chk_onoff(char *str, usage_func_t usage){
-    return chk_sw(str, "on", "off", usage);
+void chk_onoff(int *r, char *str, char *opt, usage_func_t usage){
+    chk_sw(r, str, "on", "off", opt, usage);
 }
 
-void chk_color(double *r, double *g, double *b, char *argstr, usage_func_t usage){
+void chk_color(double *r, double *g, double *b, char *argstr, char *opt, usage_func_t usage){
     int ir, ig, ib;
-    if (sscanf(argstr, "%d, %d, %d", &ir, &ig, &ib)!=3){
-        USAGE("color must be <digit>,<digit>,<digit> and every digit is 0-255\n");
-    } else {
+    if ((sscanf(argstr, "%d, %d, %d", &ir, &ig, &ib)==3)
+        && (ir>=0) && (ir<=255) && (ig>=0) && (ig<=255) && (ib>=0) && (ib<=255)) {
         *r=ir/255; *g=ig/255; *b=ib/255;
-    }
+    } else {
+        USAGE("%s must be <digit>,<digit>,<digit> and every digit is 0-255, but \"%s\"\n", opt, argstr);
+    } 
 }
 
 
@@ -496,7 +519,7 @@ void getargs(int argc, char **argv){
     // fetch from command line
     while ((opt = getopt_long
             (argc, argv, "12bc:df:F:hlmno:pP:sS:t:V", long_options, &long_index)) != -1){
-        parser(opt, long_index, optarg, (usage_func_t )usage);
+        parser(opt, long_index, optarg, (usage_func_t )usage, 0);
     }
 
     // input files are exist?
@@ -608,7 +631,7 @@ void getargs(int argc, char **argv){
 	    args->binding = args->outer;
 	    break;
 	default:
-	    USAGE("--binding must be \'l/s/n\', but \'%s\'\n", args->binding_dir);
+	    USAGE("binding must be \'l/s/n\', but \'%s\'\n", args->binding_dir);
 	}
     }
     // end of margins

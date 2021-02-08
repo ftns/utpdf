@@ -395,7 +395,7 @@ int draw_pages(cairo_t *cr, UFILE *in_f, args_t *args){
 	scoord->body_inset = args->fontsize;
 	// y-axis
 	scoord->oneline_h = args->fontsize+args->betweenline;
-	if (!args->noheader){
+	if (args->header){
 	    // has header
 	    scoord->body_top = mcoord->head_top + args->header_height + scoord->oneline_h;
 	    bodyheight = args->pheight - (scoord->body_top + mcoord->mbottom);
@@ -455,13 +455,13 @@ int draw_pages(cairo_t *cr, UFILE *in_f, args_t *args){
             draw_rectangle(cr, mcoord->body_left, mcoord->head_top, mcoord->bwidth,
                            args->pheight - mcoord->mbottom - mcoord->head_top,
                            LW_BORDER, C_BORDER);
-            if (!args->noheader){
+            if (args->header){
                 draw_rel_line(cr, mcoord->body_left, scoord->body_top,
                               mcoord->bwidth, 0, LW_BORDER, C_BORDER);
             }
         }
         // draw header
-        if (!args->noheader){
+        if (args->header){
             //
             draw_header(obj, args, page, mcoord, scoord, datebuf);
             //
@@ -502,7 +502,7 @@ int draw_pages(cairo_t *cr, UFILE *in_f, args_t *args){
                                   LW_VLINE, C_NUMVL);
                 }
             }
-        } // if (!args->noheader)
+        } // if (args->header)
 
         page++;
         
