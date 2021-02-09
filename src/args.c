@@ -321,7 +321,7 @@ void parser(int short_index, int long_index, char *argstr, usage_func_t usage, i
         case i_unit:
             chk_sw(&args->inch, argstr, "inch", "mm", opt, usage); break;
         case i_orient:
-            chk_sw(&args->portrait, argstr, "p", "l", opt, usage); break;
+            chk_sw(&args->portrait, argstr, "portrait", "landscape", opt, usage); break;
         case i_hslant:
             chk_slant(&args->hfont_slant, argstr, opt, usage); break;
         case i_hweigbt:

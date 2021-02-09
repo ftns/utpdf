@@ -1,155 +1,255 @@
-.\"
-.Dd January 18, 2021
-.Os User Commands
-.Dt UTPDF,UTPS 1
-.Sh NAME
-.Nm utpdf ,
-.Nm utps
-.Nd margin-aware converter from utf-8 text to PDF/PostScript
-.Sh SYNOPSIS
-.Nm utpdf/utps
-.Op Ar options
-.Pa file(s)
-.\"
-.Sh DESCRIPTION
-.Nm utpdf/utps
+.TH UTPDF,UTPS "1" "February 2021" "utpdf/utps ver.0.81d" "User Commands"
+.SH NAME
+utpdf, utps \- margin\-aware converter from utf\-8 text to PDF/PostScript
+.SH SYNOPSIS
+.B utpdf
+[\fI\,options\/\fR] \fI\,<utf8_textfile> \/\fR...
+.SH DESCRIPTION
+.B utpdf/utps
 converts utf-8 text files or standard input to PDF/Postscript.
-By default, the PDF output is stored in files with
-.Pa ".pdf"
-suffix,
+By default, the PDF output is stored in files with \f[CR]".pdf"\fR suffix,
 PostScript output is sent to standard output.
-.Pp
-.Nm utpdf/utps
+.P
+.B utpdf/utps
 set suitable margins with simplex/duplex, portrait/landscape,
 long edge binded/short edge binded printing.
 So printed papers are filed correctly in binder.
-.Pp
-.Nm utpdf/utps
+.P
+.B utpdf/utps
 shows timestamp on the header. By default, it is
 a modification time of files. If you specified by
-.Fl -timestamp=cur
-option, or input is standard input, the timestamp is current time.
+\fB --timestamp\fR=cur option, or input is standard input, the timestamp is current time.
 .\"
-.Sh OPTIONS
-.Ss printing:
-.Bl -tag -width indent
-.It Fl b, -border[=on/off]
-draw border
-.It Fl B Ar point
-space between lines (default: 1.0pt)
-.It Fl m, -punch[=on/off]
-show punch mark (default: off)
-.It Fl n, -number[=on/off]
-show line number (default: off)
-.It Fl -notebook[=on/off]
-show baselines like notebook (default: off)
-.It Fl -fold-arrow[=on/off]
-show arrow indicate folded line (default: on)
-.It Fl -t Ar #
-tab width (default: 8)
-.It Fl -timestamp=mod/cur
-timestamp: file modified time/current time
-(file default: modified time/stdin: current time only)
-.It Fl F Ar fontname
-body font (default: IPAGothic)
-.It Fl S Ar fontsize
-font size in pt.
-(default: oneside 9.8pt./twoside 6.6pt.)
-.El
-.Ss paper:
-.Bl -tag -width indent
-.It Fl P Ar a3/a4/a5/b4/b5/b6/letter/legal
-paper size (default: a4)
-.It Fl d, -duplex[=on]
-duplex printing(default)
-.It Fl s -duplex=off
-simplex printing
-.It Fl l
-landscape
-.It Fl p
-portrait(default)
-.It Fl 1 -side=1
-one side per page (portrait default)
-.It Fl 2 -side=2\/
-two sides per page (landscape default)
-.It Fl -binddir= Ar l/s/n
-bind long edge/short edge/none
-(portrait default: long edge/landscape default: short edge)
-.El
-.Ss misc:
-.Bl -tag -width indent
-.It Fl o Ar filename
-output file name
-.It Fl h, -help
-show this message
-.It Fl V, -version
-show version
-.El
-.Ss length unit:
-.Bl -tag -width indent
-.It Fl -inch
-unit is inch
-.It Fl -mm
-unit is mm (defalt)
-.El
-.Ss header:
-.Bl -tag -width indent
-.It Fl -header[=on/off]
-header on/off (default: on)
-.It Fl -header-font= Ar fontname
-header font (default: sans-serif)
-.It Fl -header-size= Ar fontsize
-header font size (default: oneside 16.0pt./twoside 9.0pt.)
-.It Fl -header-text= Ar text
-header center text (default: filename)
-.It Fl -date-format= Ar format
-date format in
-.Li strftime(3)
-(default: %m/%d/%y %H:%M)
-.El
-.Ss margins:
-.Bl -tag -width indent
-.It Fl -binding= Ar length
+.SH OPTIONS
+.IP
+.SS basic settings:
+.HP
+\fB\-b\fR, \fB\-\-border\fR[=on/off]	draw border
+.TP
+\fB\-m\fR, \fB\-\-punch\fR[=on/off]	show punch mark
+.HP
+\fB\-n\fR, \fB\-\-number\fR[=on/off]	show line number
+.TP
+\fB\-t\fR <#>, \fB\-\-tab=\fR<#>	tab width (default: 8)
+.TP
+\fB\-\-timestamp\fR=mod/cur	timestamp: file modified time/current time
+		\fR(file default: modified time/stdin: current time only)
+.TP
+\fB\-\-notebook\fR[=on/off]	show baselines like notebook
+.HP
+\fB\-\-fold\-arrow\fR[=on/off]	show the arrows indicate folded line
+.br
+		(default: on)
+.IP
+.SS sheet:
+.TP
+\fB\-P\fR, \fB\-\-paper\fR=\fI\,\/\fRa3/a4/a5/b4/b5/b6/letter/legal
+	sheet size (default: a4)
+.TP
+\fB\-d\fR, \fB\-\-duplex\fR[=on]	duplex printing(default)
+.TP
+\fB\-s\fR, \fB\-\-duplex\fR=off		simplex printing
+.HP
+\fB\-l\fR, \fB\-\-orientation\fR=landscape	sheet orientation is landscape
+.HP
+\fB\-p\fR, \fB\-\-orientation\fR=portrait	sheet orientation is portrait(default)
+.TP
+\fB\-1\fR, \fB\-\-col\fR=1		one column per sheet (portrait default)
+.TP
+\fB\-2\fR, \fB\-\-col\fR=2		two colimns per sheet (landscape default)
+.TP
+\fB\-\-binddir\fR=l/s/n		bind long edge/short edge/none
+	(portrait default: long edge/landscape default: short edge)
+.IP
+.SS misc:
+.TP
+\fB\-o\fR <output_file>		specify output file
+.TP
+\fB\-f\fR <config_file>		load optional config file
+.TP
+\fB\-c\fR <case_name>		load configuration for specific case.
+.br
+		\fButpdf:\fR	load \f[CR]$HOME/.utpdfrc\-<case_name>\fR
+.br
+		\fButps:\fR	load \f[CR]$HOME/.utpsrc\-<case_name>\fR
+.TP
+\fB\-h\fR, \fB\-\-help\fR		show help message
+.TP
+\fB\-V\fR, \fB\-\-version\fR		show version
+.HP
+\fB\-\-inch\fR, \fB\-\-unit\fR=\fI\,inch\/\fR	length unit is inch
+.TP
+\fB\-\-mm\fR,   \fB\-\-unit\fR=\fI\,mm\/\fR	length unit is mm (defalt)
+.IP
+.SS body:
+.TP
+\fB\-F\fR <fontname>, \fB\-\-body\-font=\fR<fontname>
+	body font (default: IPAGothic)
+.TP
+\fB\-S\fR <fontsize>, \fB\-\-body\-size=\fR<fontsize>
+	font size in pt. (default: oneside 9.8pt./twoside 6.6pt.)
+.TP
+\fB\-\-body\-weight\fR=light/normal/bold/100\-1000
+	body font weight (default: normal)
+.TP
+\fB\-\-body\-slant\fR=normal/italic/oblique
+	body font slant (default: normal)
+.TP
+\fB\-\-body\-spacing=\fR<point>		space between lines (default: 1.00pt)
+.IP
+.SS header:
+.TP
+\fB\-\-header\fR[=on/off]		header on/off (default: on)
+.TP
+\fB\-\-header\-text\fR[=<text>]		center text of header (default: filename)
+.HP
+\fB\-\-header\-font=\fR<fontname>	font of center text (default: sans\-serif)
+.TP
+\fB\-\-header\-size=\fR<fontsize>	font size of center text
+		(default: one column 16.0pt./two columns 9.0pt.)
+.TP
+\fB\-\-header\-weight\fR=light/normal/bold/100\-1000
+		font weight of cenrer text (default: bold)
+.TP
+\fB\-\-header\-slant\fR=normal/italic/oblique
+		header font slant (default: normal)
+.TP
+\fB\-\-header\-side\-size=\fR<fontsize>
+		font size of side part(date & page)
+.br		
+		(default: 10.56 = header\-size * 0.66)
+.TP
+\fB\-\-header\-side\-slant\fR=normal/italic/oblique
+		side font slant (default: same as center)
+.TP
+\fB\-\-header\-side\-weight\fR=light/normal/bold/100\-1000
+		side font weight (default: same as center)
+.TP
+\fB\-\-date\-format\fR[=<format>]
+		date header's format. it's format is \f[CR]strftime(3)\fR's one.
+.br
+		(default: %D %R)
+.IP
+.SS watermark:
+.TP
+\fB\-\-watermark\-text=\fR<text>	text of watermark
+.TP
+\fB\-\-watermark\-font=\fR<fontname>	watermark font name (default: sans\-serif)
+.TP
+\fB\-\-watermark\-slant\fR=normal/italic/oblique
+		watermark font slant (defaullt: normal)
+.TP
+\fB\-\-watermark\-weight\fR=light/normal/bold/100\-1000
+		watermark font weight (default: bold)
+.TP
+\fB\-\-watermark\-collor=\fR<red digit>,<green digit>,<blue digit>
+		watermark color (default: 230,230,255)
+.br
+		each digit must be 0\-255.
+.IP
+.SS margins:
+.TP
+\fB\-\-binding=\fR<length>
 binding margin (default: 25.4mm/1.0inch)
-.It Fl -outer= Ar length
+.TP
+\fB\-\-outer=\fR<length>
 outer margin   (default: 12.7mm/0.5inch)
-.It Fl -top= Ar length
+.TP
+\fB\-\-top=\fR<length>
 top margin     (default: 12.7mm/0.5inch)
-.It Fl -bottom= Ar length
+.TP
+\fB\-\-bottom=\fR<length>
 bottom margin  (default: 12.7mm/0.5inch)
-.It Fl -divide= Ar length
+.TP
+\fB\-\-divide=\fR<length>
 distance between two sides (default: 6.3mm/0.2inch)
-.El
+.PP
 .\"
-.Sh EXAMPLES
+.SH EXAMPLES
 Most simple example:
-.Dl $ utpdf foo.c
-makes one pdf file,
-.Pa foo.c.pdf.
-.Pp
+.br
+\f[CR]$ utpdf foo.c \fR
+.br
+makes one pdf file, \f[CR]foo.c.pdf\fR.
+.br
 Another example:
-.Dl $ utpdf foo.c bar.c
-makes two pdf files,
-,Pa foo.c.pdf, bar.c.pdf.
+.br
+\f[CR]$ utpdf foo.c bar.c \fR
+.br
+makes two pdf files, \f[CR]foo.c.pdf, bar.c.pdf\fR.
+.br
 however:
-.Dl $ utpdf foo.c bar.c -o baz.pdf
-makes only one pdf file,
-.Pa baz.pdf,
-which contain
-.Pa foo.c
-and
-.Pa bar.c.
-.Pp
+.br
+\f[CR]$ utpdf foo.c bar.c -o baz.pdf\fR
+.br
+makes only one pdf file, \f[CR]baz.pdf\fR,
+which contains \f[CR]foo.c\fR and \f[CR]bar.c\fR.
+.P
 If you want print file:
-.Dl $ utps foo.c | lpr
-so
-.Pa foo.c
-will be printed by default printer.
-If the printer has duplex printing capability,
-.Pa foo.c
+.br
+\f[CR]$ utps foo.c | lpr\fR
+.br
+so \f[CR]foo.c\fR will be printed by default printer.
+.br
+If the printer has duplex printing capability, \f[CR]foo.c\fR
 is printed by two-sided per paper. If you dare to want to print by one-sided
 per paper:
-.Dl $ utps -s foo.c | lpr
+.br
+\f[CR]$ utps -s foo.c | lpr\fR
 .\"
-.Sh BUGS
-This program is tested only in Japanese environment(ja_JP.UTF-8).
+.SH CONFIGURATAION
+.B utpdf
+reads \f[CR]$HOME/.utpdfrc\fR as configuration first.
+.B utps
+reads \f[CR]$HOME/.utpsrc\fR in the same way.
+These configuration files are text file, and their each line format is
+\f[CR]<key>: <value>\fR.
+.br
+\f[CR]<key>\fR is same as two-dashed command line option's name, and
+\f[CR]<value>\fR is a value of the option.
+.br
+If the first character of the line is \f[CR]#\fR, it is a comment line.
+.br
+Settings in the configuration file can be overrided by command line option.
+.br
+For example, if you want disable header, set
+.B--header=off
+on command line. In configuration file, you should write \f[CR]header: off\fR.
+.SS Example
+\f[CR]# sample configuration
+.br
+number: on
+.br
+orientation: l
+.br
+body-font: IPAMincho
+.br
+body-size: 12
+.br
+#
+\fR
+.br
+means: show line number, sheet orientation is landscape, text body font is IPAMincho and it's size is 12point.
+.\"
+.SH BUGS
+.B utps:
+Some non-PostScript printers could not always print by duplex,
+even if it has duplex printing ability.
+.P
+Some PostScript printers could not print duplex with short edge
+binding.
+.P
+.SH COPYRIGHT
+Copyright \(co 2021 by Akihiro SHIMIZU
+.PP
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+.PP
+http://www.apache.org/licenses/LICENSE\-2.0
+.PP
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.

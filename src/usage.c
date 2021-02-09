@@ -257,6 +257,7 @@ void version(){
 
 #ifdef SINGLE_DEBUG
 
+int makepdf=1;
 char *prog_name;
 
 char *paper_default() {
