@@ -22,13 +22,11 @@
 
 #include "utpdf.h"
 #include "args.h"
-
-typedef struct main_coordinates {
-  double head_top, mbottom, body_left, body_right, bwidth;
-  enum direction markdir;
-} mcoord_t;
+#include "pangoprint.h"
+#include "drawing.h"
 
 extern void calc_page_coordinates(args_t *args, int page, mcoord_t *mcoord);
+extern void calc_page_subcoordinates(pcobj *obj, args_t *args, mcoord_t *mcoord, scoord_t *scoord);
 
 #endif
 

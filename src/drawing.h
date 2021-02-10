@@ -26,11 +26,6 @@
 #include "coord.h"
 #include "pangoprint.h"
 
-typedef struct sub_coordinates {
-	double text_left, num_right, body_inset; 
-	double body_top, oneline_h;
-} scoord_t;
-
 extern void show_text_at_center(pcobj *obj, const char *str);
 extern void show_text_at_right(pcobj *obj, const char *str);
 extern void show_text_at_left(pcobj *obj, const char *str);
@@ -49,12 +44,10 @@ extern void draw_cont_arrow
 extern void draw_header
    (pcobj *obj, args_t *args, int page, mcoord_t *mcoord,
     scoord_t *scoord, char *datebuf);
-extern void draw_lines(pcobj *obj, UFILE *in_f, args_t *args, int lineperpage,
-                       mcoord_t *mcoord, scoord_t *scoord);
 extern void draw_lines
     (pcobj *obj, UFILE *in_f, args_t *args,int lineperpage,
-     mcoord_t *mcoord, scoord_t *scoord);
-extern int draw_pages(cairo_t *cr, UFILE *in_f, args_t *args);
+    int *fline,  mcoord_t *mcoord, scoord_t *scoord);
+extern void draw_file(pcobj *obj, UFILE *in_f, args_t *args, int last_file);
 
 #endif
 

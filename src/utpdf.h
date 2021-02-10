@@ -106,6 +106,17 @@
 
 enum direction { d_none, d_up, d_down, d_right, d_left  };
 
+typedef struct main_coordinates {
+  double head_top, mbottom, body_left, body_right, bwidth;
+  enum direction markdir;
+} mcoord_t;
+
+typedef struct sub_coordinates {
+    double text_left, num_right, body_inset; 
+    double body_top, oneline_h, bottombase;
+    int lineperpage;
+} scoord_t;
+
 extern int makepdf;
 extern char *prog_name;
 extern char *path2cmd(char *p);

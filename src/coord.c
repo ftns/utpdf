@@ -285,4 +285,37 @@ void calc_page_coordinates(args_t *arg, int page, mcoord_t *mcoord){
     }   
 }
 
+
+void calc_page_subcoordinates(pcobj *obj, args_t *args, mcoord_t *mcoord, scoord_t *scoord){
+    double bodyheight;
+    
+    scoord->body_inset = args->fontsize;
+    // y-axis
+    scoord->oneline_h = args->fontsize+args->betweenline;
+    if (args->header){
+        // has header
+        scoord->body_top = mcoord->head_top + args->header_height + scoord->oneline_h;
+        bodyheight = args->pheight - (scoord->body_top + mcoord->mbottom);
+    } else {
+        // no header
+        scoord->body_top = mcoord->head_top;
+        bodyheight = args->pheight - (mcoord->head_top + mcoord->mbottom);
+    }	    
+    scoord->lineperpage = (int)(bodyheight/scoord->oneline_h);
+    scoord->bottombase = scoord->body_top + scoord->oneline_h*scoord->lineperpage;
+	    
+    // x-axis
+    pcobj_setfont(obj, args->fontname, args->fontsize);
+    pcobj_font_face(obj, args->bfont_slant, args->bfont_weight);
+
+    if (args->numbering) {
+        scoord->num_right = mcoord->body_left + scoord->body_inset
+            + pcobj_text_width(obj, "000000"); // vertical line
+        scoord->text_left = scoord->num_right + pcobj_text_width(obj, "0");
+    } else {
+        scoord->text_left = mcoord->body_left + scoord->body_inset;
+    }
+}
+
+
 // end of coord.c

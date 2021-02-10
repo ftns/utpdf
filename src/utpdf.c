@@ -54,7 +54,7 @@ char *path2cmd(char *p){
 // 
 int main(int argc, char** argv){
     int fileindex;
-
+    
     setlocale(LC_ALL, "");
     prog_name=path2cmd(argv[0]);
     makepdf = (strncmp(prog_name, MKPDFNAME, NAMELEN)==0);
@@ -71,8 +71,8 @@ int main(int argc, char** argv){
 	// cairo stuff
 	cairo_surface_t *surface=NULL;
 	cairo_t *cr;
+        pcobj *obj;
 	int out_fd, output_notspecified=(args->outfile==NULL);
-        int pages;
       
 	for (fileindex = optind; fileindex < argc; fileindex++) {    
 	    // file stuff
@@ -111,7 +111,6 @@ int main(int argc, char** argv){
 		    surface = cairo_pdf_surface_create_for_stream
 			((cairo_write_func_t )write_func, (void *)&out_fd,
 			 args->pwidth, args->pheight);
-		    cr = cairo_create(surface);
 		} else {
                     // PostScript
 		    if (output_notspecified) {
@@ -126,7 +125,6 @@ int main(int argc, char** argv){
 		    surface = cairo_ps_surface_create_for_stream
 			((cairo_write_func_t )write_func, (void *)&out_fd,
 			 args->pwidth, args->pheight);
-		    cr = cairo_create(surface);
                     if (args->duplex) {
                         if (args->longedge) {
                             cairo_ps_surface_dsc_comment
@@ -142,7 +140,9 @@ int main(int argc, char** argv){
                                 (surface, "%%IncludeFeature: *Duplex DuplexTumble");
                         }
                     }
-		} // if (makepdf) else 
+		} // if (makepdf) else
+                cr = cairo_create(surface);
+                obj = pcobj_new(cr);
 	    } // if (surface == NULL)
             
             cairo_set_source_rgb(cr, C_BLACK);
@@ -158,27 +158,28 @@ int main(int argc, char** argv){
             }
 
             //
-            pages=draw_pages(cr, in_f, args);
+            draw_file(obj, in_f, args, (fileindex == (argc-1)));
             //
 
             close_u(in_f);
 
             if (! args->one_output){
                 // close output
+                pcobj_free(obj);
                 cairo_destroy(cr);
                 cairo_surface_destroy(surface);
                 close(out_fd);
                 surface=NULL;
             } else {
-                cairo_show_page(cr); // new page
-                if (pages%2) {
-                    cairo_show_page(cr); // add odd page
-                }
+                // if (fileindex < (argc-1)){
+                //    cairo_show_page(cr); // new page for next file.
+                //}
             }
         } // for (fileindex = optind; fileindex < argc; fileindex++) {
 
         if (args->one_output){
             // close output
+            pcobj_free(obj);
             cairo_destroy(cr);
             cairo_surface_destroy(surface);
             close(out_fd);
