@@ -1,4 +1,4 @@
-.TH UTPDF,UTPS "1" "February 2021" "utpdf/utps ver.0.81d" "User Commands"
+.TH UTPDF,UTPS "1" "February 2021" "utpdf/utps ver.0.82" "User Commands"
 .SH NAME
 utpdf, utps \- margin\-aware converter from utf\-8 text to PDF/PostScript
 .SH SYNOPSIS
@@ -24,31 +24,32 @@ a modification time of files. If you specified by
 .IP
 .SS basic settings:
 .HP
-\fB\-b\fR, \fB\-\-border\fR[=on/off]	draw border
+\fB\-b\fR, \fB\-\-border\fR[=on/off]	draw border (default: off)
 .TP
-\fB\-m\fR, \fB\-\-punch\fR[=on/off]	show punch mark
+\fB\-m\fR, \fB\-\-punch\fR[=on/off]	show punch mark (default: on)
 .HP
-\fB\-n\fR, \fB\-\-number\fR[=on/off]	show line number
+\fB\-n\fR, \fB\-\-number\fR[=on/off]	show line number (default: off)
 .TP
 \fB\-t\fR <#>, \fB\-\-tab=\fR<#>	tab width (default: 8)
 .TP
 \fB\-\-timestamp\fR=mod/cur	timestamp: file modified time/current time
 		\fR(file default: modified time/stdin: current time only)
 .TP
-\fB\-\-notebook\fR[=on/off]	show baselines like notebook
+\fB\-\-notebook\fR[=on/off]	show baselines like notebook (default: off)
 .HP
 \fB\-\-fold\-arrow\fR[=on/off]	show the arrows indicate folded line
-.br
-		(default: on)
+			(default: on)
 .IP
 .SS sheet:
 .TP
 \fB\-P\fR, \fB\-\-paper\fR=\fI\,\/\fRa3/a4/a5/b4/b5/b6/letter/legal
-	sheet size (default: a4)
+		sheet size (default: a4)
 .TP
 \fB\-d\fR, \fB\-\-duplex\fR[=on]	duplex printing(default)
 .TP
-\fB\-s\fR, \fB\-\-duplex\fR=off		simplex printing
+\fB\-s\fR, \fB\-\-duplex\fR=off 	simplex printing
+.TP
+\fB\-\-force\-duplex\fR		force printer to do duplex if it couldn't do it.
 .HP
 \fB\-l\fR, \fB\-\-orientation\fR=landscape	sheet orientation is landscape
 .HP
@@ -58,7 +59,7 @@ a modification time of files. If you specified by
 .TP
 \fB\-2\fR, \fB\-\-col\fR=2		two colimns per sheet (landscape default)
 .TP
-\fB\-\-binddir\fR=l/s/n		bind long edge/short edge/none
+\fB\-\-binded-edge\fR=l/s/n		bind long edge/short edge/none
 	(portrait default: long edge/landscape default: short edge)
 .IP
 .SS misc:
@@ -76,21 +77,23 @@ a modification time of files. If you specified by
 \fB\-h\fR, \fB\-\-help\fR		show help message
 .TP
 \fB\-V\fR, \fB\-\-version\fR		show version
-.HP
-\fB\-\-inch\fR, \fB\-\-unit\fR=\fI\,inch\/\fR	length unit is inch
 .TP
-\fB\-\-mm\fR,   \fB\-\-unit\fR=\fI\,mm\/\fR	length unit is mm (defalt)
+\fB\-\-inch\fR, \fB\-\-unit\fR=inch	length unit is inch
+.TP
+\fB\-\-mm\fR,   \fB\-\-unit\fR=mm	length unit is mm (defalt)
 .IP
 .SS body:
 .TP
-\fB\-F\fR <fontname>, \fB\-\-body\-font=\fR<fontname>
+\fB\-F\fR <fontname>, \fB\-\-body\-font\fR=<fontname>
 	body font (default: IPAGothic)
 .TP
-\fB\-S\fR <fontsize>, \fB\-\-body\-size=\fR<fontsize>
+\fB\-S\fR <fontsize>, \fB\-\-body\-size\fR=<fontsize>
 	font size in pt. (default: oneside 9.8pt./twoside 6.6pt.)
 .TP
 \fB\-\-body\-weight\fR=light/normal/bold/100\-1000
 	body font weight (default: normal)
+.br
+	light: 300, normal: 400, bold: 700	
 .TP
 \fB\-\-body\-slant\fR=normal/italic/oblique
 	body font slant (default: normal)
@@ -103,38 +106,38 @@ a modification time of files. If you specified by
 .TP
 \fB\-\-header\-text\fR[=<text>]		center text of header (default: filename)
 .HP
-\fB\-\-header\-font=\fR<fontname>	font of center text (default: sans\-serif)
+\fB\-\-header\-font\fR=<fontname>	font of center text (default: sans\-serif)
 .TP
-\fB\-\-header\-size=\fR<fontsize>	font size of center text
-		(default: one column 16.0pt./two columns 9.0pt.)
+\fB\-\-header\-size\fR=<fontsize>	font size of center text
+	(default: one column 16.0pt./two columns 9.0pt.)
 .TP
 \fB\-\-header\-weight\fR=light/normal/bold/100\-1000
-		font weight of cenrer text (default: bold)
+	font weight of cenrer text (default: bold)
 .TP
 \fB\-\-header\-slant\fR=normal/italic/oblique
-		header font slant (default: normal)
+	header font slant (default: normal)
 .TP
-\fB\-\-header\-side\-size=\fR<fontsize>
-		font size of side part(date & page)
+\fB\-\-header\-side\-size\fR=<fontsize>
+	font size of side part(date & page)
 .br		
-		(default: 10.56 = header\-size * 0.66)
+	(default: 10.56/5.94 = header\-size * 0.66)
 .TP
 \fB\-\-header\-side\-slant\fR=normal/italic/oblique
-		side font slant (default: same as center)
+	side font slant (default: same as center)
 .TP
 \fB\-\-header\-side\-weight\fR=light/normal/bold/100\-1000
-		side font weight (default: same as center)
+	side font weight (default: same as center)
 .TP
 \fB\-\-date\-format\fR[=<format>]
-		date header's format. it's format is \f[CR]strftime(3)\fR's one.
+	date header's format. it's format is \f[CR]strftime(3)\fR's one.
 .br
-		(default: %D %R)
+	(default: %D %R)
 .IP
 .SS watermark:
 .TP
-\fB\-\-watermark\-text=\fR<text>	text of watermark
+\fB\-\-watermark\-text\fR=<text>	text of watermark
 .TP
-\fB\-\-watermark\-font=\fR<fontname>	watermark font name (default: sans\-serif)
+\fB\-\-watermark\-font\fR=<fontname>	watermark font name (default: sans\-serif)
 .TP
 \fB\-\-watermark\-slant\fR=normal/italic/oblique
 		watermark font slant (defaullt: normal)
@@ -142,26 +145,26 @@ a modification time of files. If you specified by
 \fB\-\-watermark\-weight\fR=light/normal/bold/100\-1000
 		watermark font weight (default: bold)
 .TP
-\fB\-\-watermark\-collor=\fR<red digit>,<green digit>,<blue digit>
+\fB\-\-watermark\-collor\fR=<red digit>,<green digit>,<blue digit>
 		watermark color (default: 230,230,255)
 .br
 		each digit must be 0\-255.
 .IP
 .SS margins:
 .TP
-\fB\-\-binding=\fR<length>
+\fB\-\-binding\fR=<length>
 binding margin (default: 25.4mm/1.0inch)
 .TP
-\fB\-\-outer=\fR<length>
+\fB\-\-outer\fR=<length>
 outer margin   (default: 12.7mm/0.5inch)
 .TP
-\fB\-\-top=\fR<length>
+\fB\-\-top\fR=<length>
 top margin     (default: 12.7mm/0.5inch)
 .TP
-\fB\-\-bottom=\fR<length>
+\fB\-\-bottom\fR=<length>
 bottom margin  (default: 12.7mm/0.5inch)
 .TP
-\fB\-\-divide=\fR<length>
+\fB\-\-divide\fR=<length>
 distance between two sides (default: 6.3mm/0.2inch)
 .PP
 .\"
@@ -196,6 +199,10 @@ is printed by two-sided per paper. If you dare to want to print by one-sided
 per paper:
 .br
 \f[CR]$ utps -s foo.c | lpr\fR
+.br
+You can print multiple files at once by:
+.br
+\f[CR]$ utps foo.c bar.c | lpr\fR
 .\"
 .SH CONFIGURATAION
 .B utpdf
@@ -207,14 +214,17 @@ These configuration files are text file, and their each line format is
 .br
 \f[CR]<key>\fR is same as two-dashed command line option's name, and
 \f[CR]<value>\fR is a value of the option.
+Therefore, a command line option:
+.B \-\-<key>=<value>
+is equivalent to a configuration: \f[CR]<key>: <value>\fR.
 .br
-If the first character of the line is \f[CR]#\fR, it is a comment line.
+If the first character of one line is \f[CR]#\fR, it is a comment line.
 .br
 Settings in the configuration file can be overrided by command line option.
 .br
 For example, if you want disable header, set
-.B--header=off
-on command line. In configuration file, you should write \f[CR]header: off\fR.
+.B \-\-header=off
+on command line, or you should write \f[CR]header: off\fR in configuration file.
 .SS Example
 \f[CR]# sample configuration
 .br
@@ -229,15 +239,18 @@ body-size: 12
 #
 \fR
 .br
-means: show line number, sheet orientation is landscape, text body font is IPAMincho and it's size is 12point.
+means: show line number, sheet orientation is landscape,
+text body font is IPAMincho and it's size is 12point.
 .\"
 .SH BUGS
+On
 .B utps:
-Some non-PostScript printers could not always print by duplex,
-even if it has duplex printing ability.
+.br
+Some printers could not always print by duplex,
+even if it has duplex printing ability. In this case, please try
+\fB\-\-force\-duplex\fR.
 .P
-Some PostScript printers could not print duplex with short edge
-binding.
+Some printers could not fit pages. it prints little bit offset images.
 .P
 .SH COPYRIGHT
 Copyright \(co 2021 by Akihiro SHIMIZU

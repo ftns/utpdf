@@ -158,12 +158,9 @@ void draw_header(pcobj *obj, args_t *args, int page, mcoord_t *mcoord,
     cairo_t *cr=obj->cr;
     
     // hbaseline: the baseline of header font
-    // cairo_select_font_face (cr, , args->hfont_slant, args->hfont_weight);
     pcobj_setfont(obj, args->headerfont, args->head_size);
     pcobj_font_face(obj, args->hfont_slant, args->hfont_weight);
     descent=pcobj_font_descent(obj);
-    // gap = (scoord->body_top - mcoord->head_top - pcobj_font_height(obj))/3;
-    // hbaseline = scoord->body_top - gap - descent;
     hbaseline = scoord->body_top - descent;
 
     // hinset: header inset
@@ -228,7 +225,8 @@ void draw_limited_text(pcobj *obj, UFILE *in_f, int tab, const double limit,
 	if (rbuf[0] == '\t') {
             // tab
 	    double cur_right = cur_left+pcobj_text_width(obj, outbuf);
-	    double new_right = tabw*ceil((cur_right+em-orig_left)/tabw)+orig_left;
+	    double new_right = tabw*ceil((cur_right-orig_left)/tabw)+orig_left;
+            // double new_right = tabw*ceil((cur_right+em-orig_left)/tabw)+orig_left;
 	    if (new_right < limit_x) {
 		// tab jump
 		pcobj_print(obj, outbuf);

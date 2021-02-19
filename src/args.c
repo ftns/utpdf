@@ -518,6 +518,9 @@ void getargs(int argc, char **argv){
     // for getopt_long()
     int opt, long_index;
 
+    // initialization
+    args->one_output=!makepdf;
+    
     // fetch from config file
     read_config(getconfpath());
     
