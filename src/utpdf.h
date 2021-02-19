@@ -1,6 +1,6 @@
 /*
+  utpdf/utps
   margin-aware converter from utf-8 text to PDF/PostScript
-  utpdf utps
 
   Copyright (c) 2021 by Akihiro SHIMIZU
 
@@ -37,7 +37,7 @@
 
 #define MKPDFNAME "utpdf"
 #define NAMELEN 255
-#define VERSION "0.81d"
+#define VERSION "0.82"
 
 // unit: point.
 // 1inch = 72pt.
@@ -62,7 +62,6 @@
 
 #define WATERMARK_FONT "sans-serif"
 
-
 #define ARROW_WIDTH 1.0 // width of folding arrow
 
 #define TAB     8
@@ -79,19 +78,19 @@
 #define C_NUMVL  1,   0.6, 0.6  // vertical line along with left of line number
 #define C_ARROW	 0.6, 0.6, 1    // folding arrow
 #define C_BORDER 0.2, 0.2, 0.2  // border
-#define C_WHITE  1,   1,   1	// white
-#define C_RED    1,   0,   0	// red
-#define C_GREEN  0,   1,   0	// green
-#define C_BLUE   0,   0,   1	// blue
-#define C_BLACK  0,   0,   0	// black
+#define C_WHITE  1,   1,   1	// (white)
+#define C_RED    1,   0,   0	// (red)
+#define C_GREEN  0,   1,   0	// (green)
+#define C_BLUE   0,   0,   1	// (blue)
+#define C_BLACK  0,   0,   0	// (black)
 
 // watermark color
 #define WMARK_R 0.9
 #define WMARK_G 0.9
 #define WMARK_B 1.0
-#define UIWM_R 230
-#define UIWM_G 230
-#define UIWM_B 255
+#define UIWM_R  230 // 230/255=0.9019
+#define UIWM_G  230 // 230/255=0.9019
+#define UIWM_B  255 // 255/255=1
 
 
 // line width
@@ -104,11 +103,11 @@
 // #define DATE_FORMAT "%m/%d/%y %H:%M"
 #define DATE_FORMAT "%D %R"
 
-enum direction { d_none, d_up, d_down, d_right, d_left  };
+enum direction { d_down=-2, d_right=-1, d_none=0, d_left=1, d_up=2  };
 
 typedef struct main_coordinates {
-  double head_top, mbottom, body_left, body_right, bwidth;
-  enum direction markdir;
+    double head_top, mbottom, mright, body_left, body_right, bwidth;
+    enum direction markdir;
 } mcoord_t;
 
 typedef struct sub_coordinates {

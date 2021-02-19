@@ -1,6 +1,6 @@
 /*
+  utpdf/utps
   margin-aware converter from utf-8 text to PDF/PostScript
-  utpdf utps
 
   Copyright (c) 2021 by Akihiro SHIMIZU
 
@@ -22,23 +22,10 @@
 #include "paper.h"
 #include "usage.h"
 #include "args.h"
+#include "io.h"
 
 int makepdf=1;
 char *prog_name;
-
-// write to file
-cairo_status_t write_func (void *closure, const unsigned char *data,
-			   unsigned int length){
-    int fd = *(int *)closure;
-    int bytes;
-
-    while (length > 0){
-	bytes=write(fd, data, length);
-	if (bytes<0) return CAIRO_STATUS_WRITE_ERROR;
-	length -= bytes;
-    }
-    return CAIRO_STATUS_SUCCESS;
-}
 
 char *path2cmd(char *p){
     char *cur=p;
@@ -48,7 +35,6 @@ char *path2cmd(char *p){
     }
     return p;
 }
-
 
 //
 // 
@@ -69,9 +55,9 @@ int main(int argc, char** argv){
     //
     {
 	// cairo stuff
-	cairo_surface_t *surface=NULL;
-	cairo_t *cr;
-        pcobj *obj;
+	// cairo_surface_t *surface=NULL;
+        pcobj *obj=NULL;
+	// cairo_t *cr;
 	int out_fd, output_notspecified=(args->outfile==NULL);
       
 	for (fileindex = optind; fileindex < argc; fileindex++) {    
@@ -94,7 +80,7 @@ int main(int argc, char** argv){
 	    in_f = fdopen_u(in_fd, args->in_fname);
 
 	    // create output file and surface 
-	    if (surface == NULL) {
+	    if (obj == NULL) {
 		// new file
 		if (makepdf) {
 		    if (output_notspecified) {
@@ -108,9 +94,9 @@ int main(int argc, char** argv){
 		    } else {
 			out_fd = openfd(args->outfile, O_CREAT|O_RDWR|O_TRUNC);
 		    }
-		    surface = cairo_pdf_surface_create_for_stream
-			((cairo_write_func_t )write_func, (void *)&out_fd,
-			 args->pwidth, args->pheight);
+		    obj = pcobj_pdf_new
+                        ((cairo_write_func_t )write_func, (void *)&out_fd, 
+                         args->pwidth, args->pheight);
 		} else {
                     // PostScript
 		    if (output_notspecified) {
@@ -122,30 +108,52 @@ int main(int argc, char** argv){
 		    } else {
 			out_fd = openfd(args->outfile, O_CREAT|O_WRONLY|O_TRUNC);
 		    }
-		    surface = cairo_ps_surface_create_for_stream
-			((cairo_write_func_t )write_func, (void *)&out_fd,
-			 args->pwidth, args->pheight);
                     if (args->duplex) {
-                        if (args->longedge) {
+                        if (args->force_duplex){
+                            obj = pcobj_ps_new
+                                ((cairo_write_func_t )write_ps_duplex, (void *)&out_fd,
+                                 args->phys_width, args->phys_height);
+                        } else {
+                            obj = pcobj_ps_new
+                                ((cairo_write_func_t )write_func, (void *)&out_fd,
+                                 args->phys_width, args->phys_height);
+                        }
+                        cairo_ps_surface_dsc_comment
+                            (obj->surface, "%%Requirements: duplex");
+                        cairo_ps_surface_dsc_begin_setup(obj->surface);
+                        cairo_ps_surface_dsc_comment
+                            (obj->surface,
+                             "%%IncludeFeature: *Duplex DuplexNoTumble");
+                        // set orientation
+                        cairo_ps_surface_dsc_begin_page_setup (obj->surface);
+                        if (args->portrait) {
                             cairo_ps_surface_dsc_comment
-                                (surface, "%%Requirements: duplex");
-                            cairo_ps_surface_dsc_begin_setup(surface);
-                            cairo_ps_surface_dsc_comment
-                                (surface, "%%IncludeFeature: *Duplex DuplexNoTumble");
+                                (obj->surface, "%%PageOrientation: Portrait");
                         } else {
                             cairo_ps_surface_dsc_comment
-                                (surface, "%%Requirements: duplex");
-                            cairo_ps_surface_dsc_begin_setup(surface);
-                            cairo_ps_surface_dsc_comment
-                                (surface, "%%IncludeFeature: *Duplex DuplexTumble");
+                                (obj->surface, "%%PageOrientation: Landscape");
                         }
-                    }
+                    } else {
+                        // simplex printing
+                        obj = pcobj_ps_new
+                            ((cairo_write_func_t )write_func, (void *)&out_fd,
+                             args->pwidth, args->pheight);
+                        // set orientation
+                        cairo_ps_surface_dsc_begin_page_setup (obj->surface);
+                        if (args->portrait) {
+                            cairo_ps_surface_dsc_comment
+                                (obj->surface, "%%PageOrientation: Portrait");
+                        } else {
+                            cairo_ps_surface_dsc_comment
+                                (obj->surface, "%%PageOrientation: Landscape");
+                        }
+                    } // if (args->duplex) else
 		} // if (makepdf) else
-                cr = cairo_create(surface);
-                obj = pcobj_new(cr);
+                // cr = cairo_create(surface);
+                // obj = pcobj_new(cr);
 	    } // if (surface == NULL)
             
-            cairo_set_source_rgb(cr, C_BLACK);
+            cairo_set_source_rgb(obj->cr, C_BLACK);
   
             if (args->current_t){
                 time(args->mtime);
@@ -166,10 +174,8 @@ int main(int argc, char** argv){
             if (! args->one_output){
                 // close output
                 pcobj_free(obj);
-                cairo_destroy(cr);
-                cairo_surface_destroy(surface);
                 close(out_fd);
-                surface=NULL;
+                obj=NULL;
             } else {
                 // if (fileindex < (argc-1)){
                 //    cairo_show_page(cr); // new page for next file.
@@ -180,8 +186,6 @@ int main(int argc, char** argv){
         if (args->one_output){
             // close output
             pcobj_free(obj);
-            cairo_destroy(cr);
-            cairo_surface_destroy(surface);
             close(out_fd);
         }
     }

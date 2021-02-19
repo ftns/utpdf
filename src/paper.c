@@ -1,6 +1,6 @@
 /*
+  utpdf/utps
   margin-aware converter from utf-8 text to PDF/PostScript
-  utpdf utps
 
   Copyright (c) 2021 by Akihiro SHIMIZU
 

@@ -1,6 +1,6 @@
 /*
+  utpdf/utps
   margin-aware converter from utf-8 text to PDF/PostScript
-  utpdf utps
 
   Copyright (c) 2021 by Akihiro SHIMIZU
 
@@ -130,9 +130,9 @@ void help_message(int fd){
     fprintf(f, "Usage: %s [options] <utf8_textfile> ...\n", prog_name);
     fprintf(f, "options:\n");
     fprintf(f, "  basic settings:\n");
-    fprintf(f, "    -b, --border[=on/off] draw border\n");
-    fprintf(f, "    -m, --punch[=on/off]  show punch mark\n");
-    fprintf(f, "    -n, --number[=on/off] show line number\n");
+    fprintf(f, "    -b, --border[=on/off] draw border (default: off)\n");
+    fprintf(f, "    -m, --punch[=on/off]  show punch mark (default: on)\n");
+    fprintf(f, "    -n, --number[=on/off] show line number (default: off)\n");
     fprintf(f, "    -t <#>, --tab=<#>     tab width (default: %d)\n", TAB);
     fprintf(f, "    --timestamp=mod/cur   timestamp: file modified time/current time\n");
     fprintf(f, "                        (file default: modified time/stdin: current time only)\n");
@@ -142,17 +142,19 @@ void help_message(int fd){
     
     fprintf(f, "  sheet:\n");
     fprintf(f, "    -P, --paper=a3/a4/a5/b4/b5/b6/letter/legal\n");
-    fprintf(f, "                        sheet size (default: %s)\n", paper_default());
-    fprintf(f, "    -d, --duplex[=on]   duplex printing(default)\n");
-    fprintf(f, "    -s, --duplex=off    simplex printing\n");
-    fprintf(f, "    -l, --orientation=l sheet orientation is landscape\n");
-    fprintf(f, "    -p, --orientation=p sheet orientation is portrait(default)\n");
-    fprintf(f, "    -1, --col=1         one column per sheet (portrait default)\n");
-    fprintf(f, "    -2, --col=2         two colimns per sheet (landscape default) \n");
-    fprintf(f, "    --binddir=l/s/n     bind long edge/short edge/none\n");
+    fprintf(f, "                            sheet size (default: %s)\n", paper_default());
+    fprintf(f, "    -d, --duplex[=on]       duplex printing(default)\n");
+    fprintf(f, "    -s, --duplex=off        simplex printing\n");
+    fprintf(f, "    -l, --orientation=l     sheet orientation is landscape\n");
+    fprintf(f, "    -p, --orientation=p     sheet orientation is portrait(default)\n");
+    fprintf(f, "    -1, --col=1             one column per sheet (portrait default)\n");
+    fprintf(f, "    -2, --col=2             two colimns per sheet (landscape default) \n");
+    fprintf(f, "    --binded-edge=l/s/n     bind long edge/short edge/none\n");
     fprintf(f, "                   (portrait default: long edge/landscape default: short edge)\n");
-    fprintf(f, "\n");
-    
+    if (!makepdf) {
+    fprintf(f, "    --force-duplex[=on/off] force to duplex printing (default: off)\n");
+    }
+    fprintf(f, "\n");    
     fprintf(f, "  misc:\n");
     fprintf(f, "    -o <output_file>    output file\n");
     fprintf(f, "    -f <config_file>    optional config file\n");
@@ -171,6 +173,7 @@ void help_message(int fd){
     fprintf(f, "                        (default: oneside %1.1fpt./twoside %1.1fpt.)\n",FONTSIZE, FONTSIZE_TWOCOLS);
     fprintf(f, "    --body-weight=light/normal/bold/100-1000\n");
     fprintf(f, "                        body font weight (default: normal)\n");
+    fprintf(f, "                        light: 300, normal: 400, bold: 700\n");
     fprintf(f, "    --body-slant=normal/italic/oblique\n");
     fprintf(f, "                        body font slant (default: normal)\n");
     fprintf(f, "    --body-spacing=<point>\n");
@@ -181,16 +184,16 @@ void help_message(int fd){
     fprintf(f, "    --header[=on/off]        header on/off (default: on)\n");
     fprintf(f, "    --header-text[=<text>]   center text of header (default: filename)\n");
     fprintf(f, "    --header-font=<fontname> font of center text (default: %s)\n", HEADER_FONT);
-    fprintf(f, "    --header-size=<fontsize> font size of center text\n");
+    fprintf(f, "    --header-size=<fontsize> font size of header center text\n");
     fprintf(f, "                             (default: one column %1.1fpt./two columns %1.1fpt.)\n", HFONT_LARGE, HFONT_TWOCOLS_LARGE);
     fprintf(f, "    --header-weight=light/normal/bold/100-1000\n");
-    fprintf(f, "                             font weight of cenrer text (default: bold)\n");
+    fprintf(f, "                             font weight of header center text (default: bold)\n");
     fprintf(f, "    --header-slant=normal/italic/oblique\n");
-    fprintf(f, "                             header font slant (default: normal)\n");
+    fprintf(f, "                             font slant of header center text (default: normal)\n");
     fprintf(f, "    --header-side-size=<fontsize>\n");    
     fprintf(f, "                             font size of side part -- date & page\n");
-    fprintf(f, "                             (default: %3.2f = header-size * %3.2f)\n",
-            HFONT_LARGE*HFONT_M_RATE, HFONT_M_RATE);
+    fprintf(f, "                             (default: %3.2f/%3.2f = <header-size> * %3.2f)\n",
+            HFONT_LARGE*HFONT_M_RATE, HFONT_TWOCOLS_LARGE*HFONT_M_RATE, HFONT_M_RATE);
     fprintf(f, "    --header-side-slant=normal/italic/oblique\n");
     fprintf(f, "                             side font slant\n");
     fprintf(f, "                             (default: same as center)\n");
@@ -206,10 +209,9 @@ void help_message(int fd){
     fprintf(f, "                                 watermark font slant (defaullt: normal)\n");
     fprintf(f, "    --watermark-weight=light/normal/bold/100-1000\n");
     fprintf(f, "                                 watermark font weight (default: bold)\n");
-    fprintf(f, "    --watermark-collor=<red digit>,<green digit>,<blue digit>\n");
+    fprintf(f, "    --watermark-collor=<red>,<green>,<blue>\n");
     fprintf(f, "                                 watermark color (default: 230,230,255)\n");
     fprintf(f, "                                 each digit must be 0-255.\n");
-
     fprintf(f, "\n");
     fprintf(f, "  margins:\n");
     fprintf(f, "    --binding=<length>   binding margin (default: %2.1fmm/%1.1finch)\n",
@@ -229,7 +231,7 @@ void usage(char *message){
     if (message != NULL){
         fprintf(stderr, "%s\n", message);
     }
-    fprintf(stderr, "Usage: %s [-12bBdFlmnstSPp...] <utf8_textfile> ...\n", prog_name);
+    fprintf(stderr, "Usage: %s [-options...] <utf8_textfile> ...\n", prog_name);
     fprintf(stderr, "For more detail, %s -h\n", prog_name);
     exit(1);
 }

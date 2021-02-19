@@ -1,6 +1,6 @@
 /*
+  utpdf/utps
   margin-aware converter from utf-8 text to PDF/PostScript
-  utpdf utps
 
   Copyright (c) 2021 by Akihiro SHIMIZU
 
@@ -19,6 +19,8 @@
 
 #ifndef __IO_H__
 #define __IO_H__
+
+#include <cairo.h>
 
 #define UBUFLEN   16384 // 16Kbyte
 #define USTACKLEN 256
@@ -41,5 +43,9 @@ extern int close_u(UFILE *f);
 extern int get_one_uchar(UFILE *f, char *dst);
 extern int rewind_u(UFILE *f, int len);
 extern int eof_u(UFILE *f);
+
+extern cairo_status_t write_func(void *closure, const unsigned char *data, unsigned int length);
+extern cairo_status_t write_ps_duplex(void *closure, const unsigned char *data, unsigned int length);
+
 
 #endif

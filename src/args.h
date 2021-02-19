@@ -1,6 +1,6 @@
 /*
+  utpdf/utps
   margin-aware converter from utf-8 text to PDF/PostScript
-  utpdf utps
 
   Copyright (c) 2021 by Akihiro SHIMIZU
 
@@ -24,21 +24,23 @@
 #define PDF_CONF_FILE ".utpdfrc"
 #define PS_CONF_FILE ".utpsrc"
 
+
 typedef struct arguments {
     // option flags
     int twocols, numbering, header, punchmark, duplex, portrait, longedge;
     int tab, notebook, fold_arrow, border, current_t, one_output, inch;
     int hfont_slant, hfont_weight, bfont_slant, bfont_weight;
     int side_slant, side_weight, wmark_slant, wmark_weight;
+    int rotate_right, upside_down_page, force_duplex;
     // option strings
     char *fontname, *headerfont, *in_fname, *date_format, *headertext, *outfile;
-    char *binding_dir, *paper, *wmark_text, *wmark_font;
-    
+    char *binded_edge, *paper, *wmark_text, *wmark_font;    
     // option length
     double fontsize, header_height, head_size, side_size;
     double wmark_r, wmark_g, wmark_b;
     // paper size and margins
-    double pwidth, pheight, binding, outer, ptop, pbottom, divide, betweenline;
+    double pwidth, pheight, phys_width, phys_height;
+    double binding, outer, ptop, pbottom, divide, betweenline;
     // file modified time
     time_t *mtime;
 } args_t;

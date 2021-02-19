@@ -1,6 +1,6 @@
 /*
+  utpdf/utps
   margin-aware converter from utf-8 text to PDF/PostScript
-  utpdf utps
 
   Copyright (c) 2021 by Akihiro SHIMIZU
 
@@ -378,19 +378,22 @@ void draw_file(pcobj *obj, UFILE *in_f, args_t *args, int last_file){
     static int page=1;
     int file_page=1, file_line=1;
     cairo_t *cr=obj->cr;
+    mcoord_t mc_store, *mcoord=&mc_store;
+    scoord_t sc_store, *scoord=&sc_store;
         
     // pcobj *obj=pcobj_new(cr);
     
     modt = localtime(args->mtime);
     strftime(datebuf, 255, args->date_format, modt);
-    
-    do {
-	mcoord_t mc_store, *mcoord=&mc_store;
-	scoord_t sc_store, *scoord=&sc_store;
-        
-	calc_page_coordinates(args, page, mcoord);
-	calc_page_subcoordinates(obj, args, mcoord, scoord);
 
+    if (args->rotate_right){
+        pcobj_turn_right(obj);
+    }
+    // draw each page
+    do {
+        // calc. every coordinate, which moved per pages.
+        calc_page_coordinates(args, page, mcoord);
+        calc_page_subcoordinates(obj, args, mcoord, scoord);
         // draw punchmark
 	if (args->punchmark){
 	    switch (mcoord->markdir){
@@ -406,7 +409,7 @@ void draw_file(pcobj *obj, UFILE *in_f, args_t *args, int last_file){
 		draw_mark(cr, d_left, mcoord->body_left/2, args->pheight/2);
 		break;
 	    case d_right:
-		draw_mark(cr, d_right, (mcoord->body_right + args->pwidth)/2, args->pheight/2);
+		draw_mark(cr, d_right, args->pwidth-mcoord->mright/2, args->pheight/2);
 		break;
 	    }
         }
@@ -478,37 +481,42 @@ void draw_file(pcobj *obj, UFILE *in_f, args_t *args, int last_file){
         file_page++;
         
         // draw body
-        draw_lines(obj, in_f, args, scoord->lineperpage, &file_line, mcoord, scoord);
+        draw_lines(obj, in_f, args, scoord->lineperpage, &file_line,
+                   mcoord, scoord);
         //
 	
         if (args->notebook){
             // footer line
-            draw_rel_line(cr, mcoord->body_left, scoord->bottombase+1, mcoord->bwidth, 0, 1, C_BASEL);
+            draw_rel_line(cr, mcoord->body_left, scoord->bottombase+1,
+                          mcoord->bwidth, 0, 1, C_BASEL);
         }
 
         if (!args->twocols){
             // one column
             if (!(eof_u(in_f))){
                 cairo_show_page(cr); // new page
+                if (args->upside_down_page) {
+                    pcobj_upside_down(obj);
+                }
             }
         } else if ((page % 2 != 0)){
             // ((two column) and next page is odd page)
-            cairo_show_page(cr);
+            cairo_show_page(cr); // new pagea
+            if (args->upside_down_page) {
+                pcobj_upside_down(obj);
+            }
         }
         // 
         // finish drawing one page
     } while (! eof_u(in_f));
-#if 0
-    if (args->twocols){
-        if (args->one_output && !last_file && (page %2 != 0)){
-            cairo_show_page(cr);
-        }
-    }
-#endif
+
     if (!args->twocols){
         // one column
         if (args->one_output && !last_file){
-            cairo_show_page(cr);
+            cairo_show_page(cr); // new page
+            if (args->upside_down_page) {
+                pcobj_upside_down(obj);
+            }
         }
     }
 }   

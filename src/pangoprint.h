@@ -1,6 +1,6 @@
 /*
+  utpdf/utps
   margin-aware converter from utf-8 text to PDF/PostScript
-  utpdf utps
 
   Copyright (c) 2021 by Akihiro SHIMIZU
 
@@ -21,18 +21,26 @@
 
 #include <pango/pangocairo.h>
 #include <cairo.h>
+#include <cairo-pdf.h>
+#include <cairo-ps.h>
+#include "utpdf.h"
 
 typedef struct pango_cairo_print_object {
+    cairo_surface_t *surface;
     cairo_t *cr;
     PangoFontDescription *desc;
     PangoLayout *layout;
-    // PangoFontMetrics *metrics;
-    // PangoFontset *fontset;
-    // PangoFontMap *fontmap;
-    // PangoContext *context;
+    double phys_width, phys_height;
+    double l_width, l_height;
+    enum direction axis;
 } pcobj; 
 
-extern pcobj *pcobj_new(cairo_t *cr);
+extern pcobj *pcobj_pdf_new
+	(cairo_write_func_t write_func, int *out_fd,
+         double width, double height);
+extern pcobj *pcobj_ps_new
+	(cairo_write_func_t write_func, int *out_fd,
+         double width, double height);
 extern void pcobj_free(pcobj *obj);
 extern void pcobj_setfont(pcobj *obj, char *family, double size);
 extern void pcobj_setsize(pcobj *obj, double size);
@@ -53,6 +61,10 @@ extern void pcobj_draw_watermark(pcobj *obj, char *text, char *font,
                                  PangoWeight weight, PangoStyle style,
                                  double r, double g, double b);
 
+extern void pcobj_upside_down(pcobj *obj);
+extern void pcobj_turn_right(pcobj *obj);
+extern void pcobj_turn_left(pcobj *obj);
+extern void pcobj_setdir(pcobj *obj, enum direction d);
 
 #endif
 // end of pangoprint.h

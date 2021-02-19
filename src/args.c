@@ -1,6 +1,6 @@
 /*
+  utpdf/utps
   margin-aware converter from utf-8 text to PDF/PostScript
-  utpdf utps
 
   Copyright (c) 2021 by Akihiro SHIMIZU
 
@@ -29,16 +29,17 @@ typedef void (*usage_func_t)(char *);
 time_t mtime_store;
 args_t args_store = {
     // option flags
-    .twocols=-1, .numbering=0, .header=1, .punchmark=0, .duplex=1,
+    .twocols=-1, .numbering=0, .header=1, .punchmark=1, .duplex=1,
     .portrait=1, .longedge=0, .tab=TAB, .notebook=0, .fold_arrow=1,
     .border=0, .current_t=0, .one_output=0, .inch=0,
     .hfont_slant=PANGO_STYLE_NORMAL, .hfont_weight=PANGO_WEIGHT_BOLD,
     .bfont_slant=PANGO_STYLE_NORMAL, .bfont_weight=PANGO_WEIGHT_NORMAL,
     .side_slant=-1, .side_weight=-1,
     .wmark_slant=PANGO_STYLE_NORMAL, .wmark_weight=PANGO_WEIGHT_BOLD,
+    .rotate_right=0, .upside_down_page=0, .force_duplex=0,
     // option strings
-    .fontname=NULL, .headerfont=NULL, /* in_fname, */ .date_format=DATE_FORMAT,
-    .headertext=NULL, .outfile=NULL, .binding_dir=NULL, .paper=NULL,
+    .fontname=NULL, .headerfont=NULL, .in_fname=NULL, .date_format=DATE_FORMAT,
+    .headertext=NULL, .outfile=NULL, .binded_edge=NULL, .paper=NULL,
     .wmark_text=NULL, .wmark_font=WATERMARK_FONT,
     // font size
     .fontsize=0, .header_height=0, .head_size=0, .side_size=0,
@@ -54,11 +55,11 @@ args_t *args = &args_store;
 typedef enum i_option
 { i_help, i_version, i_inch, i_mm, i_binding, i_outer, i_top, i_bottom, 
   i_divide, i_hfont, i_hsize, i_notebk, i_datefmt, i_headtxt, i_header,
-  i_fold_a, i_time_s, i_border, i_punch, i_number, i_binddir, i_side,
+  i_fold_a, i_time_s, i_border, i_punch, i_number, i_bind_edge, i_side,
   i_unit, i_orient, i_hslant, i_hweigbt, i_bfont, i_bsize, i_bweight,
   i_bslant, i_bspace, i_tab, i_side_size, i_side_slant, i_side_weight,
   i_wm_text, i_wm_font, i_wm_slant, i_wm_weight, i_wm_color, i_paper,
-  i_END } i_option_t;
+  i_force_dup, i_END } i_option_t;
 
 #define NOARG no_argument 
 #define REQARG required_argument
@@ -87,7 +88,7 @@ struct option long_options[]={
     /* 17 i_border      */ { "border",             OPTARG,  0,  0 },
     /* 18 i_punch       */ { "punch",              OPTARG,  0,  0 },
     /* 19 i_number      */ { "number",             OPTARG,  0,  0 },
-    /* 20 i_binddir     */ { "binddir",            REQARG,  0,  0 },
+    /* 20 i_bind_edge   */ { "binded-edge",        REQARG,  0,  0 },
     /* 21 i_side        */ { "col",                REQARG,  0,  0 },
     /* 22 i_unit        */ { "unit",               REQARG,  0,  0 },
     /* 23 i_orient      */ { "orientation",        REQARG,  0,  0 },
@@ -107,8 +108,9 @@ struct option long_options[]={
     /* 37 i_wm_slant    */ { "watermark-slant",    REQARG,  0,  0 },
     /* 38 i_wm_weight   */ { "watermark-weight",   REQARG,  0,  0 },
     /* 39 i_wm_color    */ { "watermark-color",    REQARG,  0,  0 },
-    /* 40 i_paper       */ { "paper",              REQARG,  0, 'P'},    
-    /* 41 i_END         */ { 0, 0, 0, 0 }
+    /* 40 i_paper       */ { "paper",              REQARG,  0, 'P'},
+    /* 41 i_force_dup.  */ { "force-duplex",       OPTARG,  0,  0 },
+    /* 42 i_END         */ { 0, 0, 0, 0 }
 };
 
 #define LONGOP_NAMELEN 32
@@ -143,6 +145,7 @@ int do_shortop(struct option *loption, char *value){
     if ((loption->flag == NULL) && (loption->val != 0)){
         // parse as short option 
         parser(loption->val, 0, value, conf_usage, 1);
+
         return 1;
     }
     if (loption->flag!=NULL){
@@ -245,12 +248,12 @@ void parser(int short_index, int long_index, char *argstr, usage_func_t usage, i
         char *opt=cmd2opt(long_options[long_index].name, is_conf_file);
         
         switch (long_index) {
-        case i_binddir:
+        case i_bind_edge:
             switch (argstr[0]){
             case 'l':
             case 's':
             case 'n':
-                args->binding_dir=argstr;
+                args->binded_edge=argstr;
                 break;
             default:
                 USAGE("%s must be \"l/s/n\", but \"%s\"\n", opt, argstr);
@@ -354,6 +357,8 @@ void parser(int short_index, int long_index, char *argstr, usage_func_t usage, i
             chk_weight(&args->wmark_weight, argstr, opt, usage); break;
         case i_wm_color:
             chk_color(&args->wmark_r, &args->wmark_g, &args->wmark_b, argstr, opt, usage); break;
+        case i_force_dup:
+            chk_onoff(&args->force_duplex, argstr, opt, usage); break;
         } // switch (lindex)
     } else {
         // short option
@@ -569,57 +574,11 @@ void getargs(int argc, char **argv){
 	args->headerfont = HEADER_FONT;
     }
     
-    // paper
-    {
-	int p;
-	if (args->paper != NULL){
-	    for (p=0; p<PAPERS_END; p++){
-		if (strncmp(args->paper, paper_sizes[p].pname, PNAME_SIZE)==0){
-		    if (args->portrait){
-			args->pwidth  = paper_sizes[p].w;
-			args->pheight = paper_sizes[p].h;
-		    } else {
-			args->pwidth  = paper_sizes[p].h;
-			args->pheight = paper_sizes[p].w;
-		    }
-		    break; 
-		}
-	    }
-	    if (p>=PAPERS_END) USAGE("Unknown paper:%s\n", args->paper);
-	} else {
-	    // default
-	    if (args->portrait){
-		args->pwidth  = paper_sizes[PNAME_DEFAULT].w;
-		args->pheight = paper_sizes[PNAME_DEFAULT].h;
-	    } else {
-		args->pwidth  = paper_sizes[PNAME_DEFAULT].h;
-		args->pheight = paper_sizes[PNAME_DEFAULT].w;
-	    }
-	}
-    } // end of paper
-
-    // margins
-    if (args->inch) {
-	// inch -> point
-	args->binding *= 72; args->outer   *= 72;
-	args->ptop    *= 72; args->pbottom *= 72;
-	args->divide  *= 72;
-    } else {
-	// mm -> point
-	args->binding *= 2.8346; args->outer   *= 2.8346;
-	args->ptop    *= 2.8346; args->pbottom *= 2.8346;
-	args->divide  *= 2.8346;
-    }
-    if (args->binding == 0) { args->binding = BINDING; };
-    if (args->outer   == 0) { args->outer   = OUTER;   };
-    if (args->ptop    == 0) { args->ptop    = PTOP;    };
-    if (args->pbottom == 0) { args->pbottom = PBOTTOM; };
-    if (args->divide  == 0) { args->divide  = PBOTTOM; };
-    
-    if (args->binding_dir == NULL){ // default
+    // binding
+    if (args->binded_edge == NULL){ // default
 	args->longedge = args->portrait; // shortedge = landscape(!args->portrait)
     } else {
-	switch (args->binding_dir[0]){
+	switch (args->binded_edge[0]){
 	case 'l': // long edge
 	    args->longedge = 1;
 	    break;
@@ -631,9 +590,88 @@ void getargs(int argc, char **argv){
 	    args->binding = args->outer;
 	    break;
 	default:
-	    USAGE("binding must be \'l/s/n\', but \'%s\'\n", args->binding_dir);
+	    USAGE("binded edge must be \'l/s/n\', but \'%s\'\n", args->binded_edge);
 	}
     }
+
+    // paper
+    {
+	int p, result=-1;
+	if (args->paper != NULL){
+	    for (p=0; p<PAPERS_END; p++){
+		if (strncmp(args->paper, paper_sizes[p].pname, PNAME_SIZE)==0){
+                    result = p;
+                    break;
+                }
+            }
+	    if (p>=PAPERS_END) {
+                USAGE("Unknown paper:%s\n", args->paper);
+                result = PNAME_DEFAULT;
+            }
+        } else {
+            result = PNAME_DEFAULT;
+        }
+        if (makepdf){
+            // PDF
+            args->rotate_right=0;
+            args->upside_down_page=0;
+            if (args->portrait){
+                args->pwidth  = paper_sizes[result].w;
+                args->pheight = paper_sizes[result].h;
+            } else {
+                args->pwidth  = paper_sizes[result].h;
+                args->pheight = paper_sizes[result].w;
+            }
+            args->phys_width = args->pwidth;
+            args->phys_height = args->pheight;
+        } else {
+            // PostScript
+            args->phys_width = paper_sizes[result].w;
+            args->phys_height = paper_sizes[result].h;
+            if (args->portrait){
+                // portrait
+                args->pwidth  = paper_sizes[result].w;
+                args->pheight = paper_sizes[result].h;
+                if (args->longedge){
+                    args->rotate_right=0;
+                    args->upside_down_page=0;
+                } else {
+                    args->rotate_right=0;
+                    args->upside_down_page=1;
+                }
+            } else {
+                // landscape
+                args->pwidth  = paper_sizes[result].h;
+                args->pheight = paper_sizes[result].w;
+                if (args->longedge){
+                    args->rotate_right=1;
+                    args->upside_down_page=0;
+                } else {
+                    args->rotate_right=1;
+                    args->upside_down_page=1;
+                }
+            } // if (args->portrait) ... else
+        } // if (makepdf) else
+    } // end of paper
+
+    // margins
+    if (args->inch) {
+	// inch -> point
+	args->binding *= 72; args->outer   *= 72;
+	args->ptop    *= 72; args->pbottom *= 72;
+	args->divide  *= 72;
+    } else {
+	// mm -> point
+	args->binding *= 72/25.4; args->outer   *= 72/25.4;
+	args->ptop    *= 72/25.4; args->pbottom *= 72/25.4;
+	args->divide  *= 72/25.4;
+    }
+    if (args->binding == 0) { args->binding = BINDING; };
+    if (args->outer   == 0) { args->outer   = OUTER;   };
+    if (args->ptop    == 0) { args->ptop    = PTOP;    };
+    if (args->pbottom == 0) { args->pbottom = PBOTTOM; };
+    if (args->divide  == 0) { args->divide  = PBOTTOM; };
+    
     // end of margins
 }
 

@@ -1,6 +1,6 @@
 /*
+  utpdf/utps
   margin-aware converter from utf-8 text to PDF/PostScript
-  utpdf utps
 
   Copyright (c) 2021 by Akihiro SHIMIZU
 
@@ -20,17 +20,42 @@
 #include "pangoprint.h"
 #include <math.h>
 
-pcobj *pcobj_new(cairo_t *cr){    
-    pcobj *obj = malloc(sizeof(pcobj));
-    obj->cr = cr;
+pcobj *pcobj_setup(pcobj *obj, double width, double height){
+    obj->cr = cairo_create(obj->surface);
     obj->desc = pango_font_description_new();    
-    obj->layout = pango_cairo_create_layout (cr);
+    obj->layout = pango_cairo_create_layout (obj->cr);
+
+    obj->phys_width = width;
+    obj->phys_height = height;
+    obj->l_width = width;
+    obj->l_height = height;
+    obj->axis = d_up;
     return obj;
+}
+
+pcobj *pcobj_pdf_new(cairo_write_func_t write_func, int *out_fd,
+                     double width, double height){
+    pcobj *obj = malloc(sizeof(pcobj));    
+    obj->surface = cairo_pdf_surface_create_for_stream
+        ((cairo_write_func_t )write_func, (void *)out_fd,
+         width, height);
+    return pcobj_setup(obj, width, height);
+}
+
+pcobj *pcobj_ps_new(cairo_write_func_t write_func, int *out_fd,
+                    double width, double height){
+    pcobj *obj = malloc(sizeof(pcobj));    
+    obj->surface = cairo_ps_surface_create_for_stream
+        ((cairo_write_func_t )write_func, (void *)out_fd,
+         width, height);
+    return pcobj_setup(obj, width, height);
 }
 
 void pcobj_free(pcobj *obj){
     pango_font_description_free(obj->desc);
     g_object_unref(obj->layout);
+    cairo_destroy(obj->cr);
+    cairo_surface_destroy(obj->surface);
     free(obj);
 }
 
@@ -47,7 +72,7 @@ void pcobj_setsize(pcobj *obj, double size){
 
 void pcobj_settext(pcobj *obj, const char *str){
     pango_layout_set_text (obj->layout, str, -1);
-    pango_cairo_update_layout (obj->cr, obj->layout);
+    // pango_cairo_update_layout (obj->cr, obj->layout);
 }    
 
 void pcobj_print(pcobj *obj, const char *str){
@@ -55,12 +80,11 @@ void pcobj_print(pcobj *obj, const char *str){
     pango_cairo_show_layout (obj->cr, obj->layout);
 }
 
-
 /*
   enum PangoWeight: 100-1000
-    PANGO_WEIGHT_LIGHT  300
-    PANGO_WEIGHT_NORMAL 400
-    PANGO_WEIGHT_BOLD   700
+    PANGO_WEIGHT_LIGHT   300
+    PANGO_WEIGHT_NORMAL  400
+    PANGO_WEIGHT_BOLD    700
 */
 void pcobj_weight(pcobj *obj, PangoWeight w){
     if ((w<100)||(w>1000)){
@@ -74,8 +98,8 @@ void pcobj_weight(pcobj *obj, PangoWeight w){
 /*
   enum PangoStyle 
     PANGO_STYLE_NORMAL   the font is upright,
-    PANGO_STYLE_OBLIQUE  the font is slanted, but in a roman style.
     PANGO_STYLE_ITALIC   the font is slanted in an italic style.
+    PANGO_STYLE_OBLIQUE  the font is slanted, but in a roman style.
 */
 void pcobj_style(pcobj *obj, PangoStyle style){
     pango_font_description_set_style(obj->desc, style);
@@ -128,33 +152,34 @@ double pcobj_text_width(pcobj *obj, const char *str){
 
 double pcobj_width(pcobj *obj){
     PangoRectangle ink, logical;
-    // pango_cairo_update_layout (obj->cr, obj->layout);
+
     pango_layout_get_extents(obj->layout, &ink, &logical);
     return logical.width/PANGO_SCALE;
 }
 
 double pcobj_ink_width(pcobj *obj){
     PangoRectangle ink, logical;
-    // pango_cairo_update_layout (obj->cr, obj->layout);
+
     pango_layout_get_extents(obj->layout, &ink, &logical);
     return ink.width/PANGO_SCALE;
 }
 
 void pcobj_move_to(pcobj *obj, double x, double y){
     cairo_move_to(obj->cr, x, y-pcobj_font_ascent(obj));
-    //    cairo_move_to(obj->cr, x, y);
 }
+
+#define SAMPLE_SIZE 64
 
 void pcobj_draw_watermark(pcobj *obj, char *text, char *font,
                           double x, double y, double dx, double dy,
                           PangoWeight weight, PangoStyle style,
                           double r, double g, double b){
-    double rad, tan_t, h, w, k, new_h, new_w, e;
+    double rad, tan_t, h, w, k, new_h, new_w, e, new_size;
 
-    pcobj_setfont(obj, font, 16);
+    pcobj_setfont(obj, font, SAMPLE_SIZE);
     pcobj_font_face(obj, style, weight);
     cairo_set_source_rgb(obj->cr, r, g, b);
-    
+
     cairo_save(obj->cr);{
         cairo_translate(obj->cr, x+dx/2, y+dy/2);
         pango_cairo_update_layout (obj->cr, obj->layout);
@@ -174,20 +199,18 @@ void pcobj_draw_watermark(pcobj *obj, char *text, char *font,
         }
         new_w=r-2*e;
         new_h=k*new_w;
-        pcobj_setsize(obj, 1.1*1*new_w/w);// 16*new_w/w);
+        new_size=1.1*SAMPLE_SIZE*new_w/w;
+        pcobj_setsize(obj, new_size);
+        pcobj_settext(obj, text);
         new_w = pcobj_ink_width(obj);
         new_h = pcobj_font_height(obj);
-        
+
         cairo_rotate(obj->cr, -rad);
+        pango_cairo_update_layout (obj->cr, obj->layout);
+
         cairo_move_to(obj->cr, -new_w/2, -new_h/2);
         pango_cairo_show_layout(obj->cr, obj->layout);
-        cairo_set_source_rgb(obj->cr, 0, 0, 0);
-#ifdef SINGLE_DEBUG
-        cairo_set_line_width(obj->cr, 0.5);
-        cairo_rectangle(obj->cr, -new_w/2, -new_h/2, new_w, new_h);
-        cairo_stroke(obj->cr);
-#endif
-
+        cairo_set_source_rgb(obj->cr, 0, 0, 0); // C_BLACK
     } cairo_restore(obj->cr);
     
 #ifdef SINGLE_DEBUG
@@ -199,17 +222,139 @@ void pcobj_draw_watermark(pcobj *obj, char *text, char *font,
     pango_cairo_update_layout (obj->cr, obj->layout);
 }
 
-// --- debug part ---
+#define PI 3.14159265358979
+
+void dump_matrix(pcobj *obj){
+    cairo_matrix_t mat;
+    cairo_get_matrix(obj->cr, &mat);
+    fprintf(stderr, "/ %- 3.2f %- 3.2f \\  / %- 7.2f \\\n", mat.xx, mat.xy, mat.x0);
+    fprintf(stderr, "\\ %- 3.2f %- 3.2f /  \\ %- 7.2f /\n", mat.yx, mat.yy, mat.y0);
+}
+
+char *dir2str(enum direction d){
+    switch(d){
+    case d_none:
+        return "d_none";
+    case d_up:
+        return "d_up";
+    case d_down:
+        return "d_down";
+    case d_left:
+        return "d_left";
+    case d_right:
+        return "d_right";
+    }
+}
+
+void pcobj_upside_down(pcobj *obj){
+#if defined(SINGLE_DEBUG)
+    fprintf(stderr, "upside_down(): %s -> %s\n", dir2str(obj->axis), dir2str(-obj->axis));
+#endif
+    pcobj_setdir(obj, -obj->axis);
+}
+
+void pcobj_turn_right(pcobj *obj){
+    enum direction new_axis;
+    
+    switch(obj->axis){
+    case d_none:
+        new_axis=d_none;
+        break;
+    case d_up:
+        new_axis=d_right;
+        break;
+    case d_down:
+        new_axis=d_left;
+        break;
+    case d_right:
+        new_axis=d_down;
+        break;
+    case d_left:
+        new_axis=d_up;
+        break;
+    }
+#if defined(SINGLE_DEBUG)
+    fprintf(stderr, "turn_right(): %s -> %s\n", dir2str(obj->axis), dir2str(new_axis));
+#endif
+    pcobj_setdir(obj, new_axis);
+}
+
+void pcobj_turn_left(pcobj *obj){
+    enum direction new_axis;
+    
+    switch(obj->axis){
+    case d_none:
+        new_axis=d_none;
+        break;
+    case d_up:
+        new_axis=d_left;
+        break;
+    case d_down:
+        new_axis=d_right;
+        break;
+    case d_right:
+        new_axis=d_up;
+        break;
+    case d_left:
+        new_axis=d_down;
+        break;
+    }
+#if defined(SINGLE_DEBUG)
+    fprintf(stderr, "turn_left(): %s -> %s\n", dir2str(obj->axis), dir2str(new_axis));
+#endif
+    pcobj_setdir(obj, new_axis);
+}
+
+void pcobj_setdir(pcobj *obj, enum direction d){
+    cairo_matrix_t mat;
+
+    obj->axis=d;
+    switch (d){
+    case d_none:
+    case d_up:
+        obj->l_width=obj->phys_width;
+        obj->l_height=obj->phys_height;
+        mat.xx=1; mat.xy=0; mat.x0=0;
+        mat.yx=0; mat.yy=1; mat.y0=0;
+        break;
+    case d_down:
+        obj->l_width=obj->phys_width;
+        obj->l_height=obj->phys_height;
+        mat.xx=-1; mat.xy= 0; mat.x0= obj->phys_width;
+        mat.yx= 0; mat.yy=-1; mat.y0= obj->phys_height;
+        break;
+    case d_right:
+        obj->l_width=obj->phys_height;
+        obj->l_height=obj->phys_width;
+        mat.xx= 0; mat.xy=-1; mat.x0= obj->phys_width;
+        mat.yx= 1; mat.yy= 0; mat.y0= 0;
+        break;
+    case d_left:
+        obj->l_width=obj->phys_height;
+        obj->l_height=obj->phys_width;
+        mat.xx=  0; mat.xy= 1; mat.x0= 0;
+        mat.yx= -1; mat.yy= 0; mat.y0= obj->phys_height;
+        break;
+    }
+    cairo_set_matrix(obj->cr, &mat);
+    pango_cairo_update_layout(obj->cr, obj->layout);
+}
+
+/* --- debug part --- */
 
 #ifdef SINGLE_DEBUG
 
 #include <cairo-pdf.h>
+#include <cairo-ps.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <locale.h>
+#include "io.h"
 
 #define A4_w 595.27
 #define A4_h 841.89
+
+#define PS_TEST 1
 
 double cairo_text_width(cairo_t *cr, const char *str){
     cairo_text_extents_t t_ext;
@@ -223,33 +368,84 @@ double cairo_text_width(cairo_t *cr, const char *str){
 #define C_BLACK  0, 0, 0    // black
 #define C_WHITE  1, 1, 1    // white
 #define C_WATERMARK 0.9, 0.9, 1 // watermark
+#define C_RECT  0.5, 1, 0.5
 #define FONT_SIZE 16
 #define LINE_HEIGHT (FONT_SIZE+4)
-#define TOP 48
+#define TOP  72
 #define LEFT 72
 #define LFONT_SIZE 36
 #define LLINE_HEIGHT (LFONT_SIZE+4)
 
-static void draw_text (cairo_t *cr, char *font){
+static void draw_page (pcobj *obj, char *font){
     char buf[256];
-    pcobj *obj;
     double width;
     int w;
-    
-    obj = pcobj_new(cr);
 
+    
     // print watermark
     pcobj_draw_watermark(obj, "The quick fox ", "serif",
                          LEFT, TOP, A4_h-LEFT*2, A4_w-TOP*2,
                          PANGO_WEIGHT_BOLD, PANGO_STYLE_ITALIC,
                          C_WATERMARK);
 
+    fprintf(stderr, "After pcobj_draw_watermark()\n");
+    dump_matrix(obj);
+    
     // print fontname
-    cairo_set_source_rgb(cr, C_BLACK);
+    cairo_set_source_rgb(obj->cr, C_BLACK);
     pcobj_setfont(obj, font, FONT_SIZE);
+    pcobj_font_face(obj, PANGO_STYLE_NORMAL, PANGO_WEIGHT_NORMAL);
     pcobj_move_to(obj, LEFT, TOP);
     pcobj_print(obj, font);
 
+    cairo_set_source_rgb(obj->cr, C_RECT);    
+    cairo_set_line_width(obj->cr, 3);
+    cairo_rectangle(obj->cr, 0, 0, LEFT, TOP);
+    cairo_stroke(obj->cr);
+    cairo_set_source_rgb(obj->cr, C_BLACK);
+    
+    // upside-down
+    pcobj_upside_down(obj);
+    
+    fprintf(stderr, "upside-down \n");
+    // dump_matrix(obj);
+
+    pcobj_style(obj, PANGO_STYLE_ITALIC);
+    pcobj_move_to(obj, LEFT, TOP);
+    pcobj_print(obj, font);
+    pcobj_move_to(obj, LEFT, TOP+LINE_HEIGHT);
+    pcobj_print(obj, "upside down");
+
+    cairo_set_source_rgb(obj->cr, C_RECT);    
+    cairo_rectangle(obj->cr, 1, 1, LEFT, TOP);
+    cairo_stroke(obj->cr);
+    cairo_set_source_rgb(obj->cr, C_BLACK);
+    pcobj_upside_down(obj);
+
+    // turn right
+    pcobj_turn_right(obj);
+    pcobj_move_to(obj, TOP, LEFT);
+    pcobj_print(obj, "turn right");
+
+    cairo_set_source_rgb(obj->cr, C_RECT);    
+    cairo_rectangle(obj->cr, 1, 1, TOP, LEFT);
+    cairo_stroke(obj->cr);
+    cairo_set_source_rgb(obj->cr, C_BLACK);
+
+    // turn left
+    pcobj_turn_left(obj);
+    pcobj_turn_left(obj);
+    pcobj_move_to(obj, TOP, LEFT);
+    pcobj_print(obj, "turn left");
+
+    cairo_set_source_rgb(obj->cr, C_RECT);    
+    cairo_rectangle(obj->cr, 1, 1, TOP, LEFT);
+    cairo_stroke(obj->cr);
+    cairo_set_source_rgb(obj->cr, C_BLACK);
+
+    // print every weight
+    pcobj_style(obj, PANGO_STYLE_NORMAL);
+    pcobj_turn_right(obj);
     width=pcobj_text_width(obj, " normal ");
         
     for(w=1; w<=10; w++){
@@ -257,7 +453,7 @@ static void draw_text (cairo_t *cr, char *font){
         double h=TOP+w*LINE_HEIGHT;
         double body_width;
         
-        cairo_set_source_rgb (cr, C_BLACK);
+        cairo_set_source_rgb (obj->cr, C_BLACK);
         pcobj_move_to(obj, LEFT, h);
         pcobj_weight(obj, w*100);
 
@@ -279,16 +475,16 @@ static void draw_text (cairo_t *cr, char *font){
         pcobj_print(obj, buf);
 
         body_width=pcobj_text_width(obj, buf);
-        cairo_set_line_width(cr, 0.2);
-        cairo_set_source_rgb (cr, C_RED);
+        cairo_set_line_width(obj->cr, 0.2);
+        cairo_set_source_rgb (obj->cr, C_RED);
 
-        cairo_move_to(cr, LEFT, h);
-        cairo_rel_line_to(cr, width+body_width, 0);
-        cairo_stroke(cr);
+        cairo_move_to(obj->cr, LEFT, h);
+        cairo_rel_line_to(obj->cr, width+body_width, 0);
+        cairo_stroke(obj->cr);
     } // for(w=1; w<=10; w++)
 
     pcobj_weight(obj, PANGO_WEIGHT_NORMAL);
-    cairo_set_source_rgb (cr, C_BLACK);
+    cairo_set_source_rgb (obj->cr, C_BLACK);
 
     // Italic
     pcobj_move_to(obj, LEFT, 12*LINE_HEIGHT+TOP);
@@ -315,72 +511,74 @@ static void draw_text (cairo_t *cr, char *font){
         pcobj_print(obj, "日本語");
         w=pcobj_text_width(obj, "日");
 
-        cairo_set_line_width(cr, 0.2);
-        cairo_set_source_rgb (cr, C_BLUE);
+        cairo_set_line_width(obj->cr, 0.2);
+        cairo_set_source_rgb (obj->cr, C_BLUE);
 
         for (i=0; i<5; i++){
-            cairo_move_to(cr, LEFT+w*i, h-pcobj_font_ascent(obj));
-            cairo_rel_line_to(cr, 0, LFONT_SIZE*3);
+            cairo_move_to(obj->cr, LEFT+w*i, h-pcobj_font_ascent(obj));
+            cairo_rel_line_to(obj->cr, 0, LFONT_SIZE*3);
         }
-        cairo_stroke(cr);
-        cairo_set_source_rgb (cr, C_BLACK);
+        cairo_stroke(obj->cr);
+        cairo_set_source_rgb(obj->cr, C_BLACK);
     }
-    cairo_show_page(cr);
-    pcobj_free(obj);
-}
-
-int openfd(const char *path, int flag){
-    int fd=open(path, flag, 0666);
-    char ebuf[256];
-    
-    if (fd < 0) {
-	if ((flag & O_CREAT) != 0) {
-	    snprintf(ebuf, 255, "Could not create/write: %s\n", path);
-	} else {
-	    snprintf(ebuf, 255, "Could not open: %s\n", path);
-	}
-	perror(ebuf);
-	exit(1);
-    }
-    return fd;
-}
-
-// write to file
-cairo_status_t write_func (void *closure, const unsigned char *data,
-                           unsigned int length){
-    int fd = *(int *)closure;
-    int bytes;
-
-    while (length > 0){
-        bytes=write(fd, data, length);
-        if (bytes<0) return CAIRO_STATUS_WRITE_ERROR;
-        length -= bytes;
-    }
-    return CAIRO_STATUS_SUCCESS;
+    cairo_show_page(obj->cr);
+    pcobj_upside_down(obj);
 }
 
 
 int main(int argc, char **argv){
-  cairo_t *cr;
-  int i;
-  // cairo_status_t status;
-  cairo_surface_t *surface;
-  int fd = openfd("p.pdf", O_CREAT|O_RDWR|O_TRUNC);
+    int i, fd;
+    pcobj *obj;
+    
+    if (argc <= 1){
+        fprintf(stderr, "No font specified.\n");
+        exit(1);
+    }
+    setlocale(LC_ALL, "");
 
-  setlocale(LC_ALL, "");
-  
-  surface = cairo_pdf_surface_create_for_stream
-      ((cairo_write_func_t )write_func, (void *)&fd, A4_h, A4_w);
-  cr = cairo_create(surface);
-  cairo_set_source_rgb (cr, C_BLACK);
+#if PS_TEST
+    // PostScript
+    fd = STDOUT_FILENO;
+    obj = pcobj_ps_new((cairo_write_func_t ) write_ps_duplex, &fd, A4_w, A4_h);
+    // cairo_ps_surface_restrict_to_level(obj->surface, CAIRO_PS_LEVEL_2);
+    cairo_ps_surface_dsc_comment
+        (obj->surface, "%%Requirements: duplex");
+    cairo_ps_surface_dsc_begin_setup(obj->surface);
+    cairo_ps_surface_dsc_comment
+        (obj->surface,
+         "%%IncludeFeature: *Duplex DuplexNoTumble");
+    // set orientation
+    cairo_ps_surface_dsc_begin_page_setup (obj->surface);
+    cairo_ps_surface_dsc_comment
+        (obj->surface, "%%PageOrientation: Landscape");
 
-  for (i=1; i<argc; i++){
-      draw_text (cr, argv[i]);
-  }
-  cairo_destroy (cr);
-  cairo_surface_destroy(surface);
+    // cairo_identity_matrix(obj->cr);
+    // dump_matrix(obj);
+#else
+    // PDF
+    fd = openfd("p.pdf", O_CREAT|O_RDWR|O_TRUNC);
+    obj = pcobj_pdf_new((cairo_write_func_t ) write_func, &fd, A4_h, A4_w);
+#endif
   
-  return 0;
+    cairo_set_source_rgb (obj->cr, C_BLACK);
+
+    fprintf(stderr, "Initial state\n");
+    dump_matrix(obj);
+
+#if PS_TEST
+    // pcobj_turn_right(obj);
+    pcobj_setdir(obj, d_right);
+    fprintf(stderr, "After setdir(d_right)\n");
+    dump_matrix(obj);
+#endif
+
+    for (i=1; i<argc; i++){
+        draw_page(obj, argv[i]);
+    }
+    pcobj_free(obj);
+    close(fd);
+  
+    return 0;
 }
 
 #endif

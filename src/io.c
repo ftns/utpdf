@@ -1,6 +1,6 @@
 /*
+  utpdf/utps
   margin-aware converter from utf-8 text to PDF/PostScript
-  utpdf utps
 
   Copyright (c) 2021 by Akihiro SHIMIZU
 
@@ -21,6 +21,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <strings.h>
 #include <unistd.h>
 #include <fcntl.h>
 
@@ -182,6 +183,66 @@ int eof_u(UFILE *f){
     return (f->eof
             && (f->qindex == f->lastr)
             && (f->sindex == 0));
+}
+
+// write to file
+cairo_status_t write_func (void *closure, const unsigned char *data,
+                           unsigned int length){
+    int fd = *(int *)closure;
+    int bytes;
+
+    while (length > 0){
+        bytes=write(fd, data, length);
+        if (bytes<0) return CAIRO_STATUS_WRITE_ERROR;
+        length -= bytes;
+    }
+    return CAIRO_STATUS_SUCCESS;
+}
+
+#define PS_END_C "%%EndComments"
+#define PS_DUPLEX "<</Duplex true /Tumble false>> setpagedevice\n"
+
+cairo_status_t write_ps_duplex(void *closure, const unsigned char *data,
+                               unsigned int length){
+    static unsigned char line[1024]="";
+    static unsigned int i=0;
+    unsigned int p=0;
+    static int finished=0;
+    int end_of_line;
+    
+    if (finished) return write_func(closure, data, length);
+    
+    while ((p<length) && !finished){
+        if (data[p] == 0x0D){
+            line[i++]=data[p++];
+            if (data[p] == 0x0A){
+                line[i++]=data[p++];
+            }
+            end_of_line=1;            
+        } else if (data[p]==0x0A){
+            line[i++]=data[p++];
+            end_of_line=1;            
+        } else {
+            line[i++]=data[p++];
+            end_of_line=0;            
+        }
+        if (end_of_line){
+            if (write_func(closure, line, i) != CAIRO_STATUS_SUCCESS)
+                return CAIRO_STATUS_WRITE_ERROR;
+            i=0;
+            if (bcmp(line, PS_END_C, strlen(PS_END_C))==0){
+                if (write_func(closure, (unsigned char *)PS_DUPLEX, strlen(PS_DUPLEX)) != CAIRO_STATUS_SUCCESS)
+                    return CAIRO_STATUS_WRITE_ERROR;
+                finished=1;
+            }
+        }
+    } // while(p<length)
+
+    if ((finished)&&(p<length)){
+        return write_func(closure, &data[p], length-p);
+    }
+
+    return CAIRO_STATUS_SUCCESS;
 }
 
 // end of io.c
