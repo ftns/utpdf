@@ -222,8 +222,6 @@ void pcobj_draw_watermark(pcobj *obj, char *text, char *font,
     pango_cairo_update_layout (obj->cr, obj->layout);
 }
 
-#define PI 3.14159265358979
-
 void dump_matrix(pcobj *obj){
     cairo_matrix_t mat;
     cairo_get_matrix(obj->cr, &mat);
@@ -377,7 +375,7 @@ double cairo_text_width(cairo_t *cr, const char *str){
 #define LLINE_HEIGHT (LFONT_SIZE+4)
 
 static void draw_page (pcobj *obj, char *font){
-    char buf[256];
+    char buf[S_LEN];
     double width;
     int w;
 
@@ -469,7 +467,7 @@ static void draw_page (pcobj *obj, char *font){
             break;
         }
             
-        snprintf(buf, 256, "weight %04d: 漢字／The quick brown fox jumped over the lazy dog.", w*100);
+        snprintf(buf, S_LEN, "weight %04d: 漢字／The quick brown fox jumped over the lazy dog.", w*100);
         
         pcobj_move_to (obj, LEFT+width, h);
         pcobj_print(obj, buf);

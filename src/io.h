@@ -26,12 +26,14 @@
 #define USTACKLEN 256
 
 typedef struct utf8_file {
-   int fd;
-   char queue[UBUFLEN];
-   char stack[USTACKLEN];
-   char *fname;
-   int eof;
-   int qindex, lastr, sindex;
+    int fd;
+    char queue[UBUFLEN];   // reading queue
+    char stack[USTACKLEN]; // push back stack
+    char *fname; // filename
+    int eof;     // end-of-file flag
+    int qindex;  // queue index
+    int lastr;   // last readed index
+    int sindex;  // stack index
 } UFILE;
 
 extern int nbytechar(char c);
@@ -41,11 +43,14 @@ extern UFILE *open_u(char *path);
 extern UFILE *fdopen_u(int fd, char *path);
 extern int close_u(UFILE *f);
 extern int get_one_uchar(UFILE *f, char *dst);
-extern int rewind_u(UFILE *f, int len);
+extern int push_u(UFILE *f, char *d);
+extern int pop_u(UFILE *f, char *d);
 extern int eof_u(UFILE *f);
 
-extern cairo_status_t write_func(void *closure, const unsigned char *data, unsigned int length);
-extern cairo_status_t write_ps_duplex(void *closure, const unsigned char *data, unsigned int length);
+extern cairo_status_t write_func
+	(void *closure, const unsigned char *data, unsigned int length);
+extern cairo_status_t write_ps_duplex
+	(void *closure, const unsigned char *data, unsigned int length);
 
 
 #endif

@@ -84,12 +84,12 @@ int main(int argc, char** argv){
 		// new file
 		if (makepdf) {
 		    if (output_notspecified) {
-                        static char outf_store[255];
+                        static char outf_store[S_LEN];
                         
- 			snprintf(outf_store, 255, "%s.pdf", args->in_fname);
+ 			snprintf(outf_store, S_LEN, "%s.pdf", args->in_fname);
                         args->outfile = outf_store;
 		    } 
-                    if (strncmp(args->outfile, "-", 255)==0) {
+                    if (strncmp(args->outfile, "-", S_LEN)==0) {
 			out_fd = STDOUT_FILENO;
 		    } else {
 			out_fd = openfd(args->outfile, O_CREAT|O_RDWR|O_TRUNC);
@@ -103,7 +103,7 @@ int main(int argc, char** argv){
 			// write to STDOUT
 			args->outfile="-";
                         out_fd = STDOUT_FILENO;
-		    } else if (strncmp(args->outfile, "-", 255)==0) {
+		    } else if (strncmp(args->outfile, "-", S_LEN)==0) {
 			out_fd = STDOUT_FILENO;
 		    } else {
 			out_fd = openfd(args->outfile, O_CREAT|O_WRONLY|O_TRUNC);

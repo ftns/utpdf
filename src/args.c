@@ -23,7 +23,7 @@
 #include "paper.h"
 #include "usage.h"
 
-#define USAGE(args...) { char buf[255]; snprintf(buf, 255, args); usage(buf);}
+#define USAGE(args...) { char buf[S_LEN]; snprintf(buf, S_LEN, args); usage(buf);}
 typedef void (*usage_func_t)(char *);
 
 time_t mtime_store;
@@ -114,10 +114,12 @@ struct option long_options[]={
 };
 
 #define LONGOP_NAMELEN 32
-#define PARSE_LEN 256
+#define PARSE_LEN S_LEN
 
+// for conf_usage()
 char *conf_path="";
 int conf_line;
+
 //
 // forward declaration
 void conf_usage(char *message);
@@ -167,8 +169,8 @@ int get_double(char *str, double *v){
 }
 
 void read_case_config(char *name){
-    char buf[256];
-    snprintf(buf, 256, "%s-%s", getconfpath(), name);
+    char buf[S_LEN];
+    snprintf(buf, S_LEN, "%s-%s", getconfpath(), name);
     read_config(buf);
 }
 
@@ -233,11 +235,11 @@ void read_config(char *path){
 }
 
 char *cmd2opt(const char *cmd, int is_conf_file){
-    char *opt=(char *)malloc(256);
+    char *opt=(char *)malloc(S_LEN);
     if (is_conf_file) {
-        snprintf(opt, 256, "%s: ", cmd);
+        snprintf(opt, S_LEN, "%s: ", cmd);
     } else {
-        snprintf(opt, 256, "--%s=", cmd);
+        snprintf(opt, S_LEN, "--%s=", cmd);
     }
     return opt;
 }
@@ -462,11 +464,11 @@ void chk_color(double *r, double *g, double *b, char *argstr, char *opt, usage_f
 
 // get full path of "~/.utpdfrc" 
 char *getconfpath(){
-    static char path[256];
+    static char path[S_LEN];
     if (makepdf){
-        snprintf(path, 256, "%s/%s", getenv("HOME"), PDF_CONF_FILE);
+        snprintf(path, S_LEN, "%s/%s", getenv("HOME"), PDF_CONF_FILE);
     } else {
-        snprintf(path, 256, "%s/%s", getenv("HOME"), PS_CONF_FILE);
+        snprintf(path, S_LEN, "%s/%s", getenv("HOME"), PS_CONF_FILE);
     }
     return path;
 }

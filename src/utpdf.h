@@ -35,9 +35,14 @@
 #include <getopt.h>
 #include <locale.h>
 
-#define MKPDFNAME "utpdf"
-#define NAMELEN 255
 #define VERSION "0.82"
+
+#define S_LEN 256	// short buffer length
+#define UC_LEN  8	//
+#define PI 3.14159265358979
+
+#define MKPDFNAME "utpdf"
+#define NAMELEN 16	// compare length of MKPDFNAME
 
 // unit: point.
 // 1inch = 72pt.
@@ -57,8 +62,7 @@
 #define HEADER_FONT "sans-serif"
 #define HFONT_LARGE  	    16.0    // default fontsize for header
 #define HFONT_TWOCOLS_LARGE  9.0    // default fontsize for twocols header
-// #define HFONT_M_RATE	     0.75   // header medium font/large font
-#define HFONT_M_RATE	     0.66
+#define HFONT_M_RATE	     0.66   // header medium font/large font
 
 #define WATERMARK_FONT "sans-serif"
 
@@ -84,7 +88,7 @@
 #define C_BLUE   0,   0,   1	// (blue)
 #define C_BLACK  0,   0,   0	// (black)
 
-// watermark color
+// watermark default color
 #define WMARK_R 0.9
 #define WMARK_G 0.9
 #define WMARK_B 1.0

@@ -30,7 +30,7 @@ $(OBJECTS):%.o:%.c
 
 drawing.o: drawing.c drawing.h coord.h utpdf.h io.h args.h pangoprint.h
 coord.o:   coord.c coord.h utpdf.h args.h
-io.o:      io.c io.h
+io.o:      io.c io.h utpdf.h
 usage.o:   usage.c usage.h utpdf.h paper.h args.h
 paper.o:   paper.c paper.h
 args.o:    args.c args.h utpdf.h
@@ -44,14 +44,19 @@ realclean: clean
 
 # ------- for debugging ------- #
 
-TEST_PROGS = pangoprint usage
+TEST_PROGS = pangoprint usage io
+
+#$(TEST_PROGS):%:%.c
+#	$(CC) $(CFLAGS) $(MAIN_FLAGS) ${LDFLAGS} -DSINGLE_DEBUG -o $@ $<
 
 $(TEST_PROGS):%:%.c
-	$(CC) $(CFLAGS) $(MAIN_FLAGS) ${LDFLAGS} -DSINGLE_DEBUG -o $@ io.o $<
+	$(CC) $(CFLAGS) $(MAIN_FLAGS) ${LDFLAGS} -DSINGLE_DEBUG  $($@.OBJ) -o $@ $<
 
-pangoprint: pangoprint.h pangoprint.c utpdf.h io.o
+pangoprint: pangoprint.h pangoprint.c utpdf.h io.h
+pangoprint.OBJ=io.o
+
 usage: usage.c usage.h utpdf.h paper.h
-
+io: io.c io.h
 
 # ------- end of Makefile ------- #
 

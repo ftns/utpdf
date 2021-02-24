@@ -25,9 +25,6 @@
 #include "args.h"
 #include "pangoprint.h"
 
-#define PI 3.14159265359
-
-
 void show_text_at_center(pcobj *obj, const char *str){
     cairo_rel_move_to(obj->cr, -pcobj_text_width(obj, str)/2, 0);
     pcobj_print(obj, str);
@@ -203,7 +200,7 @@ void draw_limited_text(pcobj *obj, UFILE *in_f, int tab, const double limit,
     int clen, olen;
     double em, tabw; // width of "M", tab
     double cur_left=orig_left, limit_x;
-    static char outbuf[BUFLEN], rbuf[8];
+    static char outbuf[BUFLEN], rbuf[UC_LEN];
     static int over_sp=0;
     
     // outbuf=""
@@ -243,13 +240,14 @@ void draw_limited_text(pcobj *obj, UFILE *in_f, int tab, const double limit,
 	    }
 	} else if (rbuf[0] == 0x0D){
 	    // Is end of line is "CR" or "CRLF"?
-	    char nextbuf[8];
+	    char nextbuf[UC_LEN];
             int clen = get_one_uchar(in_f, nextbuf);
             *cont = 0;
             if ((clen == 0)||(nextbuf[0]==0x0A)) {
                 break;
             } else {
-                rewind_u(in_f, clen);
+                // rewind_u(in_f, clen);
+                push_u(in_f, nextbuf);
                 break;
             }
         } else if (rbuf[0] == 0x0A){
@@ -271,11 +269,12 @@ void draw_limited_text(pcobj *obj, UFILE *in_f, int tab, const double limit,
     if (cur_left+pcobj_text_width(obj, outbuf)>limit_x){
 	// overflow
 	*cont = 1;
+	// push back 1char.
+	// rewind_u(in_f, clen);
+        push_u(in_f, &outbuf[olen-clen]);
 	// remove 1char from outbuf, and print it
 	outbuf[olen-clen] = '\0';
 	pcobj_print(obj, outbuf);
-	// push back 1char.
-	rewind_u(in_f, clen);
 	return; 
     } else {
 	// finish this line
@@ -324,9 +323,9 @@ void draw_lines(pcobj *obj, UFILE *in_f, args_t *args, int lineperpage,
             }
         } else {				
             if (args->numbering) {
-                char nbuf[255];
+                char nbuf[S_LEN];
                 // draw line number
-                snprintf(nbuf, 255, "%5d", *fline);
+                snprintf(nbuf, S_LEN, "%5d", *fline);
                 cairo_set_source_rgb(cr, C_NUMBER);                
                 pcobj_move_to(obj, mcoord->body_left+scoord->body_inset, baseline);
                 pcobj_print(obj, nbuf);
@@ -370,7 +369,7 @@ void draw_lines(pcobj *obj, UFILE *in_f, args_t *args, int lineperpage,
 
 void draw_file(pcobj *obj, UFILE *in_f, args_t *args, int last_file){
     // header
-    char datebuf[255];
+    char datebuf[S_LEN];
     struct tm *modt;
     // numbering
     static int page=1;
@@ -382,7 +381,7 @@ void draw_file(pcobj *obj, UFILE *in_f, args_t *args, int last_file){
     // pcobj *obj=pcobj_new(cr);
     
     modt = localtime(args->mtime);
-    strftime(datebuf, 255, args->date_format, modt);
+    strftime(datebuf, S_LEN, args->date_format, modt);
 
     if (args->rotate_right){
         pcobj_turn_right(obj);

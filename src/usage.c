@@ -30,15 +30,14 @@
 #include "args.h"
 
 #define ARGC 32
-#define MAXSTRLEN 255
 
 char **cmd2vec(char *str){
     static char *vec[ARGC];
     int cp=0, vp=0, prevcp=0;
 
-    int len=strnlen(str, MAXSTRLEN);
+    int len=strnlen(str, S_LEN);
     char *cmd=(char *)malloc(len);
-    strncpy(cmd, str, MAXSTRLEN);
+    strncpy(cmd, str, S_LEN);
     
     while(cmd[cp]!='\0' && cp < len){
         if ((cmd[cp]==' ')||(cmd[cp]=='\t')){
@@ -209,7 +208,7 @@ void help_message(int fd){
     fprintf(f, "                                 watermark font slant (defaullt: normal)\n");
     fprintf(f, "    --watermark-weight=light/normal/bold/100-1000\n");
     fprintf(f, "                                 watermark font weight (default: bold)\n");
-    fprintf(f, "    --watermark-collor=<red>,<green>,<blue>\n");
+    fprintf(f, "    --watermark-color=<red>,<green>,<blue>\n");
     fprintf(f, "                                 watermark color (default: 230,230,255)\n");
     fprintf(f, "                                 each digit must be 0-255.\n");
     fprintf(f, "\n");

@@ -17,14 +17,19 @@
   limitations under the License.
 */
 
-#include "io.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
 #include <unistd.h>
 #include <fcntl.h>
 
+#include "io.h"
+#include "utpdf.h"
+
+//
+// general purpose funcitons
+
+// get length from first byte of UTF-8 character
 int nbytechar(char c){
     if ((c & 0x80) == 0x00) {
 	// 0x00 - 0x7F
@@ -52,13 +57,13 @@ int nbytechar(char c){
 // open file descriptor
 int openfd(const char *path, int flag){
     int fd=open(path, flag, 0666);
-    char ebuf[256];
+    char ebuf[S_LEN];
     
     if (fd < 0) {
 	if ((flag & O_CREAT) != 0) {
-	    snprintf(ebuf, 255, "Could not create/write: %s\n", path);
+	    snprintf(ebuf, S_LEN, "Could not create/write: %s\n", path);
 	} else {
-	    snprintf(ebuf, 255, "Could not open: %s\n", path);
+	    snprintf(ebuf, S_LEN, "Could not open: %s\n", path);
 	}
 	perror(ebuf);
 	exit(1);
@@ -70,12 +75,37 @@ int openfd(const char *path, int flag){
 //
 // UFILE: utf-8 reading interface
 
+/*
+
+*UFILE->queue
+
+|<----------- valid data ---------->|
+|<-- readed -->|<- will be readed ->|
++>>>>>>>>>>>>>>+>>>>>>>>>>>>>>>>>>>>+-------------------+
+^              ^                    ^                   ^
+0              qindex               lastr               UBUFLEN
+
+
+
+*UFILE->stack
+
+|<- valid data ->|
++<<<<<<<<<<<<<<<<+-----------+
+^                ^           ^
+0                sindex      USTACKLEN
+
+
+>>> : straight order data
+<<< : reverse order data
+
+*/
+
 UFILE *open_u(char *path) {
-    char ebuf[256];
+    char ebuf[S_LEN];
     int fd=open(path, O_RDONLY);
 
     if (fd < 0){
-        snprintf(ebuf, 255, "Could not open for read: %s\n", path);
+        snprintf(ebuf, S_LEN, "Could not open for read: %s\n", path);
         perror(ebuf);
         exit(1);
     }
@@ -104,22 +134,11 @@ int close_u(UFILE *f){
 
 int get_one_uchar(UFILE *f, char *dst){
     int i, clen;
-    char ebuf[256];
+    char ebuf[S_LEN];
 
     // read from stack
-    if (f->sindex>0) {
-        clen = nbytechar(f->stack[f->sindex]);
-        if (clen <= f->sindex) {
-            for (i=0; i<clen; i++) {
-                dst[i] = f->stack[--(f->qindex)];
-            }
-            dst[clen]='\0';
-            return clen;
-        } else {
-            fprintf(stderr, "Something wrong in read stack.\n");
-            return 0;
-        }
-    }
+    if ((clen=pop_u(f, dst))>0) return clen;
+    
     // read from queue
     if ((f->lastr - f->qindex) >= 1) {
         clen = nbytechar(f->queue[f->qindex]);
@@ -150,7 +169,7 @@ int get_one_uchar(UFILE *f, char *dst){
         // read from file
         rlen = read(f->fd, q, UBUFLEN - f->lastr);
         if (rlen < 0) {
-            snprintf(ebuf, 255, "Could not read: %s\n", f->fname);
+            snprintf(ebuf, S_LEN, "Could not read: %s\n", f->fname);
             perror(ebuf);
             exit(1);
         }
@@ -169,14 +188,36 @@ int get_one_uchar(UFILE *f, char *dst){
     }
 }
 
-int rewind_u(UFILE *f, int len){
-    if (len <= f->qindex) {
-        f->qindex -= len;
-        return len;
-    } else {
-        f->qindex = 0;
-        return -1;
+int push_u(UFILE *f, char *d){
+    int i, len=nbytechar(d[0]);
+    if ((f->sindex+len)>USTACKLEN){
+        fprintf(stderr, "stack overflow at reading %s\n", f->fname);
+        exit(1);
     }
+    for (i=len-1; i>=0; i--){
+        f->stack[f->sindex++]=d[i];
+    }
+#ifdef SINGLE_DEBUG
+    fprintf(stderr, "PUSH sindex: %d, data: \"%s\"\n", f->sindex, d);
+#endif
+    return len;
+}
+
+int pop_u(UFILE *f, char *d){
+    int i, len;
+
+    if (f->sindex<=0) return 0;
+    len=nbytechar(f->stack[f->sindex-1]);
+    if (len>f->sindex) return 0;
+
+    for (i=0; i<len; i++){
+        d[i]=f->stack[--(f->sindex)];
+    }
+    d[len]='\0';
+#ifdef SINGLE_DEBUG
+    fprintf(stderr, "POP len: %d, sindex: %d, data: \"%s\"\n", len, f->sindex, d);
+#endif
+    return len;
 }
 
 int eof_u(UFILE *f){
@@ -184,6 +225,9 @@ int eof_u(UFILE *f){
             && (f->qindex == f->lastr)
             && (f->sindex == 0));
 }
+
+//
+// write functions for cairo_{ps,pdf}_surface_create_for_stream()
 
 // write to file
 cairo_status_t write_func (void *closure, const unsigned char *data,
@@ -199,9 +243,10 @@ cairo_status_t write_func (void *closure, const unsigned char *data,
     return CAIRO_STATUS_SUCCESS;
 }
 
-#define PS_END_C "%%EndComments"
+#define PS_END_C  "%%EndComments"
 #define PS_DUPLEX "<</Duplex true /Tumble false>> setpagedevice\n"
 
+// write with Duplex command
 cairo_status_t write_ps_duplex(void *closure, const unsigned char *data,
                                unsigned int length){
     static unsigned char line[1024]="";
@@ -245,5 +290,27 @@ cairo_status_t write_ps_duplex(void *closure, const unsigned char *data,
     return CAIRO_STATUS_SUCCESS;
 }
 
+#ifdef SINGLE_DEBUG
+
+int main(int argc, char **argv){
+    int i, j, clen;
+    UFILE *f;
+    char data[UC_LEN];
+    
+    for (i=1; i<argc; i++){
+        f=open_u(argv[i]);
+        for (j=0; j<5; j++){
+            get_one_uchar(f, data);
+            clen=push_u(f, data);
+            printf("PUSH->\"%s\" %d\n", data, clen);
+        }
+        while (get_one_uchar(f, data)>0){
+            printf("\"%s\"\n", data);
+        }
+        close_u(f);
+    }
+}
+
+#endif
 // end of io.c
 
