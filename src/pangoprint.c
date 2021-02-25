@@ -142,7 +142,9 @@ double pcobj_font_descent(pcobj *obj){
 
 double pcobj_font_height(pcobj *obj){
     PangoFontMetrics *metrics=pcobj_fontmetrics(obj);
-    return (double)pango_font_metrics_get_height(metrics)/PANGO_SCALE;
+    return (double)(pango_font_metrics_get_ascent(metrics)+
+                    pango_font_metrics_get_descent(metrics))/PANGO_SCALE;
+    // after pango1.44, pango_font_metrics_get_height(metrics)/PANGO_SCALE;
 }
 
 double pcobj_text_width(pcobj *obj, const char *str){
