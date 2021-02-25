@@ -261,14 +261,11 @@ void version(){
 int makepdf=1;
 char *prog_name;
 
-char *paper_default() {
-    return "a4";
-}
-
 int main(int argc, char **argv){
     prog_name=argv[0];
-
-    help();
+    if (argc==1){
+        help();
+    }
 }
 #endif
 // end of usage.c

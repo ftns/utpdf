@@ -35,7 +35,7 @@
 #include <getopt.h>
 #include <locale.h>
 
-#define VERSION "0.82"
+#define VERSION "0.8.2.1"
 
 #define S_LEN 256	// short buffer length
 #define UC_LEN  8	//

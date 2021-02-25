@@ -34,7 +34,7 @@ io.o:      io.c io.h utpdf.h
 usage.o:   usage.c usage.h utpdf.h paper.h args.h
 paper.o:   paper.c paper.h
 args.o:    args.c args.h utpdf.h
-pangoprint.o: pangoprint.h pangoprint.c utpdf.h io.h
+pangoprint.o: pangoprint.c pangoprint.h utpdf.h io.h
 
 clean:
 	rm -rf *~ *.o *.dSYM a.out
@@ -46,16 +46,11 @@ realclean: clean
 
 TEST_PROGS = pangoprint usage io
 
-#$(TEST_PROGS):%:%.c
-#	$(CC) $(CFLAGS) $(MAIN_FLAGS) ${LDFLAGS} -DSINGLE_DEBUG -o $@ $<
-
 $(TEST_PROGS):%:%.c
-	$(CC) $(CFLAGS) $(MAIN_FLAGS) ${LDFLAGS} -DSINGLE_DEBUG  $($@.OBJ) -o $@ $<
+	$(CC) $(CFLAGS) $(MAIN_FLAGS) ${LDFLAGS} -DSINGLE_DEBUG  $(filter %.o,$^) -o $@ $<
 
-pangoprint: pangoprint.h pangoprint.c utpdf.h io.h
-pangoprint.OBJ=io.o
-
-usage: usage.c usage.h utpdf.h paper.h
+pangoprint: pangoprint.c pangoprint.h utpdf.h io.o
+usage: usage.c usage.h utpdf.h paper.o
 io: io.c io.h
 
 # ------- end of Makefile ------- #
