@@ -9,9 +9,10 @@ OBJECTS = drawing.o coord.o io.o usage.o paper.o args.o pangoprint.o
 
 BINDIR = /usr/local/bin
 MANDIR = /usr/local/share/man
-INSTALL_BIN = install -b -C -s -m 0755
-INSTALL_DOC = install -b -C -m 0644
+INSTALL_BIN = install -b -c -s -m 0755
+INSTALL_DOC = install -b -c -m 0644
 LN = ln -f
+MKDIR = mkdir -p -m 0755
 
 all: utpdf
 	ln -fs utpdf utps
@@ -19,6 +20,7 @@ all: utpdf
 install: utpdf
 	$(INSTALL_BIN) utpdf $(BINDIR)
 	$(LN) $(BINDIR)/utpdf $(BINDIR)/utps
+	$(MKDIR) $(MANDIR)/man1
 	$(INSTALL_DOC) ../docs/utpdf.1 $(MANDIR)/man1
 	$(LN) $(MANDIR)/man1/utpdf.1 $(MANDIR)/man1/utps.1
 
