@@ -243,14 +243,19 @@ means: show line number, sheet orientation is landscape,
 text body font is IPAMincho and it's size is 12point.
 .\"
 .SH BUGS
-On
-.B utps:
+.SS utpdf and utps:
+.br
+Only alphabet name fonts
+(in regular expression, its name is \f[CR][A-Za-z0-9\\ \\\-]+\fR) 
+can be used due to Pango limitation.
+.P
+.SS utps:
 .br
 Some printers could not always print by duplex,
 even if it has duplex printing ability. In this case, please try
-\fB\-\-force\-duplex\fR.
+\fB\-\-force\-duplex\fR option.
 .P
-Some printers could not fit pages. it prints little bit offset images.
+Some printers could not fit page correctly. it prints little bit offset images.
 .P
 .SH COPYRIGHT
 Copyright \(co 2021 by Akihiro SHIMIZU

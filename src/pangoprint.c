@@ -144,8 +144,10 @@ double pcobj_font_height(pcobj *obj){
     PangoFontMetrics *metrics=pcobj_fontmetrics(obj);
 
 #if (PANGO_VERSION_MAJOR >= 1) && (PANGO_VERSION_MINOR >= 44)
+    // version >= 1.44
     return ((double)pango_font_metrics_get_height(metrics))/PANGO_SCALE;
 #else
+    // version < 1.44
     return (double)(pango_font_metrics_get_ascent(metrics)+
                     pango_font_metrics_get_descent(metrics))/PANGO_SCALE;
 #endif
@@ -358,7 +360,7 @@ void pcobj_setdir(pcobj *obj, enum direction d){
 #define A4_w 595.27
 #define A4_h 841.89
 
-#define PS_TEST 1
+// #define PS_TEST
 
 double cairo_text_width(cairo_t *cr, const char *str){
     cairo_text_extents_t t_ext;
@@ -397,6 +399,7 @@ static void draw_page (pcobj *obj, char *font){
     
     // print fontname
     cairo_set_source_rgb(obj->cr, C_BLACK);
+
     pcobj_setfont(obj, font, FONT_SIZE);
     pcobj_font_face(obj, PANGO_STYLE_NORMAL, PANGO_WEIGHT_NORMAL);
     pcobj_move_to(obj, LEFT, TOP);
@@ -411,9 +414,6 @@ static void draw_page (pcobj *obj, char *font){
     // upside-down
     pcobj_upside_down(obj);
     
-    fprintf(stderr, "upside-down \n");
-    // dump_matrix(obj);
-
     pcobj_style(obj, PANGO_STYLE_ITALIC);
     pcobj_move_to(obj, LEFT, TOP);
     pcobj_print(obj, font);
@@ -545,7 +545,7 @@ int main(int argc, char **argv){
     }
     setlocale(LC_ALL, "");
 
-#if PS_TEST
+#ifdef PS_TEST
     // PostScript
     fd = STDOUT_FILENO;
     obj = pcobj_ps_new((cairo_write_func_t ) write_ps_duplex, &fd, A4_w, A4_h);
@@ -574,7 +574,7 @@ int main(int argc, char **argv){
     fprintf(stderr, "Initial state\n");
     dump_matrix(obj);
 
-#if PS_TEST
+#ifdef PS_TEST
     // pcobj_turn_right(obj);
     pcobj_setdir(obj, d_right);
     fprintf(stderr, "After setdir(d_right)\n");
