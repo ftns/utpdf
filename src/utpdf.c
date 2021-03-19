@@ -54,19 +54,18 @@ int main(int argc, char** argv){
     // Draw each file
     //
     {
-	// cairo stuff
-	// cairo_surface_t *surface=NULL;
+	// pcobj stuff (pcobj: pango_cairo_print_object)
         pcobj *obj=NULL;
-	// cairo_t *cr;
 	int out_fd, output_notspecified=(args->outfile==NULL);
-      
+
+        // for every inout file, do:
 	for (fileindex = optind; fileindex < argc; fileindex++) {    
-	    // file stuff
+	    // input file stuff
 	    UFILE *in_f;
 	    int in_fd;
 	    struct stat stat_b;
   
-	    // get input file name
+	    // get input filename
 	    args->in_fname = argv[fileindex];
 
 	    // open input file
@@ -83,6 +82,7 @@ int main(int argc, char** argv){
 	    if (obj == NULL) {
 		// new file
 		if (makepdf) {
+                    // pdf
 		    if (output_notspecified) {
                         static char outf_store[S_LEN];
                         

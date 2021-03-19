@@ -35,10 +35,10 @@
 #include <getopt.h>
 #include <locale.h>
 
-#define VERSION "0.8.2.2"
+#define VERSION "0.8.3"
 
 #define S_LEN 256	// short buffer length
-#define UC_LEN  8	//
+#define UC_LEN  8	// UTF-8 Character length
 #define PI 3.14159265358979
 
 #define MKPDFNAME "utpdf"
@@ -48,11 +48,12 @@
 // 1inch = 72pt.
 // 1mm   = 1/25.4inch = 2.835pt.
 
-#define PTOP	36.00 // paper top: 0.5inch(12.7mm)
-#define PBOTTOM	36.00 // paper bottom: 0.5inch(12.7mm)
-#define BINDING	72.00 // binding: 1inch(25.4mm)
-#define OUTER	36.00 // outer: 0.5inch(12.7mm)
-#define DIVIDE	18.00 // divide: 0.25inch(6.35mm)
+#define BINDING	72.00 // binding:      1 inch(25.4mm)
+#define PLEFT	36.00 // paper left:   0.5 inch(12.7mm)
+#define PRIGHT	36.00 // paper right:  0.5 inch(12.7mm)
+#define PTOP	36.00 // paper top:    0.5 inch(12.7mm)
+#define PBOTTOM	36.00 // paper bottom: 0.5 inch(12.7mm)
+#define DIVIDE	18.00 // divide:       0.25 inch(6.35mm)
 
 #define DEFAULT_FONT "IPAGothic"
 #define FONTSIZE         9.8 // default fontsize for onecol 
@@ -92,6 +93,7 @@
 #define WMARK_R 0.9
 #define WMARK_G 0.9
 #define WMARK_B 1.0
+// User Interface's  WaterMark default color
 #define UIWM_R  230 // 230/255=0.9019
 #define UIWM_G  230 // 230/255=0.9019
 #define UIWM_B  255 // 255/255=1
@@ -110,7 +112,7 @@
 enum direction { d_down=-2, d_right=-1, d_none=0, d_left=1, d_up=2  };
 
 typedef struct main_coordinates {
-    double head_top, mbottom, mright, body_left, body_right, bwidth;
+    double head_top, mbottom, mleft, mright, body_left, body_right, bwidth;
     enum direction markdir;
 } mcoord_t;
 

@@ -24,95 +24,128 @@
 // calc main_coordinates
 
 void oddpage(args_t *args, mcoord_t *mcoord){
+    mcoord->head_top = args->ptop;
+    mcoord->mbottom  = args->pbottom;
+    mcoord->mleft    = args->pleft;
+    mcoord->mright   = args->pright;            
+
     if (args->longedge){
         if (args->portrait){
-            mcoord->head_top   = args->ptop;
-            mcoord->mbottom    = args->pbottom;
-            mcoord->mright     = args->outer;            
+            // ++---+
+            // ||   |
+            // ||   |
+            // ||   |
+            // ++---+
+            mcoord->mleft = args->binding;
         } else {
-            mcoord->head_top   = args->binding;
-            mcoord->mbottom    = args->outer;
-            mcoord->mright     = args->pbottom;
+            // +=====+
+            // |     |
+            // +-----+
+            mcoord->head_top = args->binding;
         }
     } else {
-        // short edge
+        // shortedge
         if (args->portrait){
-            mcoord->head_top   = args->binding;
-            mcoord->mbottom    = args->outer;
-            mcoord->mright     = args->pbottom;            
+            // +====+
+            // |    |
+            // |    |
+            // |    |
+            // +----+
+            mcoord->head_top = args->binding;
         } else {
-            mcoord->head_top   = args->ptop;
-            mcoord->mbottom    = args->pbottom;
-            mcoord->mright     = args->outer;
+            // ++----+
+            // ||    |
+            // ++----+
+            mcoord->mleft = args->binding;
         }
     }
 }
 
 void evenpage(args_t *args, mcoord_t *mcoord){
-    if (args->longedge) {
+    if (args->longedge){
         if (args->portrait){
-            mcoord->head_top   = args->ptop;
-            mcoord->mbottom    = args->pbottom;
-            mcoord->mright     = args->outer;            
+            // +---++
+            // |   ||
+            // |   ||
+            // |   ||
+            // +---++
+            mcoord->head_top = args->ptop;
+            mcoord->mbottom  = args->pbottom;
+            mcoord->mleft    = args->pright;
+            mcoord->mright   = args->binding;
         } else {
-            mcoord->head_top   = args->outer;
-            mcoord->mbottom    = args->binding;
-            mcoord->mright     = args->pbottom;
+            // +-----+
+            // |     |
+            // +=====+
+            mcoord->head_top = args->pbottom;
+            mcoord->mbottom  = args->binding;
+            mcoord->mleft    = args->pleft;
+            mcoord->mright   = args->pright;
         }
     } else {
+        // shortedge
         if (args->portrait){
-            mcoord->head_top   = args->outer;
-            mcoord->mbottom    = args->binding;
-            mcoord->mright     = args->pbottom;
+            // +----+
+            // |    |
+            // |    |
+            // |    |
+            // +====+
+            mcoord->head_top = args->pbottom;
+            mcoord->mbottom  = args->binding;
+            mcoord->mleft    = args->pleft;
+            mcoord->mright   = args->pright;
         } else {
-            mcoord->head_top   = args->ptop;
-            mcoord->mbottom    = args->pbottom;
-            mcoord->mright     = args->outer;
+            // +----++
+            // |    ||
+            // +----++
+            mcoord->head_top = args->ptop;
+            mcoord->mbottom  = args->pbottom;
+            mcoord->mleft    = args->pright;
+            mcoord->mright   = args->binding;
         }
     }
 }
 
 void twocols_oddpage(args_t *args, mcoord_t *mcoord){
     oddpage(args, mcoord);
-
-    if (args->longedge){
-        if (args->portrait){
-            mcoord->bwidth=(args->pwidth-(args->binding+args->outer+args->divide))/2;
-        } else {
-            mcoord->bwidth=(args->pwidth-(args->ptop+args->pbottom+args->divide))/2;
-        }
-    } else {
-        // short edge
-        if (args->portrait) {
-            mcoord->bwidth=(args->pwidth-(args->ptop+args->pbottom+args->divide))/2;
-        } else {
-            mcoord->bwidth=(args->pwidth-(args->binding+args->outer+args->divide))/2;
-        }
-    }
+    mcoord->bwidth=(args->pwidth-(mcoord->mleft+mcoord->mright+args->divide))/2;
 }
 
 void twocols_oddpage_leftside(args_t *args, mcoord_t *mcoord){
     twocols_oddpage(args, mcoord);
+    mcoord->body_left  = mcoord->mleft;
+    mcoord->body_right = mcoord->body_left + mcoord->bwidth;
     
     if (args->longedge) {
         if (args->portrait) {
-            mcoord->body_left  = args->binding;
-            mcoord->body_right = mcoord->body_left+mcoord->bwidth;
+            // ++---+---+
+            // ||abc|   |
+            // ||   |   |
+            // ||   |   |
+            // ||   |   |
+            // ++---+---+
             mcoord->markdir    = d_left;
         } else {
-            mcoord->body_left  = args->ptop;
-            mcoord->body_right = mcoord->body_left + mcoord->bwidth;
+            // +====+====+
+            // |abcd|    |
+            // |    |    |
+            // +----+----+
             mcoord->markdir    = d_up;
         }
     } else {
         // short edge
         if (args->portrait) {
-            mcoord->body_left  = args->ptop;
-            mcoord->body_right = mcoord->body_left + mcoord->bwidth;
+            // +===+===+
+            // |abc|   |
+            // |   |   |
+            // |   |   |
+            // +---+---+
             mcoord->markdir    = d_up;
         } else {
-            mcoord->body_left  = args->binding;
-            mcoord->body_right = mcoord->body_left+mcoord->bwidth;
+            // ++----+----+
+            // ||abcd|    |
+            // ||    |    |
+            // ++----+----+
             mcoord->markdir    = d_left;
         }
     }
@@ -121,68 +154,84 @@ void twocols_oddpage_leftside(args_t *args, mcoord_t *mcoord){
 void twocols_oddpage_rightside(args_t *args, mcoord_t *mcoord){
     twocols_oddpage(args, mcoord);
     mcoord->markdir = d_none;
+    mcoord->body_left  = mcoord->mleft + mcoord->bwidth + args->divide;
+    mcoord->body_right = args->pwidth - mcoord->mright;
 
-    if (args->longedge) {
-        if (args->portrait) {
-            mcoord->body_left  = args->binding + mcoord->bwidth + args->divide;
-            mcoord->body_right = args->pwidth - args->outer;
-        } else {
-            mcoord->body_left  = args->ptop + mcoord->bwidth+args->divide;
-            mcoord->body_right = args->pwidth - args->pbottom;
-        }
-    } else {
-        // short edge
-        if (args->portrait) {
-            mcoord->body_left  = args->ptop + mcoord->bwidth + args->divide;
-            mcoord->body_right = args->pwidth - args->pbottom;
-        } else {
-            mcoord->body_left  = args->binding + mcoord->bwidth + args->divide;
-            mcoord->body_right = args->pwidth - args->outer;
-        }
-    }
+    // longedge & portrait
+    // ++---+---+
+    // ||   |abc|
+    // ||   |   |
+    // ||   |   |
+    // ||   |   |
+    // ++---+---+
+    //
+    // longedge & landscape
+    // +====+====+
+    // |    |abcd|
+    // |    |    |
+    // +----+----+
+    //
+    // shortedge & portrait
+    // +===+===+
+    // |   |abc|
+    // |   |   |
+    // |   |   |
+    // +---+---+
+    //
+    // shortedge & landscape
+    // ++----+----+
+    // ||    |abcd|
+    // ||    |    |
+    // ++----+----+
 }
 
 void twocols_evenpage(args_t *args, mcoord_t *mcoord){
     evenpage(args, mcoord);
-    
-    if (args->longedge) {
-        if (args->portrait) {
-            mcoord->bwidth=(args->pwidth-(args->binding+args->outer+args->divide))/2;
-        } else {
-            mcoord->bwidth=(args->pwidth-(args->ptop+args->pbottom+args->divide))/2;
-        }
-    } else {
-        // short edge
-        if (args->portrait) {
-            mcoord->bwidth=(args->pwidth-(args->ptop+args->pbottom+args->divide))/2;
-        } else {
-            mcoord->bwidth=(args->pwidth-(args->binding+args->outer+args->divide))/2;
-        }
-    }
+    mcoord->bwidth=(args->pwidth-(mcoord->mleft+mcoord->mright+args->divide))/2;
 }
 
 void twocols_evenpage_leftside(args_t *args, mcoord_t *mcoord){
     twocols_evenpage(args, mcoord);
+    
     if (args->longedge) {
         if (args->portrait) {
-            mcoord->body_left  = args->outer;
+            // +---+---++
+            // |abc|   ||
+            // |   |   ||
+            // |   |   ||
+            // |   |   ||
+            // +---+---++
+            mcoord->body_left  = mcoord->mright;
             mcoord->body_right = mcoord->body_left + mcoord->bwidth;
-            mcoord->markdir    = d_right;
+            mcoord->markdir = d_right;
         } else {
-            mcoord->body_left  = args->ptop;
+            // +-----+-----+
+            // |abcde|     |
+            // |     |     |
+            // +=====+=====+
+            mcoord->body_left  = mcoord->mleft;
             mcoord->body_right = mcoord->body_left + mcoord->bwidth;
-            mcoord->markdir    = d_down;
+            mcoord->markdir = d_down;
         }
     } else {
         // short edge
         if (args->portrait) {
-            mcoord->body_left  = args->ptop;
-            mcoord->body_right = mcoord->body_left+mcoord->bwidth;
-            mcoord->markdir    = d_down;
+            // +---+---+
+            // |abc|   |
+            // |   |   |
+            // |   |   |
+            // +===+===+
+            mcoord->body_left  = mcoord->mleft;
+            mcoord->body_right = mcoord->body_left + mcoord->bwidth;
+            mcoord->markdir = d_down;
         } else {
-            mcoord->body_left  = args->outer;
-            mcoord->body_right = mcoord->body_left+mcoord->bwidth;
-            mcoord->markdir    = d_right;
+            // +----+----++
+            // |abcd|    ||
+            // |    |    ||
+            // +----+----++
+            mcoord->body_left  = mcoord->mright;
+            mcoord->body_right = mcoord->body_left + mcoord->bwidth;
+            mcoord->markdir = d_right;
         }
     }
 }
@@ -190,48 +239,81 @@ void twocols_evenpage_leftside(args_t *args, mcoord_t *mcoord){
 void twocols_evenpage_rightside(args_t *args, mcoord_t *mcoord){
     twocols_evenpage(args, mcoord);    
     mcoord->markdir = d_none;
+
     if (args->longedge) {
-        if (args->portrait) {
-            mcoord->body_left  = args->outer+mcoord->bwidth+args->divide;
-            mcoord->body_right = args->pwidth-args->binding;
+        if (args->portrait){
+            // +---+---++
+            // |   |abc||
+            // |   |   ||
+            // |   |   ||
+            // |   |   ||
+            // +---+---++
+            mcoord->body_left  = mcoord->mright + mcoord->bwidth + args->divide;
+            mcoord->body_right = args->pwidth - mcoord->mleft;
         } else {
-            mcoord->body_left  = args->ptop+mcoord->bwidth+args->divide;
-            mcoord->body_right = args->pwidth-args->pbottom;
+            // +-----+-----+
+            // |     |abcde|
+            // |     |     |
+            // +=====+=====+
+            mcoord->body_left  = mcoord->mleft + mcoord->bwidth + args->divide;
+            mcoord->body_right = args->pwidth - mcoord->mright;
         }
     } else {
-        // short edge
         if (args->portrait) {
-            mcoord->body_left  = args->ptop+mcoord->bwidth+args->divide;
-            mcoord->body_right = args->pwidth-args->pbottom;
+            // +---+---+
+            // |   |abc|
+            // |   |   |
+            // |   |   |
+            // +===+===+
+            mcoord->body_left  = mcoord->mleft + mcoord->bwidth + args->divide;
+            mcoord->body_right = args->pwidth - mcoord->mright;
         } else {
-            mcoord->body_left  = args->outer+mcoord->bwidth+args->divide;
-            mcoord->body_right = args->pwidth-args->binding;
+            // +----+----++
+            // |    |abcd||
+            // |    |    ||
+            // +----+----++
+            mcoord->body_left  = mcoord->mright + mcoord->bwidth + args->divide;
+            mcoord->body_right = args->pwidth - mcoord->mleft;
         }
     }
 }
 
 void onecol_oddpage(args_t *args, mcoord_t *mcoord){
     oddpage(args, mcoord);
+    mcoord->body_left  = mcoord->mleft;
+    mcoord->body_right = args->pwidth - mcoord->mright;
 
     if (args->longedge) {
         if (args->portrait) {
-            mcoord->body_left  = args->binding;
-            mcoord->body_right = args->pwidth-args->outer;
+            // ++------+
+            // ||abcdef|
+            // ||      |
+            // ||      |
+            // ||      |
+            // ++------+
             mcoord->markdir =  d_left;
         } else {
-            mcoord->body_left  = args->ptop;
-            mcoord->body_right = args->pwidth-args->pbottom;
+            // +=======+
+            // |abcdefg|
+            // |       |
+            // +-------+
             mcoord->markdir    = d_up;
         }
     } else {
         // short edge
         if (args->portrait) {
-            mcoord->body_left  = args->ptop;
-            mcoord->body_right = args->pwidth-args->pbottom;
+            // +======+
+            // |abcdef|
+            // |      |
+            // |      |
+            // |      |
+            // +------+
             mcoord->markdir    = d_up;
         } else {
-            mcoord->body_left  = args->binding;
-            mcoord->body_right = args->pwidth - args->outer;
+            // ++-------+
+            // ||abcdefg|
+            // ||       |
+            // ++-------+
             mcoord->markdir    = d_left;
         }
     }
@@ -243,22 +325,42 @@ void onecol_evenpage(args_t *args, mcoord_t *mcoord){
 
     if (args->longedge) {
         if (args->portrait){
-            mcoord->body_left  = args->outer;
-            mcoord->body_right = args->pwidth-args->binding;
+            // +------++
+            // |abcdef||
+            // |      ||
+            // |      ||
+            // |      ||
+            // +------++
+            mcoord->body_left  = mcoord->mright;
+            mcoord->body_right = args->pwidth - mcoord->mleft;
             mcoord->markdir    = d_right;
         } else {
-            mcoord->body_left  = args->ptop;
-            mcoord->body_right = args->pwidth-args->pbottom;
+            // +-------+
+            // |abcdefg|
+            // |       |
+            // +=======+
+            mcoord->body_left  = mcoord->mleft;
+            mcoord->body_right = args->pwidth - mcoord->mright;
             mcoord->markdir    = d_down;
         }
     } else {
         if (args->portrait) {
-            mcoord->body_left  = args->ptop;
-            mcoord->body_right = args->pwidth - args->pbottom;
+            // +------+
+            // |abcdef|
+            // |      |
+            // |      |
+            // |      |
+            // +======+
+            mcoord->body_left  = mcoord->mleft;
+            mcoord->body_right = args->pwidth - mcoord->mright;
             mcoord->markdir    = d_down;
         } else {
-            mcoord->body_left  = args->outer;
-            mcoord->body_right = args->pwidth - args->binding;
+            // +-------++
+            // |abcdefg||
+            // |       ||
+            // +-------++
+            mcoord->body_left  = mcoord->mright;
+            mcoord->body_right = args->pwidth - mcoord->mleft;
             mcoord->markdir    = d_right;
         }
     }

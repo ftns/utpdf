@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
+   xmlns:ns1="http://www.iki.fi/pav/software/textext/"
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -20,12 +21,41 @@
      id="defs2">
     <marker
        style="overflow:visible"
-       id="marker2746"
+       id="marker1977"
        refX="0"
        refY="0"
        orient="auto"
        inkscape:stockid="Arrow1Mend"
        inkscape:isstock="true">
+      <path
+         transform="matrix(-0.4,0,0,-0.4,-4,0)"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         id="path1975" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="marker1967"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow1Mstart"
+       inkscape:isstock="true">
+      <path
+         transform="matrix(0.4,0,0,0.4,4,0)"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         id="path1965" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="marker2746"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow1Mend"
+       inkscape:isstock="true"
+       inkscape:collect="always">
       <path
          transform="matrix(-0.4,0,0,-0.4,-4,0)"
          style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
@@ -39,7 +69,8 @@
        refY="0"
        orient="auto"
        inkscape:stockid="Arrow1Mstart"
-       inkscape:isstock="true">
+       inkscape:isstock="true"
+       inkscape:collect="always">
       <path
          transform="matrix(0.4,0,0,0.4,4,0)"
          style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
@@ -951,6 +982,25 @@
          d="M 0,0 5,-5 -12.5,0 5,5 Z"
          id="path6006-9" />
     </marker>
+    <g
+       id="id-1f7b7958-77d5-4d86-b59a-a3484ab72755">
+      <symbol
+         overflow="visible"
+         id="id-052ba787-aba9-4ecb-bf48-09d54012a13a">
+        <path
+           style="stroke:none;stroke-width:0"
+           d=""
+           id="id-1875f8f6-31f0-44c1-a42b-f3c1d90b9835" />
+      </symbol>
+      <symbol
+         overflow="visible"
+         id="id-fb222419-69e7-4a8f-a09c-d7bd17f693e7">
+        <path
+           style="stroke:none;stroke-width:0"
+           d="m 4.84375,-3.796875 c 0.046875,-0.140625 0.046875,-0.15625 0.046875,-0.234375 0,-0.171875 -0.140625,-0.265625 -0.296875,-0.265625 -0.09375,0 -0.25,0.0625 -0.34375,0.203125 -0.015625,0.0625 -0.109375,0.359375 -0.140625,0.546875 -0.078125,0.25 -0.140625,0.53125 -0.203125,0.796875 l -0.453125,1.796875 c -0.03125,0.140625 -0.46875,0.84375 -1.125,0.84375 -0.5,0 -0.609375,-0.4375 -0.609375,-0.8125 C 1.71875,-1.375 1.890625,-2 2.21875,-2.875 2.375,-3.28125 2.421875,-3.390625 2.421875,-3.59375 c 0,-0.4375 -0.3125,-0.8125 -0.8125,-0.8125 -0.953125,0 -1.3125,1.453125 -1.3125,1.53125 0,0.109375 0.09375,0.109375 0.109375,0.109375 0.109375,0 0.109375,-0.03125 0.15625,-0.1875 0.28125,-0.9375 0.671875,-1.234375 1.015625,-1.234375 0.078125,0 0.25,0 0.25,0.3125 0,0.25 -0.109375,0.515625 -0.171875,0.703125 -0.40625,1.0625 -0.578125,1.625 -0.578125,2.09375 0,0.890625 0.625,1.1875 1.21875,1.1875 0.390625,0 0.71875,-0.171875 1,-0.453125 -0.125,0.515625 -0.25,1.015625 -0.640625,1.546875 -0.265625,0.328125 -0.640625,0.625 -1.09375,0.625 -0.140625,0 -0.59375,-0.03125 -0.765625,-0.421875 0.15625,0 0.296875,0 0.421875,-0.125 C 1.328125,1.203125 1.421875,1.0625 1.421875,0.875 1.421875,0.5625 1.15625,0.53125 1.0625,0.53125 0.828125,0.53125 0.5,0.6875 0.5,1.171875 c 0,0.5 0.4375,0.875 1.0625,0.875 1.015625,0 2.046875,-0.90625 2.328125,-2.03125 z m 0,0"
+           id="id-7c460e00-ff17-49ae-b313-5b670c9d6a1e" />
+      </symbol>
+    </g>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -959,14 +1009,14 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="3.3015933"
-     inkscape:cx="860.99569"
-     inkscape:cy="663.46012"
+     inkscape:zoom="0.84954104"
+     inkscape:cx="572.2679"
+     inkscape:cy="421.11897"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
      showgrid="false"
-     inkscape:window-width="1404"
+     inkscape:window-width="1403"
      inkscape:window-height="855"
      inkscape:window-x="0"
      inkscape:window-y="23"
@@ -1076,17 +1126,6 @@
          x="43.549381"
          y="45.494644"
          style="font-size:3.70416px;stroke-width:0.264583">(0, 0)</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.55625px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
-       x="258.94919"
-       y="50.702679"
-       id="text1173"><tspan
-         sodipodi:role="line"
-         id="tspan1171"
-         x="258.94919"
-         y="50.702679"
-         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.55625px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583">x</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:3.70416px;line-height:1.25;font-family:sans-serif;stroke-width:0.264583"
@@ -1277,33 +1316,6 @@
        d="m 147.64173,130.22019 h 10.32176"
        id="path1367" />
     <g
-       id="g1891"
-       transform="matrix(0.875,0,0,0.875,18.258252,20.154133)"
-       style="stroke-width:1.14286">
-      <text
-         xml:space="preserve"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52777px;line-height:1.25;font-family:Courier;-inkscape-font-specification:'Courier, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#008000;fill-opacity:1;stroke-width:0.302381"
-         x="79.638794"
-         y="158.67473"
-         id="text1866-5"><tspan
-           sodipodi:role="line"
-           id="tspan2536"
-           x="79.638794"
-           y="158.67473"
-           style="stroke-width:0.302381">mbottom</tspan></text>
-      <text
-         xml:space="preserve"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;line-height:1.25;font-family:Courier;-inkscape-font-specification:'Courier, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#008000;fill-opacity:1;stroke-width:0.302381"
-         x="79.638107"
-         y="156.09087"
-         id="text1891-8"><tspan
-           sodipodi:role="line"
-           id="tspan1893-5"
-           x="79.638107"
-           y="156.09087"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;font-family:Courier;-inkscape-font-specification:'Courier, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#008000;fill-opacity:1;stroke-width:0.302381">mcoord-&gt;</tspan></text>
-    </g>
-    <g
        id="g1951"
        transform="matrix(0.875,0,0,0.875,17.795231,24.135966)"
        style="stroke-width:1.14286">
@@ -1492,10 +1504,10 @@
     <g
        id="g3244"
        transform="matrix(0.875,0,0,0.875,18.721273,20.431799)"
-       style="stroke-width:1.14286">
+       style="stroke-width:1.14286;fill:#0000ff">
       <text
          xml:space="preserve"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52777px;line-height:1.25;font-family:Courier;-inkscape-font-specification:'Courier, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#008000;fill-opacity:1;stroke-width:0.302381"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52776999999999985px;line-height:1.25;font-family:Courier;-inkscape-font-specification:'Courier, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#0000ff;fill-opacity:1;stroke-width:0.302381"
          x="193.39476"
          y="140.6059"
          id="text14052"><tspan
@@ -1503,10 +1515,10 @@
            id="tspan14050"
            x="193.39476"
            y="140.6059"
-           style="stroke-width:0.302381">bwidth</tspan></text>
+           style="stroke-width:0.302381;fill:#0000ff">bwidth</tspan></text>
       <text
          xml:space="preserve"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;line-height:1.25;font-family:Courier;-inkscape-font-specification:'Courier, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#008000;fill-opacity:1;stroke-width:0.302381"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222000000000017px;line-height:1.25;font-family:Courier;-inkscape-font-specification:'Courier, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#0000ff;fill-opacity:1;stroke-width:0.302381"
          x="193.51328"
          y="137.82254"
          id="text14056"><tspan
@@ -1514,7 +1526,7 @@
            id="tspan14054"
            x="193.51328"
            y="137.82254"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;font-family:Courier;-inkscape-font-specification:'Courier, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#008000;fill-opacity:1;stroke-width:0.302381">mcoord-&gt;</tspan></text>
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222000000000017px;font-family:Courier;-inkscape-font-specification:'Courier, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#0000ff;fill-opacity:1;stroke-width:0.302381">mcoord-&gt;</tspan></text>
     </g>
     <g
        id="g12997"
@@ -1938,10 +1950,10 @@
     <g
        id="g3244-9"
        transform="matrix(0.875,0,0,0.875,-63.467397,20.39183)"
-       style="stroke-width:1.14286">
+       style="stroke-width:1.14286;fill:#0000ff">
       <text
          xml:space="preserve"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52777px;line-height:1.25;font-family:Courier;-inkscape-font-specification:'Courier, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#008000;fill-opacity:1;stroke-width:0.302381"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52776999999999985px;line-height:1.25;font-family:Courier;-inkscape-font-specification:'Courier, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#0000ff;fill-opacity:1;stroke-width:0.302381"
          x="193.39476"
          y="140.6059"
          id="text14052-1"><tspan
@@ -1949,10 +1961,10 @@
            id="tspan14050-7"
            x="193.39476"
            y="140.6059"
-           style="stroke-width:0.302381">bwidth</tspan></text>
+           style="stroke-width:0.302381;fill:#0000ff">bwidth</tspan></text>
       <text
          xml:space="preserve"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;line-height:1.25;font-family:Courier;-inkscape-font-specification:'Courier, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#008000;fill-opacity:1;stroke-width:0.302381"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222000000000017px;line-height:1.25;font-family:Courier;-inkscape-font-specification:'Courier, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#0000ff;fill-opacity:1;stroke-width:0.302381"
          x="193.51328"
          y="137.82254"
          id="text14056-5"><tspan
@@ -1960,7 +1972,7 @@
            id="tspan14054-5"
            x="193.51328"
            y="137.82254"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222px;font-family:Courier;-inkscape-font-specification:'Courier, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#008000;fill-opacity:1;stroke-width:0.302381">mcoord-&gt;</tspan></text>
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222000000000017px;font-family:Courier;-inkscape-font-specification:'Courier, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#0000ff;fill-opacity:1;stroke-width:0.302381">mcoord-&gt;</tspan></text>
     </g>
     <text
        xml:space="preserve"
@@ -2007,18 +2019,14 @@
     </g>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.0868px;line-height:1.25;font-family:Courier;-inkscape-font-specification:'Courier, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.08680000000000021px;line-height:1.25;font-family:Courier;-inkscape-font-specification:'Courier, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583;"
        x="234.89223"
        y="178.18808"
        id="text4543"><tspan
          sodipodi:role="line"
-         id="tspan3279"
-         x="234.89223"
-         y="178.18808">ver 0.8.3</tspan><tspan
+         id="tspan3221">ver 0.8.4</tspan><tspan
          sodipodi:role="line"
-         id="tspan3281"
-         x="234.89223"
-         y="182.04659">2/21/2021</tspan></text>
+         id="tspan3223">3/20/2021</tspan></text>
     <path
        style="fill:none;stroke:#000000;stroke-width:0.0881948;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:1, 1;stroke-dashoffset:0;stroke-opacity:1"
        d="M 144.00447,150.89416 V 64.217342"
@@ -2249,7 +2257,7 @@
     </g>
     <g
        id="g8431"
-       transform="matrix(0.875,0,0,0.875,97.709932,19.505757)"
+       transform="matrix(0.875,0,0,0.875,97.709932,9.7161854)"
        style="stroke-width:1.14286">
       <g
          id="g8413"
@@ -2314,7 +2322,7 @@
     </g>
     <g
        id="g9723"
-       transform="matrix(0.875,0,0,0.875,-46.101679,19.505757)"
+       transform="matrix(0.875,0,0,0.875,-46.101679,2.5724363)"
        style="stroke-width:1.14286">
       <g
          id="g9705"
@@ -2381,17 +2389,6 @@
        style="fill:none;stroke:#000000;stroke-width:0.176389;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker10420)"
        d="m 237.58662,49.85008 h 19.91769"
        id="path10412" />
-    <text
-       xml:space="preserve"
-       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.55625px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
-       x="58.003365"
-       y="185.15045"
-       id="text1173-3"><tspan
-         sodipodi:role="line"
-         id="tspan11431"
-         x="58.003365"
-         y="185.15045"
-         style="stroke-width:0.264583">y</tspan></text>
     <path
        style="fill:none;stroke:#000000;stroke-width:0.141111;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.999994, 0.999994;stroke-dashoffset:0;stroke-opacity:1"
        d="m 237.58662,162.99864 v 12.96999"
@@ -2679,42 +2676,247 @@
          x="125.38429"
          y="196.84213"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.77813px;font-family:Courier;-inkscape-font-specification:'Courier, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.264583">https://creativecommons.org/licenses/by-nc-sa/4.0/</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker2736);marker-end:url(#marker2746)"
+       d="M 78.51546,110.34758 H 61.149269"
+       id="path2732"
+       inkscape:transform-center-x="1.8655464e-05"
+       inkscape:transform-center-y="-63.661513" />
     <g
-       id="g3253">
-      <g
-         id="g3220">
-        <path
-           style="fill:none;stroke:#000000;stroke-width:0.264999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker2736);marker-end:url(#marker2746)"
-           d="M 236.94474,127.82093 H 226.33036"
-           id="path2732"
-           inkscape:transform-center-x="1.0612164e-05"
-           inkscape:transform-center-y="-51.203269" />
+       id="g1939"
+       transform="matrix(1.5043762,0,0,1.5043762,-116.02081,-72.616384)"
+       style="fill:#000080;stroke-width:0.664727">
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.11667000000000005px;line-height:1.25;font-family:Courier;-inkscape-font-specification:'Courier, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000080;fill-opacity:1;stroke-width:0.175876"
+         x="130.87038"
+         y="-229.74945"
+         id="text1909"
+         transform="rotate(90)"><tspan
+           sodipodi:role="line"
+           id="tspan1933"
+           x="130.87038"
+           y="-229.74945"
+           style="stroke-width:0.175876;fill:#000080">mright</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:1.41111000000000009px;line-height:1.25;font-family:Courier;-inkscape-font-specification:'Courier, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000080;fill-opacity:1;stroke-width:0.175876"
+         x="130.86969"
+         y="-231.12654"
+         id="text1913"
+         transform="rotate(90)"><tspan
+           sodipodi:role="line"
+           id="tspan1911"
+           x="130.86969"
+           y="-231.12654"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:1.41111000000000009px;font-family:Courier;-inkscape-font-specification:'Courier, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000080;fill-opacity:1;stroke-width:0.175876">mcoord-&gt;</tspan></text>
+    </g>
+    <g
+       id="g3208"
+       style="fill:#2b0000">
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.08680000000000021px;line-height:1.25;font-family:Courier;-inkscape-font-specification:'Courier, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#2b0000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none"
+         x="111.43223"
+         y="-67.334396"
+         id="text1883"
+         transform="rotate(90)"><tspan
+           sodipodi:role="line"
+           id="tspan3200">pleft</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.11667000000000005px;line-height:1.25;font-family:Courier;-inkscape-font-specification:'Courier, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#2b0000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none"
+         x="111.4503"
+         y="-69.826904"
+         id="text1887"
+         transform="rotate(90)"><tspan
+           sodipodi:role="line"
+           id="tspan3202">mcoord-&gt;</tspan></text>
+    </g>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker1967);marker-end:url(#marker1977)"
+       d="M 236.54009,122.91613 H 226.07312"
+       id="path1963"
+       inkscape:transform-center-x="1.359034e-05"
+       inkscape:transform-center-y="-63.661513" />
+    <g
+       id="g1891"
+       transform="matrix(1.0273215,0,0,1.0273215,6.5161378,-4.1905724)"
+       style="stroke-width:0.97341;fill:#2b0000">
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52776999999999985px;line-height:1.25;font-family:Courier;-inkscape-font-specification:'Courier, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#2b0000;fill-opacity:1;stroke-width:0.257547"
+         x="79.638794"
+         y="158.67473"
+         id="text1866-5"><tspan
+           sodipodi:role="line"
+           id="tspan2536"
+           x="79.638794"
+           y="158.67473"
+           style="stroke-width:0.257547;fill:#2b0000">mbottom</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222000000000017px;line-height:1.25;font-family:Courier;-inkscape-font-specification:'Courier, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#2b0000;fill-opacity:1;stroke-width:0.257547"
+         x="79.638107"
+         y="156.09087"
+         id="text1891-8"><tspan
+           sodipodi:role="line"
+           id="tspan1893-5"
+           x="79.638107"
+           y="156.09087"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.82222000000000017px;font-family:Courier;-inkscape-font-specification:'Courier, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#2b0000;fill-opacity:1;stroke-width:0.257547">mcoord-&gt;</tspan></text>
+    </g>
+    <g
+       transform="matrix(0.43632 0 0 0.43632 168.989 108.212)"
+       ns1:version="1.3.0"
+       ns1:texconverter="pdflatex"
+       ns1:pdfconverter="inkscape"
+       ns1:text="$x$\n"
+       ns1:preamble="default_packages.tex"
+       ns1:scale="1.2368124712992308"
+       ns1:alignment="middle center"
+       ns1:inkscapeversion="1.0.2"
+       ns1:jacobian_sqrt="0.43632"
+       id="g3705">
+      <defs
+         id="id-dc25d9dc-639c-4029-8883-af44ba9d8a44">
         <g
-           id="g3200"
-           transform="translate(0.52916667,-0.52916667)">
-          <text
-             xml:space="preserve"
-             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.0868px;line-height:1.25;font-family:Courier;-inkscape-font-specification:'Courier, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#008000;fill-opacity:1;stroke-width:0.264583"
-             x="129.13835"
-             y="-229.278"
-             id="text3182"
-             transform="rotate(90)"><tspan
-               sodipodi:role="line"
-               id="tspan3194"
-               x="129.13835"
-               y="-229.278">mright</tspan></text>
-          <text
-             xml:space="preserve"
-             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944px;line-height:1.25;font-family:Courier;-inkscape-font-specification:'Courier, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#008000;fill-opacity:1;stroke-width:0.264583"
-             x="129.13774"
-             y="-231.53888"
-             id="text3186"
-             transform="rotate(90)"><tspan
-               sodipodi:role="line"
-               id="tspan3184"
-               x="129.13774"
-               y="-231.53888"
-               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944px;font-family:Courier;-inkscape-font-specification:'Courier, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#008000;fill-opacity:1;stroke-width:0.264583">mcoord-&gt;</tspan></text>
+           id="id-3b09eeab-ee25-474a-9de2-0c57ffcd3a71">
+          <symbol
+             overflow="visible"
+             id="id-c2cad8ee-1ff2-4465-9213-df9aaac1470a">
+            <path
+               style="stroke:none;stroke-width:0"
+               d=""
+               id="id-f8b51b32-c81b-44d9-aba1-bb39ef277b1d" />
+          </symbol>
+          <symbol
+             overflow="visible"
+             id="id-2045d627-011f-4326-ac75-41cd135c0c11">
+            <path
+               style="stroke:none;stroke-width:0"
+               d="M 3.328125,-3.015625 C 3.390625,-3.265625 3.625,-4.1875 4.3125,-4.1875 c 0.046875,0 0.296875,0 0.5,0.125 C 4.53125,-4 4.34375,-3.765625 4.34375,-3.515625 c 0,0.15625 0.109375,0.34375 0.375,0.34375 0.21875,0 0.53125,-0.171875 0.53125,-0.578125 0,-0.515625 -0.578125,-0.65625 -0.921875,-0.65625 -0.578125,0 -0.921875,0.53125 -1.046875,0.75 -0.25,-0.65625 -0.78125,-0.75 -1.078125,-0.75 -1.03125,0 -1.609375,1.28125 -1.609375,1.53125 0,0.109375 0.109375,0.109375 0.125,0.109375 0.078125,0 0.109375,-0.03125 0.125,-0.109375 0.34375,-1.0625 1,-1.3125 1.34375,-1.3125 0.1875,0 0.53125,0.09375 0.53125,0.671875 0,0.3125 -0.171875,0.96875 -0.53125,2.375 -0.15625,0.609375 -0.515625,1.03125 -0.953125,1.03125 -0.0625,0 -0.28125,0 -0.5,-0.125 0.25,-0.0625 0.46875,-0.265625 0.46875,-0.546875 0,-0.265625 -0.21875,-0.34375 -0.359375,-0.34375 -0.3125,0 -0.546875,0.25 -0.546875,0.578125 0,0.453125 0.484375,0.65625 0.921875,0.65625 0.671875,0 1.03125,-0.703125 1.046875,-0.75 0.125,0.359375 0.484375,0.75 1.078125,0.75 1.03125,0 1.59375,-1.28125 1.59375,-1.53125 0,-0.109375 -0.078125,-0.109375 -0.109375,-0.109375 -0.09375,0 -0.109375,0.046875 -0.140625,0.109375 -0.328125,1.078125 -1,1.3125 -1.3125,1.3125 -0.390625,0 -0.546875,-0.3125 -0.546875,-0.65625 0,-0.21875 0.046875,-0.4375 0.15625,-0.875 z m 0,0"
+               id="id-16fe9126-0b9c-4760-a6c9-4c60dcc06082" />
+          </symbol>
+        </g>
+      </defs>
+      <g
+         id="id-8d31c05a-db03-4474-9d34-5904f18497c8"
+         transform="translate(-149.009, -130.359)">
+        <g
+           style="fill:#000000;fill-opacity:1"
+           id="id-82d455bb-3f7b-4964-a31e-a756b8cf6f99">
+          <g
+             transform="translate(148.712, 134.765)"
+             id="g3701" />
+        </g>
+      </g>
+    </g>
+    <g
+       transform="matrix(0.89966182,0,0,0.89966182,260.94454,48.132124)"
+       ns1:version="1.3.0"
+       ns1:texconverter="pdflatex"
+       ns1:pdfconverter="inkscape"
+       ns1:text="$x$\n"
+       ns1:preamble="default_packages.tex"
+       ns1:scale="1.2368124712992308"
+       ns1:alignment="middle center"
+       ns1:inkscapeversion="1.0.2"
+       ns1:jacobian_sqrt="0.43632"
+       id="g4210"
+       style="stroke-width:0.484983">
+      <defs
+         id="id-cffcf620-6f91-481a-91c2-1f0c15de65bd">
+        <g
+           id="id-f3a73135-d017-4ba9-8427-8af9073ae3d2">
+          <symbol
+             overflow="visible"
+             id="id-eecdafd1-845f-4204-b1f0-4600d6b93ca8">
+            <path
+               style="stroke:none;stroke-width:0"
+               d=""
+               id="id-05a60139-6940-4c7c-add0-55ce0b565898" />
+          </symbol>
+          <symbol
+             overflow="visible"
+             id="id-93591edd-886b-4384-a3a2-efdf719925c4">
+            <path
+               style="stroke:none;stroke-width:0"
+               d="M 3.328125,-3.015625 C 3.390625,-3.265625 3.625,-4.1875 4.3125,-4.1875 c 0.046875,0 0.296875,0 0.5,0.125 C 4.53125,-4 4.34375,-3.765625 4.34375,-3.515625 c 0,0.15625 0.109375,0.34375 0.375,0.34375 0.21875,0 0.53125,-0.171875 0.53125,-0.578125 0,-0.515625 -0.578125,-0.65625 -0.921875,-0.65625 -0.578125,0 -0.921875,0.53125 -1.046875,0.75 -0.25,-0.65625 -0.78125,-0.75 -1.078125,-0.75 -1.03125,0 -1.609375,1.28125 -1.609375,1.53125 0,0.109375 0.109375,0.109375 0.125,0.109375 0.078125,0 0.109375,-0.03125 0.125,-0.109375 0.34375,-1.0625 1,-1.3125 1.34375,-1.3125 0.1875,0 0.53125,0.09375 0.53125,0.671875 0,0.3125 -0.171875,0.96875 -0.53125,2.375 -0.15625,0.609375 -0.515625,1.03125 -0.953125,1.03125 -0.0625,0 -0.28125,0 -0.5,-0.125 0.25,-0.0625 0.46875,-0.265625 0.46875,-0.546875 0,-0.265625 -0.21875,-0.34375 -0.359375,-0.34375 -0.3125,0 -0.546875,0.25 -0.546875,0.578125 0,0.453125 0.484375,0.65625 0.921875,0.65625 0.671875,0 1.03125,-0.703125 1.046875,-0.75 0.125,0.359375 0.484375,0.75 1.078125,0.75 1.03125,0 1.59375,-1.28125 1.59375,-1.53125 0,-0.109375 -0.078125,-0.109375 -0.109375,-0.109375 -0.09375,0 -0.109375,0.046875 -0.140625,0.109375 -0.328125,1.078125 -1,1.3125 -1.3125,1.3125 -0.390625,0 -0.546875,-0.3125 -0.546875,-0.65625 0,-0.21875 0.046875,-0.4375 0.15625,-0.875 z m 0,0"
+               id="id-decc37b5-468f-4620-a9a0-4747cd7d12e4" />
+          </symbol>
+        </g>
+      </defs>
+      <g
+         id="id-67799f14-690c-425e-8f12-65010d59c678"
+         transform="translate(-149.009,-130.359)"
+         style="stroke-width:0.484983">
+        <g
+           style="fill:#000000;fill-opacity:1;stroke-width:0.484983"
+           id="id-01d1101e-5e2f-4c10-a359-8dca85078e34">
+          <g
+             transform="translate(148.712,134.765)"
+             id="g4206"
+             style="stroke-width:0.484983">
+            <path
+               style="stroke:none;stroke-width:0"
+               d="M 3.328125,-3.015625 C 3.390625,-3.265625 3.625,-4.1875 4.3125,-4.1875 c 0.046875,0 0.296875,0 0.5,0.125 C 4.53125,-4 4.34375,-3.765625 4.34375,-3.515625 c 0,0.15625 0.109375,0.34375 0.375,0.34375 0.21875,0 0.53125,-0.171875 0.53125,-0.578125 0,-0.515625 -0.578125,-0.65625 -0.921875,-0.65625 -0.578125,0 -0.921875,0.53125 -1.046875,0.75 -0.25,-0.65625 -0.78125,-0.75 -1.078125,-0.75 -1.03125,0 -1.609375,1.28125 -1.609375,1.53125 0,0.109375 0.109375,0.109375 0.125,0.109375 0.078125,0 0.109375,-0.03125 0.125,-0.109375 0.34375,-1.0625 1,-1.3125 1.34375,-1.3125 0.1875,0 0.53125,0.09375 0.53125,0.671875 0,0.3125 -0.171875,0.96875 -0.53125,2.375 -0.15625,0.609375 -0.515625,1.03125 -0.953125,1.03125 -0.0625,0 -0.28125,0 -0.5,-0.125 0.25,-0.0625 0.46875,-0.265625 0.46875,-0.546875 0,-0.265625 -0.21875,-0.34375 -0.359375,-0.34375 -0.3125,0 -0.546875,0.25 -0.546875,0.578125 0,0.453125 0.484375,0.65625 0.921875,0.65625 0.671875,0 1.03125,-0.703125 1.046875,-0.75 0.125,0.359375 0.484375,0.75 1.078125,0.75 1.03125,0 1.59375,-1.28125 1.59375,-1.53125 0,-0.109375 -0.078125,-0.109375 -0.109375,-0.109375 -0.09375,0 -0.109375,0.046875 -0.140625,0.109375 -0.328125,1.078125 -1,1.3125 -1.3125,1.3125 -0.390625,0 -0.546875,-0.3125 -0.546875,-0.65625 0,-0.21875 0.046875,-0.4375 0.15625,-0.875 z m 0,0"
+               id="id-f5679825-c81f-4ad1-a509-0e4c773e09b6" />
+          </g>
+        </g>
+      </g>
+    </g>
+    <g
+       transform="matrix(0.77728181,0,0,0.77728181,57.591739,182.6983)"
+       ns1:version="1.3.0"
+       ns1:texconverter="pdflatex"
+       ns1:pdfconverter="inkscape"
+       ns1:text="$y$\n"
+       ns1:preamble="default_packages.tex"
+       ns1:scale="1.2368124712992308"
+       ns1:alignment="middle center"
+       ns1:inkscapeversion="1.0.2"
+       ns1:jacobian_sqrt="0.43632"
+       id="g4737"
+       style="stroke-width:0.561341">
+      <defs
+         id="id-5dd091cf-4e41-4737-a480-f76689fdb6ef">
+        <g
+           id="g4802">
+          <symbol
+             overflow="visible"
+             id="symbol4796">
+            <path
+               style="stroke:none;stroke-width:0"
+               d=""
+               id="path4794" />
+          </symbol>
+          <symbol
+             overflow="visible"
+             id="symbol4800">
+            <path
+               style="stroke:none;stroke-width:0"
+               d="m 4.84375,-3.796875 c 0.046875,-0.140625 0.046875,-0.15625 0.046875,-0.234375 0,-0.171875 -0.140625,-0.265625 -0.296875,-0.265625 -0.09375,0 -0.25,0.0625 -0.34375,0.203125 -0.015625,0.0625 -0.109375,0.359375 -0.140625,0.546875 -0.078125,0.25 -0.140625,0.53125 -0.203125,0.796875 l -0.453125,1.796875 c -0.03125,0.140625 -0.46875,0.84375 -1.125,0.84375 -0.5,0 -0.609375,-0.4375 -0.609375,-0.8125 C 1.71875,-1.375 1.890625,-2 2.21875,-2.875 2.375,-3.28125 2.421875,-3.390625 2.421875,-3.59375 c 0,-0.4375 -0.3125,-0.8125 -0.8125,-0.8125 -0.953125,0 -1.3125,1.453125 -1.3125,1.53125 0,0.109375 0.09375,0.109375 0.109375,0.109375 0.109375,0 0.109375,-0.03125 0.15625,-0.1875 0.28125,-0.9375 0.671875,-1.234375 1.015625,-1.234375 0.078125,0 0.25,0 0.25,0.3125 0,0.25 -0.109375,0.515625 -0.171875,0.703125 -0.40625,1.0625 -0.578125,1.625 -0.578125,2.09375 0,0.890625 0.625,1.1875 1.21875,1.1875 0.390625,0 0.71875,-0.171875 1,-0.453125 -0.125,0.515625 -0.25,1.015625 -0.640625,1.546875 -0.265625,0.328125 -0.640625,0.625 -1.09375,0.625 -0.140625,0 -0.59375,-0.03125 -0.765625,-0.421875 0.15625,0 0.296875,0 0.421875,-0.125 C 1.328125,1.203125 1.421875,1.0625 1.421875,0.875 1.421875,0.5625 1.15625,0.53125 1.0625,0.53125 0.828125,0.53125 0.5,0.6875 0.5,1.171875 c 0,0.5 0.4375,0.875 1.0625,0.875 1.015625,0 2.046875,-0.90625 2.328125,-2.03125 z m 0,0"
+               id="path4798" />
+          </symbol>
+        </g>
+      </defs>
+      <g
+         id="id-bd348f8c-e238-48cc-8a6d-c01c75b09190"
+         transform="translate(-149.009,-130.359)"
+         style="stroke-width:0.561341">
+        <g
+           style="fill:#000000;fill-opacity:1;stroke-width:0.561341"
+           id="id-ff731fdd-d053-41ee-9ccd-e1f7fca1f097">
+          <g
+             transform="translate(148.712,134.765)"
+             id="g4733"
+             style="stroke-width:0.561341">
+            <path
+               style="stroke:none;stroke-width:0"
+               d="m 4.84375,-3.796875 c 0.046875,-0.140625 0.046875,-0.15625 0.046875,-0.234375 0,-0.171875 -0.140625,-0.265625 -0.296875,-0.265625 -0.09375,0 -0.25,0.0625 -0.34375,0.203125 -0.015625,0.0625 -0.109375,0.359375 -0.140625,0.546875 -0.078125,0.25 -0.140625,0.53125 -0.203125,0.796875 l -0.453125,1.796875 c -0.03125,0.140625 -0.46875,0.84375 -1.125,0.84375 -0.5,0 -0.609375,-0.4375 -0.609375,-0.8125 C 1.71875,-1.375 1.890625,-2 2.21875,-2.875 2.375,-3.28125 2.421875,-3.390625 2.421875,-3.59375 c 0,-0.4375 -0.3125,-0.8125 -0.8125,-0.8125 -0.953125,0 -1.3125,1.453125 -1.3125,1.53125 0,0.109375 0.09375,0.109375 0.109375,0.109375 0.109375,0 0.109375,-0.03125 0.15625,-0.1875 0.28125,-0.9375 0.671875,-1.234375 1.015625,-1.234375 0.078125,0 0.25,0 0.25,0.3125 0,0.25 -0.109375,0.515625 -0.171875,0.703125 -0.40625,1.0625 -0.578125,1.625 -0.578125,2.09375 0,0.890625 0.625,1.1875 1.21875,1.1875 0.390625,0 0.71875,-0.171875 1,-0.453125 -0.125,0.515625 -0.25,1.015625 -0.640625,1.546875 -0.265625,0.328125 -0.640625,0.625 -1.09375,0.625 -0.140625,0 -0.59375,-0.03125 -0.765625,-0.421875 0.15625,0 0.296875,0 0.421875,-0.125 C 1.328125,1.203125 1.421875,1.0625 1.421875,0.875 1.421875,0.5625 1.15625,0.53125 1.0625,0.53125 0.828125,0.53125 0.5,0.6875 0.5,1.171875 c 0,0.5 0.4375,0.875 1.0625,0.875 1.015625,0 2.046875,-0.90625 2.328125,-2.03125 z m 0,0"
+               id="id-eeb82c83-23ca-4d7c-a24a-5728dfc33641" />
+          </g>
         </g>
       </g>
     </g>

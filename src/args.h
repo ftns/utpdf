@@ -40,7 +40,7 @@ typedef struct arguments {
     double wmark_r, wmark_g, wmark_b;
     // paper size and margins
     double pwidth, pheight, phys_width, phys_height;
-    double binding, outer, ptop, pbottom, divide, betweenline;
+    double binding, pleft, pright, ptop, pbottom, divide, betweenline;
     // file modified time
     time_t *mtime;
 } args_t;

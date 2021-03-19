@@ -45,17 +45,17 @@ args_t args_store = {
     .fontsize=0, .header_height=0, .head_size=0, .side_size=0,
     .wmark_r=WMARK_R, .wmark_g=WMARK_G, .wmark_b=WMARK_B,
     // paper size and margins
-    /* pwidth, pheight, */ .binding=0, .outer=0, .ptop=0, .pbottom=0,
-    .divide=0, .betweenline=BETWEEN_L,
+    /* pwidth, pheight, */ .binding=-1, .pleft=-1, .pright=-1, .ptop=-1, .pbottom=-1,
+    .divide=-1, .betweenline=BETWEEN_L,
     // file modified time
     .mtime=&mtime_store,
 };
 args_t *args = &args_store;
 
 typedef enum i_option
-{ i_help, i_version, i_inch, i_mm, i_binding, i_outer, i_top, i_bottom, 
+{ i_help, i_version, i_inch, i_mm, i_binding, i_left, i_right, i_top, i_bottom, 
   i_divide, i_hfont, i_hsize, i_notebk, i_datefmt, i_headtxt, i_header,
-  i_fold_a, i_time_s, i_border, i_punch, i_number, i_bind_edge, i_side,
+  i_fold_a, i_time_s, i_border, i_punch, i_number, i_bind_edge, i_col,
   i_unit, i_orient, i_hslant, i_hweigbt, i_bfont, i_bsize, i_bweight,
   i_bslant, i_bspace, i_tab, i_side_size, i_side_slant, i_side_weight,
   i_wm_text, i_wm_font, i_wm_slant, i_wm_weight, i_wm_color, i_paper,
@@ -73,44 +73,45 @@ struct option long_options[]={
     /* 03 i_mm          */ { "mm",     NOARG, &args_store.inch, 0 },
     /*    below options are appeared in config file.               */
     /* 04 i_binding     */ { "binding",            REQARG,  0,  0 },
-    /* 05 i_outer       */ { "outer",              REQARG,  0,  0 },
-    /* 06 i_top         */ { "top",                REQARG,  0,  0 },
-    /* 07 i_bottom      */ { "bottom",             REQARG,  0,  0 },
-    /* 08 i_divide      */ { "divide",             REQARG,  0,  0 },
-    /* 09 i_hfont       */ { "header-font",        REQARG,  0,  0 },
-    /* 10 i_hsize       */ { "header-size",        REQARG,  0,  0 },
-    /* 11 i_notebk      */ { "notebook",           OPTARG,  0,  0 },
-    /* 12 i_datefmt     */ { "date-format",        OPTARG,  0,  0 },
-    /* 13 i_headtxt     */ { "header-text",        OPTARG,  0,  0 },
-    /* 14 i_header      */ { "header",             OPTARG,  0,  0 },
-    /* 15 i_fold_a      */ { "fold-arrow",         OPTARG,  0,  0 },
-    /* 16 i_time_s      */ { "timestamp",          REQARG,  0,  0 },
-    /* 17 i_border      */ { "border",             OPTARG,  0,  0 },
-    /* 18 i_punch       */ { "punch",              OPTARG,  0,  0 },
-    /* 19 i_number      */ { "number",             OPTARG,  0,  0 },
-    /* 20 i_bind_edge   */ { "binded-edge",        REQARG,  0,  0 },
-    /* 21 i_side        */ { "col",                REQARG,  0,  0 },
-    /* 22 i_unit        */ { "unit",               REQARG,  0,  0 },
-    /* 23 i_orient      */ { "orientation",        REQARG,  0,  0 },
-    /* 24 i_hslant      */ { "header-slant",       REQARG,  0,  0 },
-    /* 25 i_hweigbt     */ { "header-weight",      REQARG,  0,  0 },
-    /* 26 i_bfont       */ { "body-font",          REQARG,  0, 'F'},
-    /* 27 i_bsize       */ { "body-size",          REQARG,  0, 'S'},
-    /* 28 i_bweight     */ { "body-weight",        REQARG,  0,  0 },
-    /* 29 i_bslant      */ { "body-slant",         REQARG,  0,  0 },
-    /* 30 i_bspace      */ { "body-spacing",       REQARG,  0,  0 },
-    /* 31 i_tab         */ { "tab",                REQARG,  0, 't'},
-    /* 32 i_side_size   */ { "header-side-size",   REQARG,  0,  0 },
-    /* 33 i_side_slant  */ { "header-side-slant",  REQARG,  0,  0 },
-    /* 34 i_side_weight */ { "header-side-weight", REQARG,  0,  0 },
-    /* 35 i_wm_text     */ { "watermark-text",     REQARG,  0,  0 },    
-    /* 36 i_wm_font     */ { "watermark-font",     REQARG,  0,  0 },
-    /* 37 i_wm_slant    */ { "watermark-slant",    REQARG,  0,  0 },
-    /* 38 i_wm_weight   */ { "watermark-weight",   REQARG,  0,  0 },
-    /* 39 i_wm_color    */ { "watermark-color",    REQARG,  0,  0 },
-    /* 40 i_paper       */ { "paper",              REQARG,  0, 'P'},
-    /* 41 i_force_dup.  */ { "force-duplex",       OPTARG,  0,  0 },
-    /* 42 i_END         */ { 0, 0, 0, 0 }
+    /* 05 i_left        */ { "left",               REQARG,  0,  0 },
+    /* 06 i_right       */ { "right",              REQARG,  0,  0 },
+    /* 07 i_top         */ { "top",                REQARG,  0,  0 },
+    /* 08 i_bottom      */ { "bottom",             REQARG,  0,  0 },
+    /* 09 i_divide      */ { "divide",             REQARG,  0,  0 },
+    /* 10 i_hfont       */ { "header-font",        REQARG,  0,  0 },
+    /* 11 i_hsize       */ { "header-size",        REQARG,  0,  0 },
+    /* 12 i_notebk      */ { "notebook",           OPTARG,  0,  0 },
+    /* 13 i_datefmt     */ { "date-format",        OPTARG,  0,  0 },
+    /* 14 i_headtxt     */ { "header-text",        OPTARG,  0,  0 },
+    /* 15 i_header      */ { "header",             OPTARG,  0,  0 },
+    /* 16 i_fold_a      */ { "fold-arrow",         OPTARG,  0,  0 },
+    /* 17 i_time_s      */ { "timestamp",          REQARG,  0,  0 },
+    /* 18 i_border      */ { "border",             OPTARG,  0,  0 },
+    /* 19 i_punch       */ { "punch",              OPTARG,  0,  0 },
+    /* 20 i_number      */ { "number",             OPTARG,  0,  0 },
+    /* 21 i_bind_edge   */ { "binded-edge",        REQARG,  0,  0 },
+    /* 22 i_col         */ { "col",                REQARG,  0,  0 },
+    /* 23 i_unit        */ { "unit",               REQARG,  0,  0 },
+    /* 24 i_orient      */ { "orientation",        REQARG,  0,  0 },
+    /* 25 i_hslant      */ { "header-slant",       REQARG,  0,  0 },
+    /* 26 i_hweigbt     */ { "header-weight",      REQARG,  0,  0 },
+    /* 27 i_bfont       */ { "body-font",          REQARG,  0, 'F'},
+    /* 28 i_bsize       */ { "body-size",          REQARG,  0, 'S'},
+    /* 29 i_bweight     */ { "body-weight",        REQARG,  0,  0 },
+    /* 30 i_bslant      */ { "body-slant",         REQARG,  0,  0 },
+    /* 31 i_bspace      */ { "body-spacing",       REQARG,  0,  0 },
+    /* 32 i_tab         */ { "tab",                REQARG,  0, 't'},
+    /* 33 i_side_size   */ { "header-side-size",   REQARG,  0,  0 },
+    /* 34 i_side_slant  */ { "header-side-slant",  REQARG,  0,  0 },
+    /* 35 i_side_weight */ { "header-side-weight", REQARG,  0,  0 },
+    /* 36 i_wm_text     */ { "watermark-text",     REQARG,  0,  0 },    
+    /* 37 i_wm_font     */ { "watermark-font",     REQARG,  0,  0 },
+    /* 38 i_wm_slant    */ { "watermark-slant",    REQARG,  0,  0 },
+    /* 39 i_wm_weight   */ { "watermark-weight",   REQARG,  0,  0 },
+    /* 40 i_wm_color    */ { "watermark-color",    REQARG,  0,  0 },
+    /* 41 i_paper       */ { "paper",              REQARG,  0, 'P'},
+    /* 42 i_force_dup.  */ { "force-duplex",       OPTARG,  0,  0 },
+    /* 43 i_END         */ { 0, 0, 0, 0 }
 };
 
 #define LONGOP_NAMELEN 32
@@ -251,23 +252,20 @@ void parser(int short_index, int long_index, char *argstr, usage_func_t usage, i
         
         switch (long_index) {
         case i_bind_edge:
-            switch (argstr[0]){
-            case 'l':
-            case 's':
-            case 'n':
-                args->binded_edge=argstr;
-                break;
-            default:
-                USAGE("%s must be \"l/s/n\", but \"%s\"\n", opt, argstr);
-            }
+            args->binded_edge=argstr;
             break;
         case i_binding:
             if (!get_double(argstr, &args->binding)) {
                 USAGE("%s%s was wrong. \nExample: %s25.4\n", opt, argstr, opt);
             }
             break;
-        case i_outer:
-            if (!get_double(argstr, &args->outer)) {
+        case i_left:
+            if (!get_double(argstr, &args->pleft)) {
+                USAGE("%s%s was wrong. \nExample: %s12.7\n", opt, argstr, opt);
+            }
+            break;
+        case i_right:
+            if (!get_double(argstr, &args->pright)) {
                 USAGE("%s%s was wrong. \nExample: %s12.7\n", opt, argstr, opt);
             }
             break;
@@ -321,7 +319,7 @@ void parser(int short_index, int long_index, char *argstr, usage_func_t usage, i
             chk_onoff(&args->punchmark, argstr, opt, usage); break;
         case i_number:
             chk_onoff(&args->numbering, argstr, opt, usage); break;
-        case i_side:
+        case i_col:
             chk_sw(&args->twocols, argstr, "2", "1", opt, usage); break;
         case i_unit:
             chk_sw(&args->inch, argstr, "inch", "mm", opt, usage); break;
@@ -583,20 +581,20 @@ void getargs(int argc, char **argv){
     if (args->binded_edge == NULL){ // default
 	args->longedge = args->portrait; // shortedge = landscape(!args->portrait)
     } else {
-	switch (args->binded_edge[0]){
-	case 'l': // long edge
+        if (strncmp(args->binded_edge, "long", 5)){
+            // long edge
 	    args->longedge = 1;
-	    break;
-	case 's': // short edge
+        } else if (strncmp(args->binded_edge, "short", 6)){
+            // short edge
 	    args->longedge = 0;
-	    break;
-	case 'n': // no binding edge
-	    args->longedge = 1;
-	    args->binding = args->outer;
-	    break;
-	default:
-	    USAGE("binded edge must be \'l/s/n\', but \'%s\'\n", args->binded_edge);
-	}
+        } else if (strncmp(args->binded_edge, "none", 5)){
+            // no binding edge
+	    args->longedge = -1;
+            args->binding = args->pleft;
+        } else {
+	    USAGE("binded edge must be \'long/short/none\', but \'%s\'\n",
+                  args->binded_edge);
+        }
     }
 
     // paper
@@ -662,22 +660,25 @@ void getargs(int argc, char **argv){
     // margins
     if (args->inch) {
 	// inch -> point
-	args->binding *= 72; args->outer   *= 72;
+	args->binding *= 72; args->divide  *= 72;
+        args->pleft   *= 72; args->pright  *= 72;
 	args->ptop    *= 72; args->pbottom *= 72;
-	args->divide  *= 72;
     } else {
 	// mm -> point
-	args->binding *= 72/25.4; args->outer   *= 72/25.4;
+	args->binding *= 72/25.4; args->divide  *= 72/25.4;
+        args->pleft   *= 72/25.4; args->pright  *= 72/25.4;
 	args->ptop    *= 72/25.4; args->pbottom *= 72/25.4;
-	args->divide  *= 72/25.4;
     }
-    if (args->binding == 0) { args->binding = BINDING; };
-    if (args->outer   == 0) { args->outer   = OUTER;   };
-    if (args->ptop    == 0) { args->ptop    = PTOP;    };
-    if (args->pbottom == 0) { args->pbottom = PBOTTOM; };
-    if (args->divide  == 0) { args->divide  = PBOTTOM; };
+    if (args->binding < 0) { args->binding = BINDING; };
+    if (args->pleft   < 0) { args->pleft   = PLEFT;   };
+    if (args->pright  < 0) { args->pright  = PRIGHT;  };
+    if (args->ptop    < 0) { args->ptop    = PTOP;    };
+    if (args->pbottom < 0) { args->pbottom = PBOTTOM; };
+    if (args->divide  < 0) { args->divide  = DIVIDE;  };
     
     // end of margins
 }
 
 // end of args.c
+
+

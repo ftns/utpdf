@@ -148,8 +148,9 @@ void help_message(int fd){
     fprintf(f, "    -p, --orientation=p     sheet orientation is portrait(default)\n");
     fprintf(f, "    -1, --col=1             one column per sheet (portrait default)\n");
     fprintf(f, "    -2, --col=2             two colimns per sheet (landscape default) \n");
-    fprintf(f, "    --binded-edge=l/s/n     bind long edge/short edge/none\n");
-    fprintf(f, "                   (portrait default: long edge/landscape default: short edge)\n");
+    fprintf(f, "    --binded-edge=long/short/none\n");    
+    fprintf(f, "                            bind long edge/short edge/none\n");
+    fprintf(f, "                            (portrait default: long/landscape default: short)\n");
     if (!makepdf) {
     fprintf(f, "    --force-duplex[=on/off] force to duplex printing (default: off)\n");
     }
@@ -215,8 +216,10 @@ void help_message(int fd){
     fprintf(f, "  margins:\n");
     fprintf(f, "    --binding=<length>   binding margin (default: %2.1fmm/%1.1finch)\n",
             BINDING/72*25.4, BINDING/72);    
-    fprintf(f, "    --outer=<length>     outer margin   (default: %2.1fmm/%1.1finch)\n",
-            OUTER/72*25.4, OUTER/72);    
+    fprintf(f, "    --left=<length>      left margin    (default: %2.1fmm/%1.1finch)\n",
+            PLEFT/72*25.4, PLEFT/72);    
+    fprintf(f, "    --right=<length>     right margin   (default: %2.1fmm/%1.1finch)\n",
+            PRIGHT/72*25.4, PRIGHT/72);
     fprintf(f, "    --top=<length>       top margin     (default: %2.1fmm/%1.1finch)\n",
             PTOP/72*25.4, PTOP/72);    
     fprintf(f, "    --bottom=<length>    bottom margin  (default: %2.1fmm/%1.1finch)\n",
