@@ -24,6 +24,7 @@ option, or input is standard input, the timestamp is current time.
     - https://freedesktop.org/wiki/Software/pkg-config/
 
 ## Change Log
+* 3/20/2021
+  * temporal release version(v0.8.3)
 * 1/17/2021
   * initial version(v0.8)
-  
