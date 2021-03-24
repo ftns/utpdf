@@ -222,7 +222,7 @@ void draw_limited_text(pcobj *obj, UFILE *in_f, int tab, const double limit,
 	if (rbuf[0] == '\t') {
             // tab
 	    double cur_right = cur_left+pcobj_text_width(obj, outbuf);
-	    double new_right = tabw*ceil((cur_right-orig_left)/tabw)+orig_left;
+	    double new_right = tabw*(floor((cur_right-orig_left)/tabw)+1)+orig_left;
             // double new_right = tabw*ceil((cur_right+em-orig_left)/tabw)+orig_left;
 	    if (new_right < limit_x) {
 		// tab jump
